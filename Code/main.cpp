@@ -1,11 +1,12 @@
 #include "mainWindow.h"
+#include <qstringlist.h>
+#include <QtSql/qsqldatabase.h>
+#include <QtSql/qsqlerror.h>
 int main(int argc, char** argv) {
 	QApplication app(argc, argv);
-	mainWindowWidget window; // Створення вікна
-	
+	MainWindow_C mainWindow;
+	mainWindow.show();
 
-	/*не чіпати метод show, так як він відповідає за відображення вікна
-	і якщо його прибарити програма продовжить роботу у фоновому режимі*/
-	window.show(); 
+	
 	return app.exec();
 }

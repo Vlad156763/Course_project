@@ -1,9 +1,19 @@
 #include "mainWindow.h"
 
-//для вінди створюю консольне вікно куди в подальшому записуватиму помилки (цього в релізі не повинно бути, це якщо якісь глюки будуть)
+//макроси, для кращої читабельності коду
+#define START_CREATE_WIN_CONSOLE
+#define END_CREATE_WIN_CONSOLE
+
+#define START_ClASS_MAIN_WINDOW   
+#define END_ClASS_MAIN_WINDOW   
+
+
+
+
+START_CREATE_WIN_CONSOLE; //метод для створення консолі
 #ifdef Q_OS_WIN
 #include <Windows.h>
-void createConsole() {
+static void createConsole() {
     if (GetConsoleWindow() == nullptr) {
         AllocConsole(); // Створюю вікно консолі 
         FILE* stream;
@@ -13,147 +23,163 @@ void createConsole() {
     else cerr << "Консоль запущена!\n";
 }
 #endif // Q_OS_WIN
+END_CREATE_WIN_CONSOLE;
 
-mainWindowWidget::mainWindowWidget(QWidget* parent) : QWidget(parent) {
-    QGridLayout* mainLayout = new QGridLayout(this); // Створення компоновщика на основі головного вікна
-    this->setStyleSheet(
-        "background-color: rgb(30,30,30);"
+
+START_ClASS_MAIN_WINDOW; //головне вікно
+MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
+    createConsole();
+    //створення головного вікна
+    this->mainWidget = new QWidget(nullptr);
+    //встановлення стилів
+    mainWidget->setObjectName("mainWidget");
+    this->mainWidget->setStyleSheet(
+        "#mainWidget {"
+        "   background-color: rgb(30,30,30);"
+        "}"
     );
-    QWidget* mainWindowRightSize = new QWidget(this); // Віджет для правої частини
-    QWidget* mainWindowTable = new QWidget(this); // Віджет для таблиці
-    QWidget* tableTools = new QWidget(mainWindowTable); //віджет для управління таблицею
-    QWidget* table = new QWidget(mainWindowTable); //віджет для таблиці студентів
-
-    QLineEdit* inputCourse = new QLineEdit(tableTools); //поле для введення курсу
-    QLineEdit* inputSemestr = new QLineEdit(tableTools); //поле для введення семестру
-    QLineEdit* inputFaculty = new QLineEdit(tableTools); //поле для введення факультету
-    QLineEdit* inputGroup = new QLineEdit(tableTools); //поле для введення гурпи
-    QLineEdit* inputStudent = new QLineEdit(tableTools); //поле для введення студента
-
-
-
-    QLabel* table_is_not_created = new QLabel("Таблиця не створена (немає студентів)");
-    QLabel* right_side_not_created = new QLabel("Права частина не зроблена\n (і навіть поки не дуже продумана)");
-
-
-    //блокування всіх полів крім першого
-    inputSemestr->setEnabled(false);
-    inputFaculty->setEnabled(false);
-    inputGroup->setEnabled(false);
-    inputStudent->setEnabled(false);
-
-    //об'єдную сигнал returnPressed з власним методом onEnterPressed
-    /*
-    returnPressed це сигнал активується коли натиснуто enter
-    в моєму випадку я сигнал натиску enter об'єдную з моїм методом який повинен реагувати 
-    на це (наприклад підбирати студентів у таблиці за відповідним введеним курсом)
-    */
-    connect(inputCourse, &QLineEdit::returnPressed, this, [inputCourse, inputSemestr]() {
-        qDebug() << "Курс введений:" << inputCourse->text();
-        // Розблокування наступного поля
-        inputSemestr->setEnabled(true); //розблокування наступного поля вводу
-        inputSemestr->setFocus();  // Фокус на наступному полі
-        });
-    connect(inputSemestr, &QLineEdit::returnPressed, this, [inputSemestr, inputFaculty]() {
-        qDebug() << "Курс введений:" << inputSemestr->text();
-        // Розблокування наступного поля
-        inputFaculty->setEnabled(true); //розблокування наступного поля вводу
-        inputFaculty->setFocus();  // Фокус на наступному полі
-        });
-    connect(inputFaculty, &QLineEdit::returnPressed, this, [inputFaculty, inputGroup]() {
-        qDebug() << "Курс введений:" << inputFaculty->text();
-        // Розблокування наступного поля
-        inputGroup->setEnabled(true); //розблокування наступного поля вводу
-        inputGroup->setFocus();  // Фокус на наступному полі
-        });
-    connect(inputGroup, &QLineEdit::returnPressed, this, [inputGroup, inputStudent]() {
-        qDebug() << "Курс введений:" << inputGroup->text();
-        // Розблокування наступного поля
-        inputStudent->setEnabled(true); //розблокування наступного поля вводу
-        inputStudent->setFocus();  // Фокус на наступному полі
-        });
-    connect(inputStudent, &QLineEdit::returnPressed, this, [inputStudent]() {
-        qDebug() << "Курс введений:" << inputStudent->text();
-        });
-
-
-    QGridLayout* leftSideTableLayout = new QGridLayout(mainWindowTable); // Встановлення компоновщика для таблиці
-    QGridLayout* tableToolsLayout = new QGridLayout(tableTools); //встановлюю компоновщик для віджету таблиці інструментів
-    
-    
-    QGridLayout* tableLayout = new QGridLayout(table);
-    QGridLayout* rightSizeLayout = new QGridLayout(mainWindowRightSize);
-
-    inputCourse->setPlaceholderText("Курс"); //встановлення "прозорого тексту"
-    inputSemestr->setPlaceholderText("Семестр");
-    inputFaculty->setPlaceholderText("Факультет");
-    inputGroup->setPlaceholderText("Група");
-    inputStudent->setPlaceholderText("Студент");
-
-    
-    
-    //стилі для віджетів
-    ///////////////////////////////////////////////////////////
-    mainWindowRightSize->setStyleSheet(
-        "background-color: rgb(100,60,60);"
-    );
-    right_side_not_created->setStyleSheet(
-        "font-size: 30px;"
-        "color: rgb(255,255,255);"
-    );
-    table_is_not_created->setStyleSheet(
-        "font-size: 30px;"
-        "color: rgb(255,255,255);"
-    );
-    ///////////////////////////////////////////////////////////
-    tableTools->setStyleSheet(
-        "background-color: rgb(60,60,60);"
-    );
-    table->setStyleSheet(
-        "background-color: rgb(100,60,60);"
-    );
-    ///////////////////////////////////////////////////////////
-    tableLayout->addWidget(table_is_not_created, 0,0,1,1, Qt::AlignCenter); 
-    rightSizeLayout->addWidget(right_side_not_created, 0, 0, 1, 1, Qt::AlignCenter);
-    ///////////////////////////////////////////////////////////
-
-
-
-    leftSideTableLayout->setContentsMargins(0, 0, 0, 0); // Очищення внутрішніх відступів для вкладених віджетів
-    leftSideTableLayout->addWidget(tableTools, 0, 0); // Додавання віджету до компоновщика на нульовий рядок і нульовий стовпець
-    leftSideTableLayout->addWidget(table, 1, 0);
-
-    tableToolsLayout->setContentsMargins(0, 0, 0, 0); 
-    tableToolsLayout->setColumnStretch(0, 1);
-    tableToolsLayout->setColumnStretch(1, 1);
-    tableToolsLayout->setColumnStretch(2, 1);
-    tableToolsLayout->setColumnStretch(3, 1);
-    tableToolsLayout->setColumnStretch(4, 1);
-    tableToolsLayout->setColumnStretch(5, 4);
-
-    tableToolsLayout->addWidget(inputCourse, 0, 0); //ввід курсу, відносно якого буде відбуватись пошук студентів
-    tableToolsLayout->addWidget(inputSemestr, 0, 1); //ввід семестру
-    tableToolsLayout->addWidget(inputFaculty, 0, 2);  // факультет
-    tableToolsLayout->addWidget(inputGroup, 0, 3); //група
-    tableToolsLayout->addWidget(inputStudent, 0, 4); //студент
-    leftSideTableLayout->setRowStretch(0, 1);
-    leftSideTableLayout->setRowStretch(1, 15);
-
-    mainLayout->addWidget(mainWindowTable, 0, 0);
-    mainLayout->addWidget(mainWindowRightSize, 0, 1);
-    mainLayout->setColumnStretch(0, 5);
-    mainLayout->setColumnStretch(1, 2);
-
-
-    this->setWindowTitle("Успішність студентів"); // Заголовок вікна
+    this->mainLayout = new QGridLayout(this->mainWidget);
+  
     QIcon mainIcon("Images/title.png"); // Іконка для вікна програми
-    this->setWindowIcon(mainIcon); // Встановлюю іконку
-    this->setMinimumSize(800, 600); // Обмежую зміну розміру вікна 
-   
+    mainWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+
+    //віджети для інструментів та для головної частини
+    QWidget* mainWindowToolsWidget = new QWidget(this->mainWidget);
+    QWidget* mainWindowMainAreaWidget = new QWidget(this->mainWidget);
+    //компоновщики для інструментальної та для головної частин
+    QGridLayout* mainWindowToolsLayout = new QGridLayout(mainWindowToolsWidget);
+    QGridLayout* mainWindownMainAreaLayout = new QGridLayout(mainWindowMainAreaWidget);
+    //віджети головної частини
+    QWidget* mainWindowAreaWidgetLeft = new QWidget(mainWindowMainAreaWidget);
+    QWidget* mainWindowAreaWidgetMiddle = new QWidget(mainWindowMainAreaWidget);
+    QWidget* mainWindowAreaWidgetRight = new QWidget(mainWindowMainAreaWidget);
+
+    //віджети для інструметів
+    QWidget* mainWindowToolsMiddle = new QWidget(mainWindowToolsWidget);
+    QWidget* mainWindowToolsRight = new QWidget(mainWindowToolsWidget);
+
+    //для головної частини встановлюю коефіцієнт розтягування
+    mainWindownMainAreaLayout->setColumnStretch(0, 3);
+    mainWindownMainAreaLayout->setColumnStretch(1, 5);
+    mainWindownMainAreaLayout->setColumnStretch(2, 3);
+    //для головної частини встановлюю відступи 
+    mainWindownMainAreaLayout->setSpacing(5);
+    mainWindownMainAreaLayout->setContentsMargins(0, 0, 0, 0);
+    //для віджету інструментів встановлюю відступи 
+    mainWindowToolsLayout->setSpacing(5);
+    mainWindowToolsLayout->setContentsMargins(0, 0, 0, 0);
+    //для віджету інструментів встановлюю коефіцієнт розтягування
+    mainWindowToolsLayout->setColumnStretch(0, 3);
+    mainWindowToolsLayout->setColumnStretch(1, 5);
+    mainWindowToolsLayout->setColumnStretch(2, 3);
+    
+    //викликаю методи для роботи з віджетом інструментів
+    leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+    rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+
+    auto tools = [&]() {
+      
+        mainWindowToolsMiddle->setStyleSheet("border-radius: 20px;" "background-color: rgb(90,90,90);");
+        mainWindowToolsRight->setStyleSheet("border-radius: 20px;" "background-color: rgb(90,90,90);");
+
+        mainWindowToolsLayout->addWidget(mainWindowToolsMiddle, 0, 1);
+        mainWindowToolsLayout->addWidget(mainWindowToolsRight, 0, 2);
+        };
+
+  
+
+    auto leftSideMainArea = [&]() {
+        mainWindowAreaWidgetLeft->setStyleSheet("border-radius: 20px;" "background-color: rgb(90,90,90);");
+        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetLeft, 0, 0);
+        };
+
+    auto middleSideMainArea = [&]() {
+        mainWindowAreaWidgetMiddle->setStyleSheet("border-radius: 20px;" "background-color: rgb(90,90,90);");
+        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
+
+        };
+
+    auto rightSideMainArea = [&]() {
+        mainWindowAreaWidgetRight->setStyleSheet("border-radius: 20px;" "background-color: rgb(90,90,90);");
+        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
+        };
+
+    tools();
+    leftSideMainArea();
+    middleSideMainArea();
+    rightSideMainArea();
+
+    //для головного вікна встановлюю коефіцієнт розгтягування
+    this->mainLayout->setRowStretch(0, 1);
+    this->mainLayout->setRowStretch(1, 12);
+    //до головного вікна додаю віджети інструментів та головну частину
+    this->mainLayout->addWidget(mainWindowToolsWidget, 0, 0);
+    this->mainLayout->addWidget(mainWindowMainAreaWidget, 1, 0);
+
+
+    //мінімальний розмір вікна WSVGA
+    this->mainWidget->setMinimumSize(1024, 600);
 }
 
-void mainWindowWidget::show()  {
-    createConsole(); 
-    this->showMaximized(); //вікно в повному розмірі (не f11)
-    
+void MainWindow_C::show() {
+    this->mainWidget->showMaximized();
 }
+
+void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
+    //віджет і компоновщик
+    QWidget* mainWindowToolsLeftWidget = new QWidget(parentWidget); mainWindowToolsLeftWidget->setObjectName("mainWindowToolsLeftWidget");
+    QGridLayout* mainWindowToolsLeftLayout = new QGridLayout(mainWindowToolsLeftWidget);
+    //кнопки
+    QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget);
+    QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget);
+    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget);
+    //встановлення розтягування
+    mainWindowToolsLeftLayout->setColumnStretch(0, 3);
+    mainWindowToolsLeftLayout->setColumnStretch(1, 3);
+    mainWindowToolsLeftLayout->setColumnStretch(2, 3);
+    //встановлення політики (як воно себе поводитиме)
+    aboutUsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    helpButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    aboutProgramButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //прикріплення сигналів натиску на кнопку зі слотами обробки
+    connect(aboutUsButton, &QPushButton::pressed, this, &MainWindow_C::AboutUsButtonPressed);
+    connect(helpButton, &QPushButton::pressed, this, &MainWindow_C::HelpButtonPressed);
+    connect(aboutProgramButton, &QPushButton::pressed, this, &MainWindow_C::AboutProgramPressed);
+
+
+    //встановлення стилів
+    mainWindowToolsLeftWidget->setStyleSheet(
+        "#mainWindowToolsLeftWidget {"
+        "   border-radius: 20px;" 
+        "   background-color: rgb(90,90,90);"
+        "}"
+    );
+
+
+    mainWindowToolsLeftLayout->addWidget(aboutUsButton, 0, 0, 1, 1);
+    mainWindowToolsLeftLayout->addWidget(helpButton, 0, 1, 1, 1);
+    mainWindowToolsLeftLayout->addWidget(aboutProgramButton, 0, 2, 1, 1);
+
+    parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0);
+}
+
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
+
+}
+
+MainWindow_C::~MainWindow_C() {
+    delete this->mainWidget;
+}
+
+void MainWindow_C::AboutUsButtonPressed() {
+    //нове вікно про нас 
+}
+
+void MainWindow_C::HelpButtonPressed() {
+    //нове вікно з допомогою
+}
+
+void MainWindow_C::AboutProgramPressed() {
+    //нове вікно про програму (навіщо вона та її функціонал)
+}
+END_ClASS_MAIN_WINDOW;
