@@ -77,39 +77,24 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
     //викликаю методи для роботи з віджетом інструментів
     leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
     rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+    //викликаю методи для роботи з головною частиною
 
-    auto tools = [&]() {
-      
-        mainWindowToolsMiddle->setStyleSheet("border-radius: 10px;" "background-color: rgb(90,90,90);");
-        mainWindowToolsRight->setStyleSheet("border-radius: 10px;" "background-color: rgb(90,90,90);");
 
-        mainWindowToolsLayout->addWidget(mainWindowToolsMiddle, 0, 1);
-        mainWindowToolsLayout->addWidget(mainWindowToolsRight, 0, 2);
-        };
+    QString styleWidgets =
+        "   border-radius: 10px;"
+        "   background-color: rgb(90,90,90);";
 
-  
+    mainWindowAreaWidgetMiddle->setStyleSheet(styleWidgets);
+    
+    mainWindowAreaWidgetLeft->setStyleSheet(styleWidgets);
+    mainWindowToolsMiddle->setStyleSheet(styleWidgets);
+    mainWindowAreaWidgetRight->setStyleSheet(styleWidgets);
+    
+    mainWindowToolsLayout->addWidget(mainWindowToolsMiddle, 0, 1);
 
-    auto leftSideMainArea = [&]() {
-        mainWindowAreaWidgetLeft->setStyleSheet("border-radius: 10px;" "background-color: rgb(90,90,90);");
-        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetLeft, 0, 0);
-        };
-
-    auto middleSideMainArea = [&]() {
-        mainWindowAreaWidgetMiddle->setStyleSheet("border-radius: 10px;" "background-color: rgb(90,90,90);");
-        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
-
-        };
-
-    auto rightSideMainArea = [&]() {
-        mainWindowAreaWidgetRight->setStyleSheet("border-radius: 10px;" "background-color: rgb(90,90,90);");
-        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
-        };
-
-    tools();
-    leftSideMainArea();
-    middleSideMainArea();
-    rightSideMainArea();
-
+    mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetLeft, 0, 0);
+    mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
+    mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
     //для головного вікна встановлюю коефіцієнт розгтягування
     this->mainLayout->setRowStretch(0, 1);
     this->mainLayout->setRowStretch(1, 12);
@@ -134,7 +119,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     mainWindowToolsLeftLayout->setSpacing(0); //відступи між внутрішніми віджетами
     mainWindowToolsLeftLayout->setContentsMargins(2, 5, 2, 5); //внутрішні відступи
     //кнопки
-    QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget);
+    QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget); 
     QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget);
     QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget);
     //встановлення розтягування
@@ -145,28 +130,43 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     aboutUsButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     helpButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     aboutProgramButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    //втсанолвення розміру тексту в кнопках
-    QFont font_tmp;
-    font_tmp = aboutUsButton->font();
-    font_tmp.setPointSize(10);
-    aboutUsButton->setFont(font_tmp);
-    font_tmp = helpButton->font();
-    font_tmp.setPointSize(10);
-    helpButton->setFont(font_tmp);
-    font_tmp = aboutProgramButton->font();
-    font_tmp.setPointSize(10);
-    aboutProgramButton->setFont(font_tmp);
+    
     //прикріплення сигналів натиску на кнопку зі слотами обробки
     connect(aboutUsButton, &QPushButton::pressed, this, &MainWindow_C::AboutUsButtonPressed);
     connect(helpButton, &QPushButton::pressed, this, &MainWindow_C::HelpButtonPressed);
     connect(aboutProgramButton, &QPushButton::pressed, this, &MainWindow_C::AboutProgramPressed);
+    //встановюю назви об'єктів (однакові) для кнопок
+    aboutUsButton->setObjectName("customButton");
+    helpButton->setObjectName("customButton");
+    aboutProgramButton->setObjectName("customButton");
     //встановлення стилів
+    QString buttonStyle =
+        "#customButton {"
+        "   border-radius: 5px;"
+        "   background-color: rgb(64, 64, 64);"
+        "   font-size: 12px;"
+        "   margin: 5px;"
+        "   padding: 5px;"
+        "}"
+        "#customButton:hover {"
+        "   background-color: rgb(120, 120, 120);"
+        "}"
+        "#customButton:focus {"
+        "   outline: 0px;"
+        "}"
+        "#customButton:pressed  {"
+        "  background-color: rgb(150, 150, 150);"
+        "}";
     mainWindowToolsLeftWidget->setStyleSheet(
         "#mainWindowToolsLeftWidget {"
         "   border-radius: 10px;" 
         "   background-color: rgb(90,90,90);"
         "}"
     );
+    
+    aboutProgramButton->setStyleSheet(buttonStyle);
+    helpButton->setStyleSheet(buttonStyle);
+    aboutUsButton->setStyleSheet(buttonStyle);
 
     mainWindowToolsLeftLayout->addWidget(aboutUsButton, 0, 0, 1, 1);
     mainWindowToolsLeftLayout->addWidget(helpButton, 0, 1, 1, 1);
@@ -175,26 +175,44 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
 
-void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
     QGridLayout* mainWindowToolsRightLayout = new QGridLayout(mainWindowToolsRightWidget);
+    
     //видаляю відступи для компоновщика
     mainWindowToolsRightLayout->setSpacing(0); //відступи між внутрішніми віджетами
     mainWindowToolsRightLayout->setContentsMargins(2, 5, 2, 5); //внутрішні відступи
     //кнопка налаштувань
-    QPushButton* setingsButton = new QPushButton("Налаштування", mainWindowToolsRightWidget);
-    setingsButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    QPushButton* setingsButton = new QPushButton("Налаштування", mainWindowToolsRightWidget); setingsButton->setObjectName("setingsButton");
+    setingsButton->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     QFont font_tmp;
     font_tmp = setingsButton->font();
     font_tmp.setPointSize(10);
     setingsButton->setFont(font_tmp);
 
-    connect(setingsButton, &QPushButton::pressed, this, &MainWindow_C::setingsButtonPressed);
+    connect(setingsButton, &QPushButton::released, this, &MainWindow_C::setingsButtonPressed);
     mainWindowToolsRightWidget->setStyleSheet(
         "#mainWindowToolsRightWidget {"
         "   border-radius: 10px;"
         "   background-color: rgb(90,90,90);"
+        "}"
+    );
+    setingsButton->setStyleSheet(
+        "#setingsButton {"
+        "   border-radius: 5px;"
+        "   background-color: rgb(64, 64, 64);"
+        "   font-size: 12px;"
+        "   margin: 5px;"
+        "}"
+        "#setingsButton:hover {"
+        "   background-color: rgb(120, 120, 120);"
+        "}"
+        "#setingsButton:focus {"
+        "   outline: 0px;"  
+        "}"
+        "#setingsButton:pressed  {"
+        "  background-color: rgb(150, 150, 150);"
         "}"
     );
 
@@ -206,23 +224,160 @@ MainWindow_C::~MainWindow_C() {
     delete this;
 }
 
+
+//кнопка про нас
 void MainWindow_C::AboutUsButtonPressed() {
     /////////////////////////////////////////////////////
     //нове вікно про нас 
     /////////////////////////////////////////////////////
+    QDialog* settingsWidget = new QDialog();
+    QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
+    //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
+    settingsLayout->setRowStretch(1, 1);
+    QWidget* Pagination = new QWidget(settingsWidget); Pagination->setObjectName("Pagination");
+    settingsLayout->addWidget(Pagination, 1, 0);
+    QString styleForWidget =
+        "#Pagination {"
+        "   background-color: rgb(90,90,90);"
+        "   border-radius: 10px;"
+        "   padding: 10px;"
+        "}";
+    Pagination->setStyleSheet(styleForWidget);
+    //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
+    showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", settingsWidget, settingsLayout);
+    
 }
+//загальне вікно для виведення інформації про нас
+void MainWindow_C::showWindowAboutUs(
+    const QString& path, 
+    const QString& name, 
+    const QString& responsible, 
+    const QString& linkToGit,
+    QDialog* settingsWidget,
+    QGridLayout* settingsLayout
+) {
+    settingsWidget->setWindowTitle("Про нас");
+    QIcon mainIcon("Images/title.png");
+    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+    settingsLayout->setRowStretch(0, 6);
+    QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
+    settingsLayout->addWidget(Body, 0, 0);
+    QString styleForWidget =
+        "#Body {"
+        "   background-color: rgb(90,90,90);"
+        "   border-radius: 10px;"
+        "   padding: 10px;"
+        "}";
+    Body->setStyleSheet(styleForWidget);
+    // для основного віджету встановлюю компоновщик і два віджети для фото і для тексту
+    QGridLayout* bodyLayout = new QGridLayout(Body);
+    QWidget* textLocation = new QWidget(Body); textLocation->setObjectName("textLocation");
+    textLocation->setStyleSheet(
+        "#textLocation {"
+        "   background-color: rgb(64, 64, 64);"
+        "   font-size: 12px;"
+        "   border-radius: 5px;"
+        "}"
+    );
+    //для текстового віджету додаю компоновщик щоб красиво розприділити текст
+    QGridLayout* textLayout = new QGridLayout(textLocation);
+    //додаю текст
+    QLabel* textName = new QLabel("Гайлунь Владислав", textLocation); textName->setObjectName("textName");
+    QLabel* textLink = new QLabel(
+        " < a href = '" + linkToGit + "' > Github < /a> "
+    );
+    QLabel* textResponsible = new QLabel("Відповідальний за: " + responsible);
+    textName->setStyleSheet(
+        "#textName {"
+        "   font-weight: bold;"
+        "   background-color: rgb(8, 82, 79);"
+        "   border-radius: 5px;"
+        "   border: 2px solid rgb(23,103,99);"
+        "}"
+    );
+    textLink->setOpenExternalLinks(true); //відкриття зовнішніх посилань
+    //налаштовую фото
+    QPixmap photoLocationPixmap(path);
+    QLabel* photoLabel = new QLabel(Body);  photoLabel->setObjectName("photoLabel");
+    photoLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    photoLabel->setAlignment(Qt::AlignCenter);
+    /*
+    Щоб додати зображення до вікна (і маштабувати його правильно)
+    треба отримати розмір мітки, в якій зберігається фото, однак до моменту виклику
+    обробника подій exec НЕМОЖЛИВО отримати розмір.
+    Тому я додав таймер який спрацює одразу ж як тільки обробник подій до нього дійде.
+    Як це працює:
+    Коли запускається обробник подій, він запускає таймер на 0 секунд, після того, як таймер
+    вийшов, обробник подій виконує код у SetAutoSizeForImg а там автоматичні підлаштування для фото
+    */
+    auto SetAutoSizeForImg = [photoLabel, photoLocationPixmap]() {
+        photoLabel->setPixmap(
+            photoLocationPixmap.scaled(
+                photoLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation
+            )
+        );
+        };
+    QTimer::singleShot(0, SetAutoSizeForImg);
+    photoLabel->setObjectName("photoLabel");
+    photoLabel->setStyleSheet(
+        "#photoLabel {"
+        "   background-color: rgb(64, 64, 64);"
+        "   border-radius: 5px;"
+        "   padding: 10px;"
+        "}"
+    );
+
+    //налаштування дизайну віконечка
+    bodyLayout->setRowStretch(0, 4);
+    bodyLayout->setRowStretch(1, 1);
+    bodyLayout->addWidget(textLocation, 1, 0);
+    bodyLayout->addWidget(photoLabel, 0, 0);
+    textLayout->addWidget(textName, 0, 0, 1, 2);
+    textName->setAlignment(Qt::AlignCenter);
+    textLayout->addWidget(textLink, 1, 1);
+    textLink->setAlignment(Qt::AlignRight);
+    textLayout->addWidget(textResponsible, 1, 0);
+    textResponsible->setAlignment(Qt::AlignTop | Qt::AlignLeft);
+
+    //розміри, пам'ять обробка подій
+    settingsWidget->setFixedSize(400, 400);
+    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
+    settingsWidget->exec();
+}
+
 
 void MainWindow_C::HelpButtonPressed() {
     /////////////////////////////////////////////////////
     //нове вікно з допомогою
     /////////////////////////////////////////////////////
+    //нове вікно з кнопками для додавання студентів,і для видалення 
+    QDialog* settingsWidget = new QDialog();
+    QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
+    settingsWidget->setWindowTitle("Допомога");
+    QIcon mainIcon("Images/title.png");
+    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+
+    settingsWidget->setFixedSize(400, 400);
+    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
+    settingsWidget->exec();
 }
 
 void MainWindow_C::AboutProgramPressed() {
     /////////////////////////////////////////////////////
     //нове вікно про програму (навіщо вона та її функціонал)
     /////////////////////////////////////////////////////
+    //нове вікно з кнопками для додавання студентів,і для видалення 
+    QDialog* settingsWidget = new QDialog();
+    QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
+    settingsWidget->setWindowTitle("Про програму");
+    QIcon mainIcon("Images/title.png");
+    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+
+    settingsWidget->setFixedSize(400, 400);
+    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
+    settingsWidget->exec();
 }
+
 
 void MainWindow_C::setingsButtonPressed() {
     //нове вікно з кнопками для додавання студентів,і для видалення 
@@ -311,15 +466,15 @@ void MainWindow_C::setingsButtonPressed() {
     DeleteGroup->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     DeleteStudent->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     //слоти для обробки сигналів натиску на кнопки "додати"
-    connect(AddStudent, &QPushButton::pressed, this, &MainWindow_C::AddStudentButtonPressed);
-    connect(AddGroup, &QPushButton::pressed, this, &MainWindow_C::AddGroupButtonPressed);
-    connect(AddFaculty, &QPushButton::pressed, this, &MainWindow_C::AddFacultyButtonPressed);
-    connect(AddSpecialty, &QPushButton::pressed, this, &MainWindow_C::AddSpecialtyButtonPressed);
+    connect(AddStudent, &QPushButton::released, this, &MainWindow_C::AddStudentButtonPressed);
+    connect(AddGroup, &QPushButton::released, this, &MainWindow_C::AddGroupButtonPressed);
+    connect(AddFaculty, &QPushButton::released, this, &MainWindow_C::AddFacultyButtonPressed);
+    connect(AddSpecialty, &QPushButton::released, this, &MainWindow_C::AddSpecialtyButtonPressed);
     //слоти для обробки сигналів натиску на кнопки "видалити"
-    connect(DeleteStudent, &QPushButton::pressed, this, &MainWindow_C::DeleteStudentButtonPressed);
-    connect(DeleteGroup, &QPushButton::pressed, this, &MainWindow_C::DeleteGroupButtonPressed);
-    connect(DeleteFaculty, &QPushButton::pressed, this, &MainWindow_C::DeleteFacultyButtonPressed);
-    connect(DeleteSpecialty, &QPushButton::pressed, this, &MainWindow_C::DeleteSpecialtyButtonPressed);
+    connect(DeleteStudent, &QPushButton::released, this, &MainWindow_C::DeleteStudentButtonPressed);
+    connect(DeleteGroup, &QPushButton::released, this, &MainWindow_C::DeleteGroupButtonPressed);
+    connect(DeleteFaculty, &QPushButton::released, this, &MainWindow_C::DeleteFacultyButtonPressed);
+    connect(DeleteSpecialty, &QPushButton::released, this, &MainWindow_C::DeleteSpecialtyButtonPressed);
     
     //додавання кнопок у головний компоновщик
     settingsLayout->addWidget(AddSpecialty, 0, 0, 1, 1);
@@ -497,6 +652,7 @@ void MainWindow_C::DeleteFacultyButtonPressed() {
     );
 }
 void MainWindow_C::DeleteSpecialtyButtonPressed() {
+
     QDialog* settingsWidget = qobject_cast<QDialog*>(sender()->parent());
     if (settingsWidget) settingsWidget->accept(); // Закриваю вікно налаштувань
 
@@ -689,9 +845,11 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
 }
 
 template<typename LaFunc>
+
 void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString& title, const QString& textButton,  const QStringList& labels, const QStringList& objectNames,  LaFunc saveAction) {
     dialog->setFixedWidth(this->width() / 5);
     dialog->setWindowTitle(title);
+    dialog->setObjectName("dialog");
     QGridLayout* layout = new QGridLayout(dialog);
     dialog->setModal(true);
     dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -703,8 +861,29 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
         layout->addWidget(label, i, 0);//додаю до компоновщика мітки та рядки
         layout->addWidget(lineEdit, i, 1);
     }
-    QPushButton* saveButton = new QPushButton(textButton, dialog);
-    connect(saveButton, &QPushButton::pressed, [this, dialog, saveAction]() {
+    QPushButton* saveButton = new QPushButton(textButton, dialog); saveButton->setObjectName("saveButton");
+
+    dialog->setStyleSheet(
+        "#dialog {"
+        "   background-color: rgb(30,30,30);"
+        "}"
+    );
+    saveButton->setStyleSheet(
+        "#saveButton {"
+        "   border-radius: 5px;"
+        "   background-color: rgb(64, 64, 64);"
+        "}"
+        "#saveButton:hover {"
+        "   background-color: rgb(120, 120, 120);"
+        "}"
+        "#saveButton:focus {"
+        "   outline: 0px;"
+        "}"
+        "#saveButton:pressed  {"
+        "  background-color: rgb(150, 150, 150);"
+        "}"
+    );
+    connect(saveButton, &QPushButton::released, [this, dialog, saveAction]() {
         saveAction(); // викликає функцію для кнопки збереження
         });
     layout->addWidget(saveButton, labels.size(), 0, 1, 2);

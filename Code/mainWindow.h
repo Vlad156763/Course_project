@@ -14,6 +14,11 @@
 #include <qevent.h>
 #include <qtimer.h>
 #include <qstringlist.h>
+#include <qpixmap.h>
+#include <qpainter.h>
+#include <qgraphicsview.h>
+#include <qgraphicsitem.h>
+
 
 #include <iostream>
 #include <vector>
@@ -44,6 +49,7 @@ private:
     void DeleteButtonFor_DeleteGroup(QDialog*);//метод для обробки кнопки "Видалити у "видалити групу"
     void DeleteButtonFor_DeleteFaculty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити факултет"
     void DeleteButtonFor_DeleteІSpetialty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити спеціальність"
+    void showWindowAboutUs(const QString&, const QString&, const QString&, const QString&, QDialog*, QGridLayout*);//загальний метод для відображення вікон про нас
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"
