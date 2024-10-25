@@ -40,6 +40,7 @@ private:
     template<typename LaFunc> 
     void WindowAdd_and_Delete_All_Type(QDialog* , const QString&, const QString&, const QStringList&, const QStringList&, LaFunc);
     
+
     void SaveButtonFor_AddStudent(QDialog*);//метод для обробки кнопки "зберегти" у "додати студента"
     void SaveButtonFor_AddGroup(QDialog*); //метод для обробки кнопки "зберегти" у "додати групу"
     void SaveButtonFor_AddFaculty(QDialog*); //метод для обробки кнопки "зберегти" у "додати факультет"
