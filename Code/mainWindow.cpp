@@ -928,3 +928,5 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
 }
 END_CLASS_SMALL_MESSAGE;
 //QGridLayout* layout
+
+
