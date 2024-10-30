@@ -120,8 +120,10 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     mainWindowToolsLeftLayout->setContentsMargins(2, 5, 2, 5); //внутрішні відступи
     //кнопки
     QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget); 
-    QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget);
-    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget);
+    QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget); 
+    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget); 
+   
+
     //встановлення розтягування
     mainWindowToolsLeftLayout->setColumnStretch(0, 3);
     mainWindowToolsLeftLayout->setColumnStretch(1, 3);
@@ -147,6 +149,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
         "   font-size: 12px;"
         "   margin: 5px;"
         "   padding: 5px;"
+        "   color: rgb(255, 255, 255);"
         "}"
         "#customButton:hover {"
         "   background-color: rgb(120, 120, 120);"
@@ -201,7 +204,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
     setingsButton->setStyleSheet(
         "#setingsButton {"
         "   border-radius: 5px;"
-        "   color: rgb(255,255,255);" //встановив колір
+        "   color: rgb(255,255,255);" 
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
         "   margin: 5px;"
@@ -231,7 +234,7 @@ void MainWindow_C::AboutUsButtonPressed() {
     /////////////////////////////////////////////////////
     //нове вікно про нас 
     /////////////////////////////////////////////////////
-    QDialog* settingsWidget = new QDialog();
+    QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
     QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
     //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
     settingsLayout->setRowStretch(1, 1);
@@ -243,6 +246,11 @@ void MainWindow_C::AboutUsButtonPressed() {
         "   border-radius: 10px;"
         "   padding: 10px;"
         "}";
+    settingsWidget->setStyleSheet(
+        "#settingsWidget {"
+        "   background-color: rgb(30,30,30);"
+        "}"
+    );
     Pagination->setStyleSheet(styleForWidget);
     //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
     showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", settingsWidget, settingsLayout);
@@ -276,6 +284,7 @@ void MainWindow_C::showWindowAboutUs(
     textLocation->setStyleSheet(
         "#textLocation {"
         "   background-color: rgb(64, 64, 64);"
+        "   color: rgb(255, 255, 255); "
         "   font-size: 12px;"
         "   border-radius: 5px;"
         "}"
@@ -285,12 +294,15 @@ void MainWindow_C::showWindowAboutUs(
     //додаю текст
     QLabel* textName = new QLabel("Гайлунь Владислав", textLocation); textName->setObjectName("textName");
     QLabel* textLink = new QLabel(
-        " < a href = '" + linkToGit + "' > Github < /a> "
+        "<a href='" + linkToGit + "' style='color: rgb(53, 133, 129);'>Github</a>"
     );
-    QLabel* textResponsible = new QLabel("Відповідальний за: " + responsible);
+    textLink->setTextFormat(Qt::RichText);
+    QLabel* textResponsible = new QLabel("Відповідальний за: " + responsible); textResponsible->setObjectName("textResponsible");
+    textResponsible->setStyleSheet("#textResponsible { color: rgb(255, 255, 255); }");
     textName->setStyleSheet(
         "#textName {"
         "   font-weight: bold;"
+        "   color: rgb(255, 255, 255); "
         "   background-color: rgb(8, 82, 79);"
         "   border-radius: 5px;"
         "   border: 2px solid rgb(23,103,99);"
@@ -352,7 +364,9 @@ void MainWindow_C::HelpButtonPressed() {
     //нове вікно з допомогою
     /////////////////////////////////////////////////////
     //нове вікно з кнопками для додавання студентів,і для видалення 
-    QDialog* settingsWidget = new QDialog();
+    QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
+    settingsWidget->setStyleSheet("#settingsWidget {    background-color: rgb(30, 30, 30); }");
+
     QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
     settingsWidget->setWindowTitle("Допомога");
     QIcon mainIcon("Images/title.png");
@@ -362,13 +376,14 @@ void MainWindow_C::HelpButtonPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
-
 void MainWindow_C::AboutProgramPressed() {
     /////////////////////////////////////////////////////
     //нове вікно про програму (навіщо вона та її функціонал)
     /////////////////////////////////////////////////////
     //нове вікно з кнопками для додавання студентів,і для видалення 
-    QDialog* settingsWidget = new QDialog();
+    QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
+    settingsWidget->setStyleSheet("#settingsWidget {    background-color: rgb(30, 30, 30); }");
+
     QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
     settingsWidget->setWindowTitle("Про програму");
     QIcon mainIcon("Images/title.png");
@@ -378,8 +393,6 @@ void MainWindow_C::AboutProgramPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
-
-
 void MainWindow_C::setingsButtonPressed() {
     //нове вікно з кнопками для додавання студентів,і для видалення 
     QDialog* settingsWidget = new QDialog();
@@ -400,6 +413,7 @@ void MainWindow_C::setingsButtonPressed() {
     QString Add_Css =
         "#%1 {"
         "   background-color: rgb(30, 120, 30);"
+        "   color: rgb(255,255,255);"
         "   font-size: 14px;"
         "}"
         "#%1:hover {"
@@ -430,6 +444,7 @@ void MainWindow_C::setingsButtonPressed() {
     QString Delete_Css =
         "#%1 {"
         "   background-color: rgb(120, 30, 30);"
+        "   color: rgb(255,255,255);"
         "   font-size: 14px;"
         "}"
         "#%1:hover {"
@@ -682,8 +697,8 @@ void MainWindow_C::SaveButtonFor_AddSpecialty(QDialog* dialog) {
         //додати факултет до БД
         // у векторі  AllLineEdits зберігаюсься рядки 
         // [0] - Спеціальність
-        // [1] - Факультет
         /////////////////////////////////////////////////////
+        
         //це вивід у консоль для демонстраії
         cqdout << "Додати спеціальність ";
         for (int i = 0; i < AllLineEdits.size(); i++)
@@ -857,7 +872,10 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
     //створюю рядки для вводу, мітки для тексту, вказую для рядків унікальний тип, додаю це все до компоновщика
     for (int i = 0; i < labels.size(); ++i) {
         QLabel* label = new QLabel(labels[i], dialog); //створюю мітку з текстом із параметру
+        label->setObjectName("label");
+        label->setStyleSheet("#label {color: rgb(255,255,255);}");
         QLineEdit* lineEdit = new QLineEdit(dialog); //створюю рдок для введнення
+        lineEdit->setStyleSheet("QLineEdit { background: rgb(60, 60, 60); }");
         lineEdit->setObjectName(objectNames[i]); //встановлюю унікальне ім'я для рядка введення (це для пошуку та перевірки чи вони не пусті)
         layout->addWidget(label, i, 0);//додаю до компоновщика мітки та рядки
         layout->addWidget(lineEdit, i, 1);
@@ -873,6 +891,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
         "#saveButton {"
         "   border-radius: 5px;"
         "   background-color: rgb(64, 64, 64);"
+        "   color: rgb(255,255,255);"
         "}"
         "#saveButton:hover {"
         "   background-color: rgb(120, 120, 120);"
