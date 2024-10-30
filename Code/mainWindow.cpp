@@ -201,6 +201,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
     setingsButton->setStyleSheet(
         "#setingsButton {"
         "   border-radius: 5px;"
+        "   color: rgb(255,255,255);" //встановив колір
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
         "   margin: 5px;"
@@ -928,5 +929,4 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
 }
 END_CLASS_SMALL_MESSAGE;
 //QGridLayout* layout
-
 
