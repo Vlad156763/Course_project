@@ -19,8 +19,9 @@
 #include <qgraphicsview.h>
 #include <qgraphicsitem.h>
 
-
-
+#include <QtSql/qsqldatabase.h>
+#include <QtSql/qsqlerror.h>
+#include <QtSql/qsqlquery.h>
 
 #include <iostream>
 #include <vector>
@@ -28,6 +29,19 @@
 #define cqdout qDebug() // студія плутає макрос qDebug() із класом qDebug
 using std::cerr;
 using std::vector;
+
+void CreateTables();
+void addSpecialty(QSqlQuery& query, const QString& specialty);
+void addFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
+void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group);
+void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, const QString& specialty, int class_group);
+
+void getAllStudents(QSqlQuery& query);
+void getFaculty(QSqlQuery& query);
+void getSpecialty(QSqlQuery& query);
+void getGroup(QSqlQuery& query);
+void clearAllTables();
+void dropAllTables();
 
 class MainWindow_C: public QWidget {
     Q_OBJECT;
@@ -79,6 +93,7 @@ public:
     SmallMessage_C(QWidget*);
     void show(const QString&, const QString&, QGridLayout*);
 };
+
 #endif //!MAINWINDOW_H
 /*
 WindowAddAll_Type (QDialog* dialog

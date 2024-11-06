@@ -2,9 +2,6 @@
 
 #include <qapplication.h>
 #include <qwidget.h>
-#include <QtSql/qsqldatabase.h>
-#include <QtSql/qsqlerror.h>
-
 
 int main(int argc, char** argv) {
 	QApplication app(argc, argv);
@@ -14,7 +11,7 @@ int main(int argc, char** argv) {
 	QStringList drivers = QSqlDatabase::drivers();
 	cqdout << "Доступні драйвери:" << drivers;
 
+	CreateTables();
 
-	
 	return app.exec();
 }
