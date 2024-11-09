@@ -18,7 +18,7 @@
 #include <qpainter.h>
 #include <qgraphicsview.h>
 #include <qgraphicsitem.h>
-
+#include <qstyle.h>
 
 #include <iostream>
 #include <vector>
@@ -76,6 +76,11 @@ class SmallMessage_C : public QWidget {
 public:
     SmallMessage_C(QWidget*);
     void show(const QString&, const QString&, QGridLayout*);
+};
+class WarningDialog : public QDialog {
+public:
+    WarningDialog(QWidget*, const QString&, const QString&, const QString&, QLabel*, const QString&);
+    void show();
 };
 #endif //!MAINWINDOW_H
 /*
