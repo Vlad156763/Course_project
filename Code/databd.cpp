@@ -7,7 +7,7 @@ void CreateTables() {
     if (db.open()) {
         cqdout << "Database is open.";
         QSqlQuery query;
-        // Таблиця для спецільностей
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS specialty ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -16,7 +16,7 @@ void CreateTables() {
             cqdout << "Error creating specialty table:" << query.lastError().text();
         }
 
-        // Таблиця для факультетів
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS faculty ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -26,7 +26,7 @@ void CreateTables() {
             cqdout << "Error creating faculty table:" << query.lastError().text();
         }
 
-        // Таблиця для груп
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅ
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS class_group ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -37,7 +37,7 @@ void CreateTables() {
             cqdout << "Error creating class_group table:" << query.lastError().text();
         }
 
-        // Таблиця для студентів
+        // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS students ("
             "id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -199,10 +199,10 @@ void dropAllTables() {
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
 
-    // Список всех таблиц для удаления
+    // пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     QStringList tables = { "specialty", "faculty", "class_group", "students" };
 
-    // Цикл для удаления каждой таблицы
+    // пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     for (const QString& tableName : tables) {
         QString dropQuery = QString("DROP TABLE IF EXISTS %1").arg(tableName);
         if (!query.exec(dropQuery)) {

@@ -10,6 +10,9 @@
 #define START_CLASS_SMALL_MESSAGE
 #define END_CLASS_SMALL_MESSAGE
 
+#define START_CLASS_WARNING_DIALOG
+#define END_CLASS_WARNING_DIALOG
+
 
 START_CREATE_WIN_CONSOLE; //метод для створення консолі
 #ifdef Q_OS_WIN
@@ -28,7 +31,7 @@ END_CREATE_WIN_CONSOLE;
 
 
 START_ClASS_MAIN_WINDOW; //головне вікно
-MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
+MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     createConsole();
     //присворюю до змінної 
     //встановлення стилів
@@ -39,7 +42,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
         "}"
     );
     this->mainLayout = new QGridLayout(this);
-  
+
     this->setWindowTitle("Успішність студентів");
     QIcon mainIcon("Images/title.png"); // Іконка для вікна програми
     this->setWindowIcon(mainIcon); // Встановлюю іконку
@@ -73,7 +76,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
     mainWindowToolsLayout->setColumnStretch(0, 3);
     mainWindowToolsLayout->setColumnStretch(1, 5);
     mainWindowToolsLayout->setColumnStretch(2, 3);
-    
+
     //викликаю методи для роботи з віджетом інструментів
     leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
     rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
@@ -85,11 +88,11 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent){
         "   background-color: rgb(90,90,90);";
 
     mainWindowAreaWidgetMiddle->setStyleSheet(styleWidgets);
-    
+
     mainWindowAreaWidgetLeft->setStyleSheet(styleWidgets);
     mainWindowToolsMiddle->setStyleSheet(styleWidgets);
     mainWindowAreaWidgetRight->setStyleSheet(styleWidgets);
-    
+
     mainWindowToolsLayout->addWidget(mainWindowToolsMiddle, 0, 1);
 
     mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetLeft, 0, 0);
@@ -119,10 +122,10 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     mainWindowToolsLeftLayout->setSpacing(0); //відступи між внутрішніми віджетами
     mainWindowToolsLeftLayout->setContentsMargins(2, 5, 2, 5); //внутрішні відступи
     //кнопки
-    QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget); 
-    QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget); 
-    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget); 
-   
+    QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget);
+    QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget);
+    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget);
+
 
     //встановлення розтягування
     mainWindowToolsLeftLayout->setColumnStretch(0, 3);
@@ -132,7 +135,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     aboutUsButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     helpButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     aboutProgramButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    
+
     //прикріплення сигналів натиску на кнопку зі слотами обробки
     connect(aboutUsButton, &QPushButton::pressed, this, &MainWindow_C::AboutUsButtonPressed);
     connect(helpButton, &QPushButton::pressed, this, &MainWindow_C::HelpButtonPressed);
@@ -162,11 +165,11 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
         "}";
     mainWindowToolsLeftWidget->setStyleSheet(
         "#mainWindowToolsLeftWidget {"
-        "   border-radius: 10px;" 
+        "   border-radius: 10px;"
         "   background-color: rgb(90,90,90);"
         "}"
     );
-    
+
     aboutProgramButton->setStyleSheet(buttonStyle);
     helpButton->setStyleSheet(buttonStyle);
     aboutUsButton->setStyleSheet(buttonStyle);
@@ -178,11 +181,11 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
 
-void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
     QGridLayout* mainWindowToolsRightLayout = new QGridLayout(mainWindowToolsRightWidget);
-    
+
     //видаляю відступи для компоновщика
     mainWindowToolsRightLayout->setSpacing(0); //відступи між внутрішніми віджетами
     mainWindowToolsRightLayout->setContentsMargins(2, 5, 2, 5); //внутрішні відступи
@@ -204,7 +207,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
     setingsButton->setStyleSheet(
         "#setingsButton {"
         "   border-radius: 5px;"
-        "   color: rgb(255,255,255);" 
+        "   color: rgb(255,255,255);"
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
         "   margin: 5px;"
@@ -213,7 +216,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
         "   background-color: rgb(120, 120, 120);"
         "}"
         "#setingsButton:focus {"
-        "   outline: 0px;"  
+        "   outline: 0px;"
         "}"
         "#setingsButton:pressed  {"
         "  background-color: rgb(150, 150, 150);"
@@ -254,13 +257,13 @@ void MainWindow_C::AboutUsButtonPressed() {
     Pagination->setStyleSheet(styleForWidget);
     //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
     showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", settingsWidget, settingsLayout);
-    
+
 }
 //загальне вікно для виведення інформації про нас
 void MainWindow_C::showWindowAboutUs(
-    const QString& path, 
-    const QString& name, 
-    const QString& responsible, 
+    const QString& path,
+    const QString& name,
+    const QString& responsible,
     const QString& linkToGit,
     QDialog* settingsWidget,
     QGridLayout* settingsLayout
@@ -408,7 +411,7 @@ void MainWindow_C::setingsButtonPressed() {
         "   background-color: rgb(30,30,30);"
         "}"
     );
-    
+
     //кнопки
     QString Add_Css =
         "#%1 {"
@@ -421,7 +424,7 @@ void MainWindow_C::setingsButtonPressed() {
         "   border-radius: 5px;"
         "}"
         "#%1:focus {"
-        "   border-radius: 5px;" 
+        "   border-radius: 5px;"
         "   outline: 0px;"  // Видаляє фокусне виділення        
         "}";
     QPushButton* AddSpecialty = new QPushButton("Додати спеціальність", settingsWidget); AddSpecialty->setObjectName("AddSpecialty");
@@ -491,7 +494,7 @@ void MainWindow_C::setingsButtonPressed() {
     connect(DeleteGroup, &QPushButton::released, this, &MainWindow_C::DeleteGroupButtonPressed);
     connect(DeleteFaculty, &QPushButton::released, this, &MainWindow_C::DeleteFacultyButtonPressed);
     connect(DeleteSpecialty, &QPushButton::released, this, &MainWindow_C::DeleteSpecialtyButtonPressed);
-    
+
     //додавання кнопок у головний компоновщик
     settingsLayout->addWidget(AddSpecialty, 0, 0, 1, 1);
     settingsLayout->addWidget(AddFaculty, 1, 0, 1, 1);
@@ -502,7 +505,7 @@ void MainWindow_C::setingsButtonPressed() {
     settingsLayout->addWidget(DeleteGroup, 2, 1, 1, 1);
     settingsLayout->addWidget(DeleteStudent, 3, 1, 1, 1);
 
-    settingsWidget->setFixedSize(this->width() / 3, this->height() / 3 ); //розмір форми підлаштовується під розміри вікна 
+    settingsWidget->setFixedSize(this->width() / 3, this->height() / 3); //розмір форми підлаштовується під розміри вікна 
     settingsWidget->setModal(true);//встановлюю модальне вікно як правду (це для того, щоб головне вікно було заблоковане
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
@@ -523,8 +526,8 @@ void MainWindow_C::AddStudentButtonPressed() {
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
 
     /*
-    Лямбда функція для виклику специфічних методів збереження 
-    От наприклад треба зберегти дані про студента це 4 методи, але якщо 
+    Лямбда функція для виклику специфічних методів збереження
+    От наприклад треба зберегти дані про студента це 4 методи, але якщо
     зберети дані про групу, це тільки 3 методи, тому для кожного додавання
     треба окремий метод щоб правильно зберігати все в бд
     */
@@ -536,8 +539,8 @@ void MainWindow_C::AddStudentButtonPressed() {
         settingsWidgetAddStydentWidget,
         "Додати студента",
         "Зберегти",
-        {"Спеціальність:", "Факультет:", "Група:","Студент:"},
-        {"InputSpecialty", "InputFaculty", "InputGroup", "InputStudent"},
+        { "Спеціальність:", "Факультет:", "Група:","Студент:" },
+        { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" },
         saveAction
     );
 }
@@ -599,7 +602,7 @@ void MainWindow_C::AddSpecialtyButtonPressed() {
         settingsWidgetAddStydentWidget,
         "Додати спеціальність",
         "Зберегти",
-        { "Спеціальність:"},
+        { "Спеціальність:" },
         { "InputSpecialty" },
         saveAction
     );
@@ -863,7 +866,7 @@ void MainWindow_C::DeleteButtonFor_DeleteStudent(QDialog* dialog) {
             cqdout << "\t" << AllLineEdits[i];
         };
     // Викликаю загальний метод 
-    SaveButtonFor_AllType(dialog,"Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
+    SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
 }
 void MainWindow_C::DeleteButtonFor_DeleteGroup(QDialog* dialog) {
     // Лямбда-функція для дій з БД (Видалити групу)
@@ -917,18 +920,22 @@ void MainWindow_C::DeleteButtonFor_DeleteІSpetialty(QDialog* dialog) {
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty" });
 }
 
-template<typename LaFunc> 
+template<typename LaFunc>
 void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, const QString& color, LaFunc dbAction, const QStringList& fieldNames) {
     //створення вектора для запису у БД всіх полів
     vector<QString> AllLineEdits;
     AllLineEdits.reserve(fieldNames.size());//резервні місця під текст
-        
+
     // Перевірка полів за допомогою ітератора
     // Перевіряємо, чи є діти
     for (const QString& fieldName : fieldNames) { //проходжусь по кожній комірці списку 
-        QLineEdit* lineEdit = dialog->findChild<QLineEdit*>(fieldName); 
+        QLineEdit* lineEdit = dialog->findChild<QLineEdit*>(fieldName);
         if (lineEdit == nullptr || lineEdit->text().isEmpty()) { //якщо дитина з такою унікальною назовю знайдена і пуста - попередження
-            QMessageBox::warning(dialog, "Попередження", "Заповніть всі поля!");
+            QLabel* iconLabel = new QLabel();
+            iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+            WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
+            warning.show();
+            //QMessageBox::warning(dialog, "Попередження", "Заповніть всі поля!");
             return;
         }
         AllLineEdits.push_back(lineEdit->text()); //записую текст з полів у вектор
@@ -943,7 +950,7 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
 
 template<typename LaFunc>
 
-void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString& title, const QString& textButton,  const QStringList& labels, const QStringList& objectNames,  LaFunc saveAction) {
+void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString& title, const QString& textButton, const QStringList& labels, const QStringList& objectNames, LaFunc saveAction) {
     dialog->setFixedWidth(this->width() / 5);
     dialog->setWindowTitle(title);
     dialog->setObjectName("dialog");
@@ -956,13 +963,13 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
         label->setObjectName("label");
         label->setStyleSheet("#label {color: rgb(255,255,255);}");
         QLineEdit* lineEdit = new QLineEdit(dialog); //створюю рдок для введнення
-        lineEdit->setStyleSheet("QLineEdit { background: rgb(60, 60, 60); }");
+        lineEdit->setStyleSheet("QLineEdit { background: rgb(60, 60, 60); color: rgb(255,255,255);}");
         lineEdit->setObjectName(objectNames[i]); //встановлюю унікальне ім'я для рядка введення (це для пошуку та перевірки чи вони не пусті)
         layout->addWidget(label, i, 0);//додаю до компоновщика мітки та рядки
         layout->addWidget(lineEdit, i, 1);
     }
     QPushButton* saveButton = new QPushButton(textButton, dialog); saveButton->setObjectName("saveButton");
-
+    
     dialog->setStyleSheet(
         "#dialog {"
         "   background-color: rgb(30,30,30);"
@@ -990,7 +997,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
     layout->addWidget(saveButton, labels.size(), 0, 1, 2);
     layout->setAlignment(Qt::AlignTop);
     dialog->exec();
- }
+}
 
 END_ClASS_MAIN_WINDOW;
 
@@ -1000,7 +1007,7 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
     layout->addWidget(this);
     QLabel* label = new QLabel(text, this);
     label->setObjectName("label"); //унікальна назва для CSS
-    label->setFixedSize(200, 50); //фіксований розмір
+    label->setFixedSize(150, 40); //фіксований розмір
     label->setStyleSheet(
         QString(
             "#label {"
@@ -1026,5 +1033,56 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
     timer->start(3000); //запуск на 3 секунди
 }
 END_CLASS_SMALL_MESSAGE;
-//QGridLayout* layout
 
+START_CLASS_WARNING_DIALOG;
+WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString& titleText, const QString& wayIconTitle, QLabel* IconMsg, const QString& textButton) : QDialog(parent) {
+    QGridLayout* layout = new QGridLayout(this);
+    this->setObjectName("this");
+    this->setStyleSheet(
+        "#this {"
+        "   color: rgb(255,255,255);"
+        "   background-color: rgb(30,30,30);"
+        "}"
+    );
+    //іконка
+    QIcon mainIcon("Images/warning.png");
+    this->setWindowIcon(mainIcon);
+    this->setWindowTitle(titleText);
+    //іконка
+    IconMsg->setParent(this);
+    IconMsg->setAlignment(Qt::AlignCenter);
+    //текст
+    QLabel* textLabel = new QLabel(msg, this);
+    textLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+    textLabel->setObjectName("textLabel");
+    textLabel->setStyleSheet(
+        "#textLabel {"
+        "   color: #ffffff;"
+        "}"
+    );
+    //кнопка
+    QPushButton* button = new QPushButton(textButton, this);
+     button->setObjectName("button");
+    button->setStyleSheet(
+        "#button {"
+        "   color: rgb(255,255,255);"
+        "   background-color: rgb(60,60,60);"
+        "   margin-left: 35px;"
+        "}"
+    );
+    connect(button, &QPushButton::released, [this]() {
+            this->accept();
+        }
+    );
+    //додаю віджети у сітку
+    layout->setColumnStretch(0, 1);
+    layout->setColumnStretch(1, 2);
+    layout->addWidget(IconMsg, 0, 0);
+    layout->addWidget(textLabel, 0, 1);
+    layout->addWidget(button, 1, 1);
+}
+void WarningDialog::show() {
+    this->setFixedSize(200, 100);
+    this->exec();
+}
+END_CLASS_WARNING_DIALOG;
