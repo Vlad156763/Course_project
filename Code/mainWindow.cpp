@@ -708,7 +708,8 @@ void MainWindow_C::SaveButtonFor_AddSpecialty(QDialog* dialog) {
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
 
-        addSpecialty(query, specialty);
+        addSpecialty(query, specialty); // Функція для додавання спеціальності
+
         };
 
     // Викликаю загальний метод 
@@ -728,14 +729,7 @@ void MainWindow_C::SaveButtonFor_AddFaculty(QDialog* dialog) {
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
 
-        query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
-        query.bindValue(":specialty", specialty);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This specialty is not exist";
-            return;
-        }
-
-        addFaculty(query, specialty, faculty);
+        addFaculty(query, specialty, faculty); // Функція для додавання факультету
         };
 
     // Викликаю загальний метод 
@@ -764,24 +758,7 @@ void MainWindow_C::SaveButtonFor_AddGroup(QDialog* dialog) {
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
 
-        // Перевірка існування спеціальності
-        query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
-        query.bindValue(":specialty", specialty);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This specialty is not exist";
-            return;
-        }
-
-        // Перевірка існування факультету
-        query.prepare("SELECT COUNT(*) FROM faculty WHERE faculty = :faculty AND specialty = :specialty");
-        query.bindValue(":specialty", specialty);
-        query.bindValue(":faculty", faculty);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This faculty is not exist";
-            return;
-        }
-
-        addGroup(query, specialty, faculty, class_group);
+        addGroup(query, specialty, faculty, class_group); // Функція для додавання групи
         };
 
     // Викликаю загальний метод 
@@ -813,35 +790,9 @@ void MainWindow_C::SaveButtonFor_AddStudent(QDialog* dialog) {
 
         QSqlDatabase db = QSqlDatabase::database(); 
         QSqlQuery query(db); // Створюємл обьект базиданих
-        // Перевірка існування спеціальності
-        query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
-        query.bindValue(":specialty", specialty);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This specialty is not exist";
-            return;
-        }
-
-        // Перевірка існування факультету
-        query.prepare("SELECT COUNT(*) FROM faculty WHERE faculty = :faculty AND specialty = :specialty");
-        query.bindValue(":specialty", specialty);
-        query.bindValue(":faculty", faculty);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This faculty is not exist";
-            return;
-        }
-
-        // Перевірка існування групи
-        query.prepare("SELECT COUNT(*) FROM class_group WHERE faculty = :faculty AND specialty = :specialty AND class_group = :class_group");
-        query.bindValue(":specialty", specialty);
-        query.bindValue(":faculty", faculty);  
-        query.bindValue(":class_group", class_group);
-        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
-            cqdout << "This group is not exist";
-            return;
-        }
 
         // Функція додавання студента
-        addStudent(query, name, faculty, specialty, class_group);
+        addStudent(query, name, faculty, specialty, class_group); // Функція для додавання студента
         };
 
     // Загальний метод
@@ -850,74 +801,105 @@ void MainWindow_C::SaveButtonFor_AddStudent(QDialog* dialog) {
 
 
 void MainWindow_C::DeleteButtonFor_DeleteStudent(QDialog* dialog) {
-    // Лямбда-функція для дій з БД (видалити студента)
+    // Лямбда-функція для дій з БД (додати студента)
     auto dbAction = [this](vector<QString> AllLineEdits) {
-        /////////////////////////////////////////////////////
-        //видалити студента з БД
-        // у векторі  AllLineEdits зберігаюсься рядки 
-        // [0] - Спеціальність
-        // [1] - Факультет
-        // [2] - Група
-        // [3] - ПІБ
-        /////////////////////////////////////////////////////
-        //це вивід у консоль для демонстраії
-        cqdout << "Видалено студента";
-        for (int i = 0; i < AllLineEdits.size(); i++)
-            cqdout << "\t" << AllLineEdits[i];
+        // Перевіримо, чи достатьо даних
+        if (AllLineEdits.size() < 4) {
+            cqdout << "No data to add Students!";
+            return;
+        }
+
+        QString specialty = AllLineEdits[0]; // Спеціальність
+        QString faculty = AllLineEdits[1]; // Факультет
+        QString groupString = AllLineEdits[2]; // Група как строка
+        QString name = AllLineEdits[3]; // ПІБ
+
+        // Перетворимо строку в int для групи
+        bool conversionOk;
+        int class_group = groupString.toInt(&conversionOk);
+
+        if (!conversionOk) {
+            cqdout << "Помилка при перетворенні";
+            return;
+        }
+
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db); // Створюємл обьект базиданих
+        
+        DeleteStudent(query, name, faculty, specialty, class_group);
         };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
 }
 void MainWindow_C::DeleteButtonFor_DeleteGroup(QDialog* dialog) {
     // Лямбда-функція для дій з БД (Видалити групу)
+    // Лямбда-функція для дій з БД (додати групу)
     auto dbAction = [this](vector<QString> AllLineEdits) {
-        /////////////////////////////////////////////////////
-        //видалити групу з БД 
-        // у векторі  AllLineEdits зберігаюсься рядки 
-        // [0] - Спеціальність
-        // [1] - Факультет
-        // [2] - Група
-        /////////////////////////////////////////////////////
-        //це вивід у консоль для демонстраії
-        cqdout << "Видалено групу";
-        for (int i = 0; i < AllLineEdits.size(); i++)
-            cqdout << "\t" << AllLineEdits[i];
+        if (AllLineEdits.size() < 3) {
+            cqdout << "No data to add group!";
+            return;
+        }
+        QString specialty = AllLineEdits[0]; // Спеціальність 
+        QString faculty = AllLineEdits[1]; ; // Факультет
+        QString groupString = AllLineEdits[2]; // Група как строка
+
+        bool conversionOk;
+        int class_group = groupString.toInt(&conversionOk);
+
+        if (!conversionOk) {
+            cqdout << "Помилка при перетворенні";
+            return;
+        }
+
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        DeleteGroup(query, specialty, faculty, class_group);
         };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup" });
 }
 void MainWindow_C::DeleteButtonFor_DeleteFaculty(QDialog* dialog) {
-    // Лямбда-функція для дій з БД (додати студента)
+    // Лямбда-функція для дій з БД (додати факультет)
     auto dbAction = [this](vector<QString> AllLineEdits) {
-        /////////////////////////////////////////////////////
-        //видалити факультет з БД 
-        // у векторі  AllLineEdits зберігаюсься рядки 
-        // [0] - Спеціальність
-        // [1] - Факультет
-        /////////////////////////////////////////////////////
-        //це вивід у консоль для демонстраії
-        cqdout << "Видалено факультет";
-        for (int i = 0; i < AllLineEdits.size(); i++)
-            cqdout << "\t" << AllLineEdits[i];
-        };
+        if (AllLineEdits.size() < 2) {
+            cqdout << "No data to add Faculty!";
+            return;
+        }
+        QString specialty = AllLineEdits[0]; // Спеціальність
+        QString faculty = AllLineEdits[1]; ; // Факультет
+
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+
+        query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
+        query.bindValue(":specialty", specialty);
+        if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
+            cqdout << "This specialty is not exist";
+            return;
+        }
+        DeleteFaculty(query, specialty, faculty);
+     };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty" });
 
 }
 void MainWindow_C::DeleteButtonFor_DeleteІSpetialty(QDialog* dialog) {
     auto dbAction = [this](vector<QString> AllLineEdits) {
-        /////////////////////////////////////////////////////
-        //видалити спеціальність з БД 
-        // у векторі  AllLineEdits зберігаюсься рядки 
-        // [0] - Спеціальність
-        /////////////////////////////////////////////////////
-        //це вивід у консоль для демонстраії
-        cqdout << "Видалено cпеціальність";
-        for (int i = 0; i < AllLineEdits.size(); i++)
-            cqdout << "\t" << AllLineEdits[i];
+
+        if (AllLineEdits.size() < 1) {
+            cqdout << "No data to delete Specialty!";
+            return;
+        }
+        QString specialty = AllLineEdits[0]; // Спеціальність
+
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+
+        DeleteSpecialty(query, specialty);
         };
+
     // Викликаю загальний метод 
-    SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty" });
+    SaveButtonFor_AllType(dialog, "Deleted!", "169, 38, 38", dbAction, { "InputSpecialty" });
 }
 
 template<typename LaFunc>
