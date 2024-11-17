@@ -57,7 +57,11 @@ void getAllStudents(QSqlQuery& query);
 void getFaculty(QSqlQuery& query);
 void getSpecialty(QSqlQuery& query);
 void getGroup(QSqlQuery& query);
-void clearAllTables();
+void DeleteSpecialty(QSqlQuery& query, const QString& specialty);
+void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
+void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group);
+void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, int class_group);
+int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 void dropAllTables();
 
 class counterTimer {
