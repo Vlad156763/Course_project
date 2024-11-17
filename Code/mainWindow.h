@@ -19,17 +19,33 @@
 #include <qgraphicsview.h>
 #include <qgraphicsitem.h>
 #include <qstyle.h>
+#include <qpainter.h>
+#include <qrandom.h>
+#include <qmovie.h>
+#include <qtextedit.h>
+#include <qgraphicsproxywidget.h>
+
+
 
 #include <QtSql/qsqldatabase.h>
 #include <QtSql/qsqlerror.h>
 #include <QtSql/qsqlquery.h>
+#include <qabstractitemview.h>
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include <vector>
+#include <cstring>//для std::strrchr
 
-#define cqdout qDebug() // студія плутає макрос qDebug() із класом qDebug
 using std::cerr;
+using std::strrchr;
 using std::vector;
+using std::this_thread::sleep_for;
+using namespace std::chrono;
+
+#define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
+#define cqdout (qDebug() << "┌[msg]" << FILENAME << __LINE__ << "\n└TEXT:" )
 
 void CreateTables();
 void addSpecialty(QSqlQuery& query, const QString& specialty);
@@ -44,19 +60,100 @@ void getGroup(QSqlQuery& query);
 void clearAllTables();
 void dropAllTables();
 
-class MainWindow_C: public QWidget {
+class counterTimer {
+    int counter = 0;
+public:
+    int operator ++ ();
+    int operator -- ();
+    int operator ++ (int);
+    int operator -- (int);
+    int get() {
+        return this->counter;
+    }
+
+};
+
+class SmallMessage_C : public QWidget {
+public:
+    SmallMessage_C(QWidget*);
+    void show(const QString&, const QString&, QGridLayout*);
+};
+class WarningDialog : public QDialog {
+public:
+    WarningDialog(QWidget*, const QString&, const QString&, const QString&, QLabel*, const QString&);
+    void show();
+};
+class smartText : public QLabel {
+public:
+    smartText(const QString&, QWidget* = nullptr);
+private:
+    QString originalText; // зберігає повний текст
+    void updateElidedText();
+    void resizeEvent(QResizeEvent*) override;
+};
+class blockWidget : public QPushButton {
+    Q_OBJECT
+private:
+    //клас коло 
+    class circleQWidget : public QWidget {
+    private:
+        int x = 0;
+        int y = 0;
+        int r1 = 0;
+        int r2 = 0;
+        QColor color;
+    public:
+        circleQWidget(QWidget* = nullptr);
+        void SetCoordinats(const int&, const int&);
+        void SetSizeCircle(const int&, const int&);
+        void SetColor(const QColor&);
+        void SetChar(const QChar&);
+    private:
+        void paintEvent(QPaintEvent*) override;
+    };
+    
+public:
+    blockWidget(const QString&, QWidget* = nullptr);
+    
+    void AddStructure();
+
+private:
+    void resizeEvent(QResizeEvent* ) override;
+    QColor generateColorFromString(const QString&);
+    smartText* text = nullptr;
+    circleQWidget* circle = nullptr;
+    QHBoxLayout* layout = nullptr;
+
+public slots:
+    void specialtyButtonPressed(counterTimer&, QWidget*, QWidget*, QWidget*, const QString&);
+    void GroupButtonPressed(counterTimer&, QWidget*, QWidget*, const QString&, const QString&, const QString&);
+    void FacultyButtonPressed(counterTimer&,  QWidget*, QWidget*, const QString&, const QString&);
+    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
+    void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
+};
+class configBlock{
+private:
+    QWidget* widget = nullptr;
+public:
+    configBlock();
+    void setWidget(QWidget*);
+    template<typename LaFunc>
+    void setConfigBlock(LaFunc, QWidget*, counterTimer&);
+    template<typename LaFunc>
+    void setConfigPredmetBlock(LaFunc, QWidget*);
+
+};
+
+class MainWindow_C : public QWidget {
     Q_OBJECT;
 private:
     QGridLayout* mainLayout = nullptr;
-    void leftSideToolsWidget(QWidget*, QGridLayout*);
-    void rightSideToolsWidget(QWidget*, QGridLayout*);
+    void leftSideToolsWidget(QWidget*, QGridLayout*)const;
+    void rightSideToolsWidget(QWidget*, QGridLayout*)const;
     //логіка кнопки збережння та видалення для всіх типів (шаблон для лямбда функції)
-    template<typename LaFunc> 
-    void SaveButtonFor_AllType(QDialog*,const QString&, const QString&, LaFunc, const QStringList&);
-    //логіка для вікон з додаванням та видаленням
-    template<typename LaFunc> 
-    void WindowAdd_and_Delete_All_Type(QDialog* , const QString&, const QString&, const QStringList&, const QStringList&, LaFunc);
-    
+    template<typename LaFunc>
+    void SaveButtonFor_AllType(QDialog*, const QString&, const QString&, LaFunc, const QStringList&);
+
     void SaveButtonFor_AddStudent(QDialog*);//метод для обробки кнопки "зберегти" у "додати студента"
     void SaveButtonFor_AddGroup(QDialog*); //метод для обробки кнопки "зберегти" у "додати групу"
     void SaveButtonFor_AddFaculty(QDialog*); //метод для обробки кнопки "зберегти" у "додати факультет"
@@ -67,6 +164,14 @@ private:
     void DeleteButtonFor_DeleteFaculty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити факултет"
     void DeleteButtonFor_DeleteІSpetialty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити спеціальність"
     void showWindowAboutUs(const QString&, const QString&, const QString&, const QString&, QDialog*, QGridLayout*);//загальний метод для відображення вікон про нас
+    template<typename LaFunc>
+    void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
+
+    //віджет для головної частини 
+    void mainWidgetArea(QWidget*, QGridLayout*, QWidget*);
+
+    //таймер для відслідковування віджетів головної частини
+    counterTimer* TimersCounter = nullptr;
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"
@@ -84,22 +189,14 @@ private slots:
     void DeleteFacultyButtonPressed();
     void DeleteSpecialtyButtonPressed();
 public:
-     MainWindow_C(QWidget* = nullptr);
+    MainWindow_C(QWidget* = nullptr);
+    void show();
     ~MainWindow_C();
-    void show();
+    friend class blockWidget;
 };
+//логіка для вікон з додаванням та видаленням
 
-class SmallMessage_C : public QWidget {
-public:
-    SmallMessage_C(QWidget*);
-    void show(const QString&, const QString&, QGridLayout*);
-};
-class WarningDialog : public QDialog {
-public:
-    WarningDialog(QWidget*, const QString&, const QString&, const QString&, QLabel*, const QString&);
-    void show();
-};
+
 #endif //!MAINWINDOW_H
-/*
-WindowAddAll_Type (QDialog* dialog
-*/
+
+

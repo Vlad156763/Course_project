@@ -75,6 +75,11 @@
       <Command>C:\My_file\programming_libraries\C++\Qt\6.8.0\msvc2022_64\bin\windeployqt.exe --release "$(TargetDir)$(TargetName).exe"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEvent>
+      <Command>C:\My_file\programming_libraries\C++\Qt\6.8.0\msvc2022_64\bin\windeployqt.exe --debug "$(TargetDir)$(TargetName).exe"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
     <ClCompile>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -115,9 +120,6 @@
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="mainWindow.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Test_and_Debuging(mainWindow).h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">

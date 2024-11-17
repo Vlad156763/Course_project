@@ -7,11 +7,10 @@ int main(int argc, char** argv) {
 	QApplication app(argc, argv);
 	MainWindow_C mainWindow;
 	mainWindow.show();
-
-	QStringList drivers = QSqlDatabase::drivers();
-	cqdout << "Доступні драйвери:" << drivers;
-
 	CreateTables();
-
-	return app.exec();
+	return app.exec();;
 }
+//todo: видаляти пам'ять під створені об'єкти! 
+//todo: пагінація
+//todo: вікно про додаток
+//todo: вікно про програму (її історія створення)
