@@ -76,7 +76,6 @@ public:
     }
 
 };
-
 class SmallMessage_C : public QWidget {
 public:
     SmallMessage_C(QWidget*);
@@ -129,9 +128,9 @@ private:
     QHBoxLayout* layout = nullptr;
 
 public slots:
-    void specialtyButtonPressed(counterTimer&, QWidget*, QWidget*, QWidget*, const QString&);
-    void GroupButtonPressed(counterTimer&, QWidget*, QWidget*, const QString&, const QString&, const QString&);
-    void FacultyButtonPressed(counterTimer&,  QWidget*, QWidget*, const QString&, const QString&);
+    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&);
+    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&);
+    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&);
     void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
 };
@@ -142,7 +141,7 @@ public:
     configBlock();
     void setWidget(QWidget*);
     template<typename LaFunc>
-    void setConfigBlock(LaFunc, QWidget*, counterTimer&);
+    void setConfigBlock(LaFunc, QWidget&, counterTimer&);
     template<typename LaFunc>
     void setConfigPredmetBlock(LaFunc, QWidget*);
 
@@ -172,7 +171,7 @@ private:
     void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
 
     //віджет для головної частини 
-    void mainWidgetArea(QWidget*, QGridLayout*, QWidget*);
+    void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);
 
     //таймер для відслідковування віджетів головної частини
     counterTimer* TimersCounter = nullptr;
@@ -202,5 +201,3 @@ public:
 
 
 #endif //!MAINWINDOW_H
-
-

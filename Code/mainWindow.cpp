@@ -1,5 +1,8 @@
 #include "mainWindow.h"
 
+
+
+
 MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     //встановлення таймеру
     this->TimersCounter = new counterTimer();
@@ -49,7 +52,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
     rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
     //викликаю метод для роботи з головною частиною
-    mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget);
+    mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, *mainWindowMainAreaWidget);
 
     QString styleWidgets =
         "   border-radius: 10px;"
@@ -76,6 +79,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
 }
 MainWindow_C::~MainWindow_C() {
 delete this->TimersCounter;
+this->close();
 }
 void MainWindow_C::show() {
     this->showMaximized();
@@ -120,6 +124,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
         "   margin: 5px;"
         "   padding: 5px;"
         "   color: rgb(255, 255, 255);"
+        "   font-weight: bold;"
         "}"
         "#customButton:hover {"
         "   background-color: rgb(120, 120, 120);"
@@ -147,7 +152,6 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
 
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
-
 void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) const {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
@@ -177,6 +181,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
         "   color: rgb(255,255,255);"
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
+        "   font-weight: bold;"
         "   margin: 5px;"
         "}"
         "#setingsButton:hover {"
@@ -193,8 +198,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
     mainWindowToolsRightLayout->addWidget(setingsButton, 0, 0, 1, 1);
     parentLayout->addWidget(mainWindowToolsRightWidget, 0, 2); //додаю до компоновщика віджет з кнопкою
 }
-
-void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWidget* mainWedgetTools) {
+void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWidget& mainWedgetTools) {
     cqdout << "Вивід шляху відбувається так: (Спеціальність) (Факультет) (Група) (Студент) (Предмет)";
     auto CSS = [](QWidget* widget, const QString& string) {
         widget->setStyleSheet(
@@ -214,7 +218,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     configBlock block;
     block.setWidget(LeftSide);
     block.setConfigBlock(
-        [this, mainWedgetTools, RightSide, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
+        [this, &mainWedgetTools, RightSide, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: Отримати всі спеціальністі послідовно і записувати у SpecialtyName
             static int counter = 0;
@@ -247,7 +251,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
 
             blockWidget* block = new blockWidget(SpecialtyName, widget);
             connect(block, &QPushButton::released, block, 
-                [this, block, RightSide, MiddleSide, SpecialtyName, mainWedgetTools]() mutable {
+                [this, block, RightSide, MiddleSide, SpecialtyName, &mainWedgetTools]() mutable {
                     block->specialtyButtonPressed(*this->TimersCounter, mainWedgetTools, RightSide, MiddleSide, SpecialtyName);
                 })
                 ;
@@ -261,7 +265,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     //коли натиснуто на блок з групою, весь віджет оновлюється щоб показати студентів у цій групі по центру
     block.setWidget(MiddleSide);
     block.setConfigBlock(
-        [this, mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
+        [this, &mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //todo: Отримати всі групи послідовно і записувати у GroupName
         static int counter = 0;
@@ -293,7 +297,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         blockWidget* block = new blockWidget(GroupName, widget);
-        connect(block, &QPushButton::released, [this, mainWedgetTools, block, MiddleSide, GroupName]() { block->GroupButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", ""); });
+        connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, GroupName]() { block->GroupButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", ""); });
         block->AddStructure();
         layout->addWidget(block, counter++ + 1, 0);
         return false;
@@ -304,7 +308,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     //коли натиснуто блок з факультету, оновлюється блоки з групами
     block.setWidget(RightSide);
     block.setConfigBlock(
-        [this, mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
+        [this, &mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: Отримати всі факультети послідовно і записувати у FacultyName
             static int counter = 0;
@@ -336,7 +340,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
-            connect(block, &QPushButton::released, [this, mainWedgetTools, block, MiddleSide, FacultyName]() { block->FacultyButtonPressed(*this->TimersCounter,  mainWedgetTools, MiddleSide, FacultyName, ""); });
+            connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, FacultyName]() { block->FacultyButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, FacultyName, ""); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
@@ -348,7 +352,6 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     parent_grid->addWidget(MiddleSide, 0, 1);
     parent_grid->addWidget(RightSide, 0, 2);
 }
-
 
 
 //кнопка про нас
@@ -409,10 +412,10 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     //додаю текст
     QLabel* textName = new QLabel("Гайлунь Владислав", textLocation); textName->setObjectName("textName");
     QLabel* textLink = new QLabel(
-        "<a href='" + linkToGit + "' style='color: rgb(53, 133, 129);'>Github</a>"
+        "<a href='" + linkToGit + "' style='color: rgb(53, 133, 129);'>Github</a>", textLocation
     );
     textLink->setTextFormat(Qt::RichText);
-    QLabel* textResponsible = new QLabel("Відповідальний за: " + responsible); textResponsible->setObjectName("textResponsible");
+    QLabel* textResponsible = new QLabel("Відповідальний за: " + responsible, textLocation); textResponsible->setObjectName("textResponsible");
     textResponsible->setStyleSheet("#textResponsible { color: rgb(255, 255, 255); }");
     textName->setStyleSheet(
         "#textName {"
@@ -469,7 +472,6 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
 
     //розміри, пам'ять обробка подій
     settingsWidget->setFixedSize(400, 400);
-    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
 
@@ -523,15 +525,15 @@ void MainWindow_C::setingsButtonPressed() {
     QString Add_Css =
         "#%1 {"
         "   background-color: rgb(30, 120, 30);"
-        "   color: rgb(255,255,255);"
+        "   color: rgb(255, 255,255);"
         "   font-size: 14px;"
+        "   border-radius: 5px;"
+        "   font-weight: bold;"
         "}"
         "#%1:hover {"
         "   background-color: rgb(40, 140, 40);"  // колір змінюється при наведенні
-        "   border-radius: 5px;"
         "}"
         "#%1:focus {"
-        "   border-radius: 5px;"
         "   outline: 0px;"  // Видаляє фокусне виділення        
         "}";
     QPushButton* AddSpecialty = new QPushButton("Додати спеціальність", settingsWidget); AddSpecialty->setObjectName("AddSpecialty");
@@ -556,14 +558,13 @@ void MainWindow_C::setingsButtonPressed() {
         "   background-color: rgb(120, 30, 30);"
         "   color: rgb(255,255,255);"
         "   font-size: 14px;"
+        "   border-radius: 5px;"
+        "   font-weight: bold;"
         "}"
         "#%1:hover {"
         "   background-color: rgb(140, 40, 40);"  // колір змінюється при наведенні
-        "   border-radius: 5px;"
-
         "}"
         "#%1:focus {"
-        "   border-radius: 5px;"
         "   outline: 0px;"  // Видаляє фокусне виділення        
         "}";
     QPushButton* DeleteSpecialty = new QPushButton("Видалити спеціальність", settingsWidget); DeleteSpecialty->setObjectName("DeleteSpecialty");
@@ -612,7 +613,7 @@ void MainWindow_C::setingsButtonPressed() {
     settingsLayout->addWidget(DeleteGroup, 2, 1, 1, 1);
     settingsLayout->addWidget(DeleteStudent, 3, 1, 1, 1);
 
-    settingsWidget->setFixedSize(this->width() / 3, this->height() / 3); //розмір форми підлаштовується під розміри вікна 
+    settingsWidget->setFixedSize(this->width() / 3 + 60, this->height() / 3 + 20); //розмір форми підлаштовується під розміри вікна 
     settingsWidget->setModal(true);//встановлюю модальне вікно як правду (це для того, щоб головне вікно було заблоковане
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
@@ -1002,7 +1003,7 @@ void MainWindow_C::DeleteButtonFor_DeleteІSpetialty(QDialog* dialog) {
         };
 
     // Викликаю загальний метод 
-    SaveButtonFor_AllType(dialog, "Deleted!", "169, 38, 38", dbAction, { "InputSpecialty" });
+    SaveButtonFor_AllType(dialog, "Успішно видалено!", "169, 38, 38", dbAction, { "InputSpecialty" });
 }
 
 template<typename LaFunc>
@@ -1018,9 +1019,9 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
         if (lineEdit == nullptr || lineEdit->text().isEmpty()) { //якщо дитина з такою унікальною назовю знайдена і пуста - попередження
             QLabel* iconLabel = new QLabel();
             iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+            iconLabel->setAttribute(Qt::WA_DeleteOnClose);
             WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
             warning.show();
-            //QMessageBox::warning(dialog, "Попередження", "Заповніть всі поля!");
             return;
         }
         AllLineEdits.push_back(lineEdit->text()); //записую текст з полів у вектор
@@ -1039,7 +1040,6 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
     dialog->setObjectName("dialog");
     QGridLayout* layout = new QGridLayout(dialog);
     dialog->setModal(true);
-    dialog->setAttribute(Qt::WA_DeleteOnClose);
     //створюю рядки для вводу, мітки для тексту, вказую для рядків унікальний тип, додаю це все до компоновщика
     for (int i = 0; i < labels.size(); ++i) {
         QLabel* label = new QLabel(labels[i], dialog); //створюю мітку з текстом із параметру
@@ -1063,6 +1063,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
         "   border-radius: 5px;"
         "   background-color: rgb(64, 64, 64);"
         "   color: rgb(255,255,255);"
+        "   font-weight: bold;"
         "}"
         "#saveButton:hover {"
         "   background-color: rgb(120, 120, 120);"
@@ -1087,7 +1088,7 @@ SmallMessage_C::SmallMessage_C(QWidget* parent) : QWidget(parent) {}
 void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout) {
     QLabel* label = new QLabel(text, this);
     label->setObjectName("label"); //унікальна назва для CSS
-    label->setFixedSize(150, 40); //фіксований розмір
+    label->setFixedSize(160, 40); //фіксований розмір
     label->setStyleSheet(
         QString(
             "#label {"
@@ -1096,6 +1097,7 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
             "   border-radius: 10px;"
             "   padding: 11px;"
             "   font-size: 14px;"
+            "   font-weight: bold;"
             "}"
         ).arg(color)
     );
@@ -1145,6 +1147,9 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
         "   color: rgb(255,255,255);"
         "   background-color: rgb(60,60,60);"
         "   margin-left: 35px;"
+        "}"
+        "#button:focus {"
+        "   outline: 0px;"  // Видаляє фокусне виділення        
         "}"
     );
     button->setFixedHeight(25);
@@ -1272,7 +1277,7 @@ QColor blockWidget::generateColorFromString(const QString& input) {
     }
     return QColor::fromHsl(hue, saturation, lightness);
 }
-void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName) {
+void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName) {
     cqdout << "specialtyButtonPressed" << '(' << SpecialtyName << ')' << "(None)" << "(None)" << "(None)" << "(None)";
     static QPointer<blockWidget> prevPressedButton = nullptr;
     if (prevPressedButton && prevPressedButton != this) {
@@ -1312,7 +1317,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* m
     configBlock block;
     block.setWidget(RightSide);
     block.setConfigBlock(
-        [&counterTimers, mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: отримати всі факультети які мають поточну спеціальність SpecialtyName і записувати послідовно у FacultyName 
             static int counter = 0;
@@ -1340,7 +1345,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* m
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
             connect(block, &QPushButton::released,
-                [&counterTimers, mainWedgetTools, block, MiddleSide, SpecialtyName, FacultyName]() {
+                [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, FacultyName]() {
                     block->FacultyButtonPressed(counterTimers, mainWedgetTools, MiddleSide, FacultyName, SpecialtyName);
                 });
             block->AddStructure();
@@ -1352,7 +1357,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* m
     );
     block.setWidget(MiddleSide);
     block.setConfigBlock(
-        [&counterTimers, mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: Отримати всі групи, які мають спеціальність SpecialtyName і записувати послідовно у GroupName 
             static int counter = 0;
@@ -1378,7 +1383,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* m
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
-            connect(block, &QPushButton::released, [&counterTimers, mainWedgetTools, block, MiddleSide, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, "", SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, "", SpecialtyName); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
@@ -1387,12 +1392,12 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget* m
         counterTimers
     );
 }
-void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget* mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName) {
+void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName) {
     cqdout << "GroupButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << "(None)" << "(None)";
     configBlock block;
     block.setWidget(widget);
     block.setConfigBlock(
-        [&counterTimers, mainWedgetTools, widget, SpecialtyName, FacultyName, GroupName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, widget, SpecialtyName, FacultyName, GroupName](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: зчитати всіх студентів які мають SpecialtyName, FacultyName, GroupName (ці значення можуть бути пусті, тому треба перевіряти їх) і послідовно записувати у StudyName
             static int counter = 0;
@@ -1419,7 +1424,7 @@ void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget* mainW
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(StudyName, widget);
             // кнопки поки не пригвинчую, так як кнопки зі студентами треба привязати до вікна редагування їх оцінок
-            connect(block, &QPushButton::released, [&counterTimers, mainWedgetTools, block, widget, FacultyName, StudyName, GroupName, SpecialtyName]() {block->StudyButtonPressed(StudyName, GroupName, FacultyName, SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, widget, FacultyName, StudyName, GroupName, SpecialtyName]() {block->StudyButtonPressed(StudyName, GroupName, FacultyName, SpecialtyName); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
@@ -1549,6 +1554,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             "   border-radius: 5px;"
             "   background-color: rgb(64, 64, 64);"
             "   color: rgb(255,255,255);"
+            "   font-weight: bold;"
             "}"
             "#button:hover {"
             "   background-color: rgb(120, 120, 120);"
@@ -1600,6 +1606,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         "   color: rgb(255,255,255);"
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
+        "   font-weight: bold;"
         "   margin: 5px;"
         "}"
         "#addPredmet:hover {"
@@ -1618,6 +1625,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         "   color: rgb(255,255,255);"
         "   background-color: rgb(64, 64, 64);"
         "   font-size: 12px;"
+        "   font-weight: bold;"
         "   margin: 5px;"
         "}"
         "#delPredmet:hover {"
@@ -1663,14 +1671,30 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         "}"
     );
     QGridLayout* EvalLayout = new QGridLayout(Eval);
-    QTextEdit* Edit = new QTextEdit(Eval);
+    QTextEdit* Edit = new QTextEdit(Eval); Edit->setObjectName("Edit");
+    Edit->setStyleSheet(
+        "#Edit {"
+        "   color: #ffffff;"
+        "   background-color: rgb(60,60,60);"
+        "}"
+    );
     Edit->setReadOnly(false); 
 
     EvalLayout->addWidget(Edit);
-    QPushButton* addOneEval = new QPushButton("Зберегти", dialog); addOneEval->setObjectName("addOneEval");
+    QWidget* SaveButtonWidget = new QWidget(dialog); SaveButtonWidget->setObjectName("SaveButtonWidget");
+    QGridLayout* SaveButtonLayout = new QGridLayout(SaveButtonWidget);
+    SaveButtonLayout->setSpacing(0);
+    SaveButtonLayout->setContentsMargins(0, 0, 0, 0);
+    SaveButtonWidget->setStyleSheet(
+        "#SaveButtonWidget {"
+        "   border-radius: 10px;"
+        "   background-color: rgb(90,90,90);"
+        "}"
+    );
+
+    QPushButton* addOneEval = new QPushButton("Зберегти", SaveButtonWidget); addOneEval->setObjectName("addOneEval");
     addOneEval->setStyleSheet(
         "#addOneEval {"
-        "   border-radius: 5px;"
         "   border-radius: 5px;"
         "   background-color: rgb(64, 64, 64);"
         "   color: rgb(255,255,255);"
@@ -1688,6 +1712,8 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         "  background-color: rgb(150, 150, 150);"
         "}"
     );
+    SaveButtonLayout->addWidget(addOneEval);
+
     addOneEval->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     addOneEval->setFixedHeight(30);
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1718,12 +1744,12 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
 
     layout->setRowStretch(0, 25);
     layout->setRowStretch(1, 1);
-    layout->addWidget(addOneEval, 1, 0, 1, 2);
+    layout->addWidget(SaveButtonWidget, 1, 0, 1, 2);
     layout->addWidget(Eval, 0, 0, 1, 2);
 
     dialog->exec();
 }
-void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget* mainWedgetTools, QWidget* MiddleSide, const QString& FacultyName, const QString& SpecialtyName) {
+void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* MiddleSide, const QString& FacultyName, const QString& SpecialtyName) {
     cqdout << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << "(None)" << "(None)" << "(None)";
     static QPointer<blockWidget> prevPressedButton = nullptr;
     if (prevPressedButton && prevPressedButton != this) {
@@ -1763,7 +1789,7 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget* mai
     configBlock block;
     block.setWidget(MiddleSide);
     block.setConfigBlock(
-        [&counterTimers, mainWedgetTools, MiddleSide, SpecialtyName, FacultyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName, FacultyName](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //todo: Отримати всі групи які мають поточний факультет і спеціальність (спеціальність може бути пуста) і послідовно записувати у GroupName
             static int counter = 0;
@@ -1789,7 +1815,7 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget* mai
             }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
-            connect(block, &QPushButton::released, [&counterTimers, mainWedgetTools, block, MiddleSide, FacultyName, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, FacultyName, SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, FacultyName, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, FacultyName, SpecialtyName); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
@@ -1804,7 +1830,7 @@ void configBlock::setWidget(QWidget* widget) {
 }
 
 template<typename LaFunc>
-void configBlock::setConfigBlock(LaFunc workDB, QWidget* mainWedgetTools, counterTimer& counterTimers) {
+void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counterTimer& counterTimers) {
 
     QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(widget->layout());
     if (!layout) {
@@ -1838,30 +1864,29 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget* mainWedgetTools, counte
     gif->start();
 
     // Таймер для поступового додавання віджетів
-    QTimer* timer = new QTimer(mainWedgetTools);
+    QTimer* timer = new QTimer(&mainWedgetTools);
     counterTimers++;
-    mainWedgetTools->setEnabled(false);
+
     QApplication::setOverrideCursor(Qt::BusyCursor);
+    mainWedgetTools.setEnabled(false);
     // Підключення таймера до функції
     QObject::connect(timer, &QTimer::timeout,
-        [&counterTimers, mainWedgetTools, timer, WidgetCapasity, gif, gifLoad, LayoutCapasity, workDB]() mutable {
+        [&counterTimers, &mainWedgetTools, timer, WidgetCapasity, gif, gifLoad, LayoutCapasity, workDB]() mutable {
             if (workDB(LayoutCapasity, WidgetCapasity)) {
                 QTimer::singleShot(500, [&mainWedgetTools, &counterTimers, &gif, &gifLoad]() {
                     gif->stop();
                     gif->deleteLater();
                     gifLoad->deleteLater();
                     counterTimers--; 
+                    QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
                     if (counterTimers.get() == 0) {
-                        mainWedgetTools->setEnabled(true);  // Розблокування вікна
-                        QApplication::setOverrideCursor(Qt::ArrowCursor);
+                        mainWedgetTools.setEnabled(true);  // Розблокування вікна                        
                     }
                 });
                 timer->stop();
             }
         }
     );
-    timer->start();
-
 
     WidgetScroll->setStyleSheet(
         "QScrollArea {"
@@ -1940,9 +1965,10 @@ void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools)
             if (workDB(LayoutCapasity, WidgetCapasity)) {
                 QTimer::singleShot(500, [&mainWedgetTools, &gif, &gifLoad]() {
                     gif->stop();
+                    gif->deleteLater();
                     gifLoad->deleteLater();
                     mainWedgetTools->setEnabled(true);  // Розблокування вікна
-                    QApplication::setOverrideCursor(Qt::ArrowCursor);
+                    QApplication::restoreOverrideCursor();
                     });
                 timer->stop();
             }
