@@ -95,26 +95,21 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
     //кнопки
     QPushButton* aboutUsButton = new QPushButton("Про нас", mainWindowToolsLeftWidget);
     QPushButton* helpButton = new QPushButton("Допомога", mainWindowToolsLeftWidget);
-    QPushButton* aboutProgramButton = new QPushButton("Про програму", mainWindowToolsLeftWidget);
 
 
     //встановлення розтягування
     mainWindowToolsLeftLayout->setColumnStretch(0, 3);
     mainWindowToolsLeftLayout->setColumnStretch(1, 3);
-    mainWindowToolsLeftLayout->setColumnStretch(2, 3);
     //встановлення політики (як воно себе поводитиме)
     aboutUsButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     helpButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    aboutProgramButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 
     //прикріплення сигналів натиску на кнопку зі слотами обробки
     connect(aboutUsButton, &QPushButton::released, this, &MainWindow_C::AboutUsButtonPressed);
     connect(helpButton, &QPushButton::released, this, &MainWindow_C::HelpButtonPressed);
-    connect(aboutProgramButton, &QPushButton::released, this, &MainWindow_C::AboutProgramPressed);
     //встановюю назви об'єктів (однакові) для кнопок
     aboutUsButton->setObjectName("customButton");
     helpButton->setObjectName("customButton");
-    aboutProgramButton->setObjectName("customButton");
     //встановлення стилів
     QString buttonStyle =
         "#customButton {"
@@ -141,14 +136,10 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
         "   background-color: rgb(90,90,90);"
         "}"
     );
-
-    aboutProgramButton->setStyleSheet(buttonStyle);
     helpButton->setStyleSheet(buttonStyle);
     aboutUsButton->setStyleSheet(buttonStyle);
-
     mainWindowToolsLeftLayout->addWidget(aboutUsButton, 0, 0, 1, 1);
     mainWindowToolsLeftLayout->addWidget(helpButton, 0, 1, 1, 1);
-    mainWindowToolsLeftLayout->addWidget(aboutProgramButton, 0, 2, 1, 1);
 
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
@@ -475,32 +466,179 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     settingsWidget->exec();
 }
 
-
 void MainWindow_C::HelpButtonPressed() {
     //нове вікно з кнопками для додавання студентів,і для видалення 
     QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
-    settingsWidget->setStyleSheet("#settingsWidget {    background-color: rgb(30, 30, 30); }");
+    settingsWidget->setStyleSheet("#settingsWidget {    background-color: rgb(30, 30, 30); padding: 5px; }");
 
     QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
     settingsWidget->setWindowTitle("Допомога");
     QIcon mainIcon("Images/title.png");
     settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
 
-    settingsWidget->setFixedSize(400, 400);
-    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
-    settingsWidget->exec();
-}
-void MainWindow_C::AboutProgramPressed() {
-    //нове вікно з кнопками для додавання студентів,і для видалення 
-    QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
-    settingsWidget->setStyleSheet("#settingsWidget {    background-color: rgb(30, 30, 30); }");
+    QWidget* MainWidget = new QWidget(settingsWidget); MainWidget->setObjectName("MainWidget");
+    QGridLayout* MainLayout = new QGridLayout(MainWidget);
 
-    QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
-    settingsWidget->setWindowTitle("Про програму");
-    QIcon mainIcon("Images/title.png");
-    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+    QScrollArea* WidgetScroll = new QScrollArea(MainWidget);
 
-    settingsWidget->setFixedSize(400, 400);
+    QLabel* MainText = new QLabel(MainWidget); MainText->setObjectName("MainText");
+    MainText->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    MainText->setWordWrap(true); // Увімкнути перенесення тексту
+    WidgetScroll->setWidget(MainText);
+    WidgetScroll->setWidgetResizable(true);
+    /*
+    <b>жжрний</b> <br>
+    <i>курсив</i> <br>
+    <u>підкреслення</u> <br>
+    <sup>верхній індекс</sup> <br>
+    <sub>нижній індекс</sub> <br>
+    <mark>виділення тексту</mark> <br>
+    <h1>заголовок1</h1> <br>
+    <h2>заголовок2</h2> <br>
+    <h3>заголовок3</h3> <br>
+    <h4>заголовок4</h4> <br>
+    <h5>заголовок5</h5> <br>
+    <h6>заголовок6</h6> <br>
+
+    */
+
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+    this->setEnabled(false);
+    MainText->setText(
+        "<html>"
+        "   <body>"
+        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"  
+        "           Зараз ми вам допоможемо!"
+        "       </div>"
+        "       <hr>"
+        "       <div style = 'font-size: 18px; color: #ffffff; font-weight: bold;'>"
+        "           Знайомство"
+        "       </div>"
+        "       <div style = 'font-size: 14px; color: #ffffff;'>"
+        "           Раді що завітали до нас! Ми - студенти-програмісти університету \"Запорізька політехніка\" які виконують курсовий проєкт в цілях отримати залік. Бажаємо приємного користування додатком! "
+        "       </div>"
+        "       <div style = 'font-size: 18px; color: #ffffff; font-weight: bold;'>"
+        "           Що це?"
+        "       </div>"
+        "       <div style = 'font-size: 14px; color: #ffffff;'>"
+        "           Цей додаток був розроблений в цілях структурувати оцінки студентів у одне місце, а також полегшити взаємодію з ними."
+        "       </div>"
+        "       <div style = 'font-size: 18px; color: #ffffff; font-weight: bold;'>"
+        "       Як користуватись?"  
+        "       </div>"
+        "       <ol>"
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Головне вікно (Успішність студентів)"
+        "               </div>"
+        "               <div style = 'font-size: 14px; color: #ffffff;'>"
+        "                   Поточне вікно зустрічає вас 2-ма частинами <i>верхньою </i> та <i>нижньою</i> які візуально поділені на 3 підчастини кожна."
+        //here: якщо буде доданий пошук, то ось текст який відповідає за його опис
+        "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою та перейти до налаштувань."
+        "                   <br><u>Нижня частина</u>- відповідає за навігацію та пошук студента вручну натискаючи на <i>блоки</i>."
+        "                   <br><u>Блоки</u> - це кнопки, які допомагають знайти оцінки студента. "
+        "                   <br><u>Лівий віджет блоків</u> - відповідає за блоки із (спеціальністю), і якщо натиснути на нього, Ви отримаєте всі групи, факультети і тд. які мають обрану спеціальність."
+        "                   <br><u>Центральний віджет блоків</u> - відповідає одразу за групи, та за студентів. Одразу Вам буде видно тільки групи, так щоб отримати, блоки із студентами треба зробити *клік* "
+        "                   по блоку з групою. Після цього у Вас з'явиться доступ до студентів які є у групі. Натиснувши на будь-який блок із студентом ви відкриєте вікно з <i>предметами студента </i>."
+        "                   <br><u>Правий віджет блоків</u> - у цьому віджеті ви можете обрати певний факультет щоб зменшити пошуки груп та студентів.<br>"
+        "               </div>"
+        "           </li>"
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Вікно (Про нас)"
+        "               </div>"
+        "               <div  style = 'font-size: 14px; color: #ffffff;'>"
+        "                   Це вікно призначене для перегляду розробників, їх акаунтів на Github, фото яке розробники бажали вставити, а також хто за що був відповідальний.<br>"  
+        "               </div>"
+        "           </li>"
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Вікно (Допомога)"
+        "               </div>"
+        "               <div  style = 'font-size: 14px; color: #ffffff;'>"
+        "                   В цьому вікні ви можете почитати що означає кожен віджет, для чого ця програма була створена, як нею користуватись. Цей віджет вам гарантовано допоможе!<br>"
+        "               </div>"
+        "           </li>"
+        //here:  якщо буде додано пошук, то напиши про нього тут
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Вікно (Налаштування)"
+        "               </div>"
+        "               <div  style = 'font-size: 14px; color: #ffffff;'>"
+        "                   Вікно зустріне вас 8-ма кнопками, які додають студетів/групи/факультети і тд. (Після натиску на будь-яку кнопку з цього меню Вам буде надано поле для введеня "
+        "                   і підказака що саме треба ввести у поле. Якщо ви спробуєте одразу зберегти (нічого не написавши у поле/поля буде попередження. Якщо ви додасте спеціальність/факультет/групу і тд. "
+        "                   яка вам більше не потрібна, ви можете її в будь-який час видалити за допомогою відповідних кнопок. "
+        "                   Якщо ви заповнили поля для додавання/видалення і натиснули збереги (або видалити) то у правому нижньому куту екрану з'явиться повідомлення про це."  
+        "               </div>"
+        "           </li>"
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Вікно (Предмети студента)"
+        "               </div>"
+        "               <div  style = 'font-size: 14px; color: #ffffff;'>"
+        "                   Тут ви можете бачити ще одні блоки, але вони пов'язані з предметами поточного студента. Ви можете <i>додати</i> або <i>видалити</i> певний предмет вказавши його назву."
+        "               </div>"
+        "           </li>"
+        "           <li>"
+        "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
+        "                   Вікно (Оцінки студента)"
+        "               </div>"
+        "               <div  style = 'font-size: 14px; color: #ffffff;'>"
+        "                   В цьому вікні є текстове поле в яке Ви додаєте оцінки (не важливо як, зчитані будуть тільки числа без будь-яких символів) при додаванні оцінок у текстове поле і натисканні"
+        "                   \"зберегти\", після повторного перезаходу, ті оцінки, які були введені виведуться знову для редагування. Ви можете видалити всі оцінки залишивши пусте поле і зберегти його"
+        "                   , а можете одразу додати всі оцінки які має цей студент."
+        "               </div>"
+        "           </li>"
+        "       </ol>"
+        "   </body>"
+        "</html>"
+    );
+
+
+
+    MainText->setStyleSheet(
+        "#MainText {" 
+        "   background-color: transparent;"
+        "   padding: 10px;"
+        "}"
+    );
+    MainWidget->setStyleSheet(
+        "#MainWidget {"
+        "   background-color: rgb(90,90,90);"
+        "   border-radius: 10px;"
+        "}"
+    );
+    WidgetScroll->setStyleSheet(
+        "QScrollArea {"
+        "   border: none;"
+        "   background-color: transparent;"
+        "}"
+        "QScrollBar:vertical {"
+        "    width: 8px;"
+        "    margin: 0px;"
+        "    padding: 0px;"
+        "    border-radius: 4px;"
+        "    background-color: rgb(90,90,90);"
+        "}"
+        "QScrollBar::handle:vertical {"
+        "    background: rgb(64,64,64);"
+        "    min-height: 20px;"
+        "    border-radius: 4px;"
+        "}"
+        "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
+        "    height: 0px;"
+        "}"
+        "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {"
+        "    background: none;" //ось це прибирає прозорість блоку, де знаходиться повзунок 
+        "}"
+    );
+    this->setEnabled(true);
+    QApplication::restoreOverrideCursor();
+    MainLayout->addWidget(WidgetScroll);
+    settingsLayout->addWidget(MainWidget);
+    settingsWidget->setFixedSize(500, 500);
+    MainLayout->setSpacing(0);
+    MainLayout->setContentsMargins(0, 5, 5, 5);
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
@@ -903,7 +1041,6 @@ void MainWindow_C::SaveButtonFor_AddStudent(QDialog* dialog) {
     SaveButtonFor_AllType(dialog, "Успішно додано!", "8, 82, 79", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
 }
 
-
 void MainWindow_C::DeleteButtonFor_DeleteStudent(QDialog* dialog) {
     // Лямбда-функція для дій з БД (додати студента)
     auto dbAction = [this](vector<QString> AllLineEdits) {
@@ -1085,7 +1222,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
 
 
 SmallMessage_C::SmallMessage_C(QWidget* parent) : QWidget(parent) {}
-void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout) {
+void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout, Qt::Alignment aligment, int row, int column, int rowSpan, int ColumnSpan) {
     QLabel* label = new QLabel(text, this);
     label->setObjectName("label"); //унікальна назва для CSS
     label->setFixedSize(160, 40); //фіксований розмір
@@ -1105,7 +1242,7 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
     label->setAlignment(Qt::AlignCenter);
 
     //вирівнювання віджету
-    layout->addWidget(label, 1, 0, 1, 1, Qt::AlignBottom | Qt::AlignRight);
+    layout->addWidget(label, row, column, rowSpan, ColumnSpan, aligment);
     QTimer* timer = new QTimer(this); //таймер 
     //підключаю сигнал закінчення таймеру до лямбда функції яка видалить label
 
@@ -1512,7 +1649,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
     QPushButton* delPredmet = new QPushButton("Видалити предмет", WidgetButton); delPredmet->setObjectName("delPredmet");
     //вікно з додаванням та видаленням предметів
 
-    auto WindowAddAndDelPredmet = [](const QString& title, const QString& Label, const QString& textButton, QString& PredmetName) {
+    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget](const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
         QDialog* dialog = new QDialog(); dialog->setObjectName("dialog");
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         QGridLayout* layout = new QGridLayout(dialog); layout->setObjectName("layout");
@@ -1521,7 +1658,9 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         QLabel* text = new QLabel(Label, dialog); text->setObjectName("text");
         QLineEdit* line = new QLineEdit(dialog); line->setObjectName("line");
         QPushButton* button = new QPushButton(textButton, dialog); button->setObjectName("button");
-        QObject::connect(button, &QPushButton::released, [&PredmetName, dialog, line]() {
+
+
+        QObject::connect(button, &QPushButton::released, [settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line]() {
             if (line->text().isEmpty()) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(dialog->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
@@ -1530,6 +1669,8 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             }
             else {
                 PredmetName = line->text();
+                SmallMessage_C* smallWindow = new SmallMessage_C(settingsWidget);
+                smallWindow->show(textW, color, settingsLayout, Qt::AlignHCenter| Qt::AlignTop, 0,0, 1,2);
                 dialog->accept();
             }
             });
@@ -1578,7 +1719,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
     };
     connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
-        WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName);
+        WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName, "Успішно додано!", "8, 82, 79");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1586,7 +1727,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         });
     connect(delPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
-        WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName);
+        WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
         ///////////////////////////////////////////////////////////////////////////////////////////////////

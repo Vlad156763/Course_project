@@ -79,7 +79,7 @@ public:
 class SmallMessage_C : public QWidget {
 public:
     SmallMessage_C(QWidget*);
-    void show(const QString&, const QString&, QGridLayout*);
+    void show(const QString&, const QString&, QGridLayout*, Qt::Alignment = Qt::AlignBottom | Qt::AlignRight, int = 1, int = 0, int = 1, int = 1 );
 };
 class WarningDialog : public QDialog {
 public:
@@ -179,7 +179,6 @@ private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"
     void HelpButtonPressed();// допомога
-    void AboutProgramPressed(); //про програму
     //слоти для інструментального віджету (правий віджет)
     void setingsButtonPressed(); //натиснуто кнопку налаштувань
     //слоти для налаштувань (првий віджет інструментів)
