@@ -27,22 +27,19 @@
 
 
 
+
 #include <QtSql/qsqldatabase.h>
 #include <QtSql/qsqlerror.h>
 #include <QtSql/qsqlquery.h>
 #include <qabstractitemview.h>
 
 #include <iostream>
-#include <chrono>
-#include <thread>
 #include <vector>
 #include <cstring>//для std::strrchr
 
 using std::cerr;
 using std::strrchr;
 using std::vector;
-using std::this_thread::sleep_for;
-using namespace std::chrono;
 
 #define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define cqdout (qDebug() << "┌[msg]" << FILENAME << __LINE__ << "\n└TEXT:" )
@@ -117,7 +114,7 @@ private:
     
 public:
     blockWidget(const QString&, QWidget* = nullptr);
-    
+    blockWidget(QWidget* = nullptr);
     void AddStructure();
 
 private:
@@ -197,6 +194,5 @@ public:
     friend class blockWidget;
 };
 //логіка для вікон з додаванням та видаленням
-
 
 #endif //!MAINWINDOW_H

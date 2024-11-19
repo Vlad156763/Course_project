@@ -73,12 +73,14 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <PostBuildEvent>
-      <Command>C:\My_file\programming_libraries\C++\Qt\6.8.0\msvc2022_64\bin\windeployqt.exe --release "$(TargetDir)$(TargetName).exe"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PostBuildEvent>
-      <Command>C:\My_file\programming_libraries\C++\Qt\6.8.0\msvc2022_64\bin\windeployqt.exe --debug "$(TargetDir)$(TargetName).exe"</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">

@@ -1220,7 +1220,6 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
     dialog->exec();
 }
 
-
 SmallMessage_C::SmallMessage_C(QWidget* parent) : QWidget(parent) {}
 void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout, Qt::Alignment aligment, int row, int column, int rowSpan, int ColumnSpan) {
     QLabel* label = new QLabel(text, this);
@@ -1355,6 +1354,11 @@ blockWidget::blockWidget(const QString& text, QWidget* parent) : QPushButton(par
     this->layout = new QHBoxLayout(this);
     this->text = new smartText(text, this);
     this->circle = new circleQWidget(this);
+    layout->setSpacing(0);
+    layout->setContentsMargins(10, 10, 10, 10);
+}
+blockWidget::blockWidget(QWidget* parent) : QPushButton(parent) {
+    this->layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setContentsMargins(10, 10, 10, 10);
 }
@@ -1570,6 +1574,7 @@ void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainW
         counterTimers
     );
 }
+
 void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName) {
     cqdout << "StudyButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << '(' << StudyName << ')';
 
@@ -1788,6 +1793,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
+
 void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName, const QString& StudentName, const QString& PredmetName) {
     cqdout << "PredmetButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << '(' << StudentName << ')' << '(' << PredmetName << ')';
 
