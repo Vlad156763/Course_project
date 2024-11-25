@@ -44,6 +44,10 @@ using std::vector;
 #define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define cqdout (qDebug() << "┌[msg]" << FILENAME << __LINE__ << "\n└TEXT:" )
 
+
+
+
+
 void CreateTables();
 void addSpecialty(QSqlQuery& query, const QString& specialty);
 void addFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
@@ -60,6 +64,17 @@ void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& facu
 void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, int class_group);
 int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 void dropAllTables();
+
+
+//TODO: клас для сортування блоків у масиві
+
+
+class SandS {
+
+public:
+    int k = 0;
+
+};
 
 class counterTimer {
     int counter = 0;
@@ -116,7 +131,7 @@ public:
     blockWidget(const QString&, QWidget* = nullptr);
     blockWidget(QWidget* = nullptr);
     void AddStructure();
-
+    QDialog* setDialogForPredmet(const QString&, const QString&, const QString&, const QString&, QWidget**);
 private:
     void resizeEvent(QResizeEvent* ) override;
     QColor generateColorFromString(const QString&);
@@ -125,31 +140,33 @@ private:
     QHBoxLayout* layout = nullptr;
 
 public slots:
-    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&);
-    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&);
-    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&);
-    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
+    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&, SandS&);
+    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&, SandS&);
+    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&, SandS&);
+    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, SandS&);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
 };
 class configBlock{
 private:
     QWidget* widget = nullptr;
+    QLayout* layout = nullptr; 
 public:
     configBlock();
     void setWidget(QWidget*);
+    void setLayout(QLayout*);
     template<typename LaFunc>
-    void setConfigBlock(LaFunc, QWidget&, counterTimer&);
+    void setConfigBlock(LaFunc, QWidget&, counterTimer&, const QString&);
     template<typename LaFunc>
-    void setConfigPredmetBlock(LaFunc, QWidget*);
-
+    void setConfigPredmetBlock(LaFunc, QWidget*, const QString&);
+    friend class MainWindow_C;
 };
-
 class MainWindow_C : public QWidget {
     Q_OBJECT;
 private:
     QGridLayout* mainLayout = nullptr;
-    void leftSideToolsWidget(QWidget*, QGridLayout*)const;
-    void rightSideToolsWidget(QWidget*, QGridLayout*)const;
+    void leftSideToolsWidget(QWidget*, QGridLayout*);
+    void rightSideToolsWidget(QWidget*, QGridLayout*);
+    void ToolsMiddleWidget(QWidget*, QGridLayout*);
     //логіка кнопки збережння та видалення для всіх типів (шаблон для лямбда функції)
     template<typename LaFunc>
     void SaveButtonFor_AllType(QDialog*, const QString&, const QString&, LaFunc, const QStringList&);
@@ -163,7 +180,7 @@ private:
     void DeleteButtonFor_DeleteGroup(QDialog*);//метод для обробки кнопки "Видалити у "видалити групу"
     void DeleteButtonFor_DeleteFaculty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити факултет"
     void DeleteButtonFor_DeleteІSpetialty(QDialog*); //метод для обробки кнопки "Видалити" у "видалити спеціальність"
-    void showWindowAboutUs(const QString&, const QString&, const QString&, const QString&, QDialog*, QGridLayout*);//загальний метод для відображення вікон про нас
+    void showWindowAboutUs(const QString&, const QString&, const QString&, const QString&, QWidget*, QGridLayout*);//загальний метод для відображення вікон про нас
     template<typename LaFunc>
     void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
 
@@ -172,6 +189,8 @@ private:
 
     //таймер для відслідковування віджетів головної частини
     counterTimer* TimersCounter = nullptr;
+    //клас сортування для сортування всіх блоків 
+    SandS* SandSBlocks = nullptr;
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"
@@ -189,9 +208,7 @@ private slots:
     void DeleteSpecialtyButtonPressed();
 public:
     MainWindow_C(QWidget* = nullptr);
-    void show();
     ~MainWindow_C();
-    friend class blockWidget;
 };
 //логіка для вікон з додаванням та видаленням
 

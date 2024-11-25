@@ -1,11 +1,10 @@
 #include "mainWindow.h"
 
 
-
-
 MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     //встановлення таймеру
     this->TimersCounter = new counterTimer();
+    this->SandSBlocks = new SandS();
     //присворюю до змінної встановлення стилів
     this->setObjectName("mainWidget");
     this->setStyleSheet(
@@ -29,10 +28,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     //віджети головної частини
     QWidget* mainWindowAreaWidgetMiddle = new QWidget(mainWindowMainAreaWidget);
     QWidget* mainWindowAreaWidgetRight = new QWidget(mainWindowMainAreaWidget);
-    QWidget* mainWindowToolsMiddle = new QWidget(mainWindowToolsWidget);
-    //віджети для інструметів
-    QWidget* mainWindowToolsRight = new QWidget(mainWindowToolsWidget);
-
+    
     //для головної частини встановлюю коефіцієнт розтягування
     mainWindownMainAreaLayout->setColumnStretch(0, 3);
     mainWindownMainAreaLayout->setColumnStretch(1, 5);
@@ -51,20 +47,19 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     //викликаю методи для роботи з віджетом інструментів
     leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
     rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+    ToolsMiddleWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+
     //викликаю метод для роботи з головною частиною
     mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, *mainWindowMainAreaWidget);
-
+    
     QString styleWidgets =
         "   border-radius: 10px;"
         "   background-color: rgb(90,90,90);";
     mainWindowAreaWidgetMiddle->setStyleSheet(styleWidgets);
-    mainWindowToolsMiddle->setStyleSheet(styleWidgets);
     mainWindowAreaWidgetRight->setStyleSheet(styleWidgets);
     mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
     mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
 
-
-    mainWindowToolsLayout->addWidget(mainWindowToolsMiddle, 0, 1);
     //для головного вікна встановлюю коефіцієнт розгтягування
     this->mainLayout->setRowStretch(0, 1);
     this->mainLayout->setRowStretch(1, 12);
@@ -80,12 +75,79 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
 MainWindow_C::~MainWindow_C() {
 delete this->TimersCounter;
 this->close();
-}
-void MainWindow_C::show() {
-    this->showMaximized();
+delete this->SandSBlocks;
 }
 
-void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) const {
+
+void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
+    QWidget* mainWindowToolsMiddle = new QWidget(parentWidget);
+    QGridLayout* mainWindowToolsMiddleLayout = new QGridLayout(mainWindowToolsMiddle);
+    QString styleWidgets =
+        "   border-radius: 10px;"
+        "   background-color: rgb(90,90,90);";
+    mainWindowToolsMiddle->setStyleSheet(styleWidgets);
+    parentLayout->addWidget(mainWindowToolsMiddle, 0, 1);
+
+
+    QLabel* iconSearch = new QLabel(mainWindowToolsMiddle);
+    QLineEdit* lineEdit = new QLineEdit(mainWindowToolsMiddle);
+    lineEdit->setFixedHeight(40);
+    lineEdit->setStyleSheet(
+        "QLineEdit {"
+        "   background-color: rgb(70,70,70);"
+        "   border-radius: 5px;"
+        "   color: #ffffff;"
+        "   font-size: 20px;"
+        "   padding: 5px;"
+        "}"
+    );
+    /*
+    QString SpecialtyName = "1";
+QString FacultyName = "2";
+QString GroupName = "3";
+QString StudyName = "4";
+
+    */
+    QObject::connect(lineEdit, &QLineEdit::returnPressed, [lineEdit, mainWindowToolsMiddle, mainWindowToolsMiddleLayout, this]() {
+        QString StudyName, GroupName, FacultyName, SpecialtyName;
+        QWidget* PredmetBox;
+        blockWidget *tmp = new blockWidget(mainWindowToolsMiddle);
+        QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
+        configBlock block;
+        block.setWidget(PredmetBox);
+        block.setLayout(PredmetBox->layout());
+        block.setConfigPredmetBlock(
+            [this, SpecialtyName, FacultyName, GroupName, StudyName, tmp, PredmetBox, block](QGridLayout* layout, QWidget* widget)->bool {
+                //SandSBlocks
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
+                //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
+                static int counter = 0;
+                QString PredmetName = "Предмети";
+                if (counter++ >= 3) { counter = 0; return true; }
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
+                blockWidget* block = new blockWidget(PredmetName, PredmetBox);
+                connect(block, &QPushButton::released, [this, block, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
+                    block->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
+                    });
+
+                block->AddStructure();
+                layout->addWidget(block, counter++ + 1, 0);
+                return false;
+            },
+            PredmetBox,
+            "Предмети"
+        );
+        dialog->exec();
+    });
+
+
+
+    iconSearch->setPixmap(QPixmap("Images/searchIcon.png").scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+
+    mainWindowToolsMiddleLayout->addWidget(iconSearch, 0, 0);
+    mainWindowToolsMiddleLayout->addWidget(lineEdit, 0, 1);
+}
+void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
     //віджет і компоновщик
     QWidget* mainWindowToolsLeftWidget = new QWidget(parentWidget); mainWindowToolsLeftWidget->setObjectName("mainWindowToolsLeftWidget");
     QGridLayout* mainWindowToolsLeftLayout = new QGridLayout(mainWindowToolsLeftWidget);
@@ -143,7 +205,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
 
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
-void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) const {
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
     QGridLayout* mainWindowToolsRightLayout = new QGridLayout(mainWindowToolsRightWidget);
@@ -205,159 +267,190 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QWidget* LeftSide = new QWidget(parent); LeftSide->setObjectName("LeftSide"); CSS(LeftSide, "LeftSide");
     QWidget* MiddleSide = new QWidget(parent); MiddleSide->setObjectName("MiddleSide"); CSS(MiddleSide, "MiddleSide");
     QWidget* RightSide = new QWidget(parent); RightSide->setObjectName("RightSide"); CSS(RightSide, "RightSide");
+    //сітки для віджетів з блоками
+    QGridLayout* LeftSideLayout = new QGridLayout(LeftSide);
+    QGridLayout* MiddleSideLayout = new QGridLayout(MiddleSide);
+    QGridLayout* RightSideLayout = new QGridLayout(RightSide);
+    //HERE: зчитування всіх: спеціальностей, факультетів, груп, студентів, предметів, з БД і запис у масиви класу sortBlock
+    
     //підключення натиску на спеціальність для факульетів
+
     configBlock block;
     block.setWidget(LeftSide);
+    block.setLayout(LeftSideLayout);
     block.setConfigBlock(
         [this, &mainWedgetTools, RightSide, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: Отримати всі спеціальністі послідовно і записувати у SpecialtyName
+            //HERE: відбувається поступове отримання всіх спеціальностей із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
-            QString SpecialtyName;
-            auto ExampleGetOneSpecialty = []()->QString {
-                static int counter = 0;
-                //якщо в бд більше немає спеціальностей, лічильник очищається і повертається виключення
-                if (counter + 1 > 3) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі спеціальністю
-                else {
-                    vector<QString> SpecialtyNameArr;
-                    SpecialtyNameArr.push_back("Спеціальність 1");
-                    SpecialtyNameArr.push_back("Спеціальність 2");
-                    SpecialtyNameArr.push_back("Спеціальність 3");
-                    return SpecialtyNameArr[counter++];
-                }
-            };
-            try {
-                // тут SpecialtyName повинно отримувати з бд рядок спеціальності
-                SpecialtyName = ExampleGetOneSpecialty();
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення спеціальностей
-                counter = 0;
-                return true;
-            }
+            QString SpecialtyName = "спеціальність";
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-
             blockWidget* block = new blockWidget(SpecialtyName, widget);
             connect(block, &QPushButton::released, block, 
                 [this, block, RightSide, MiddleSide, SpecialtyName, &mainWedgetTools]() mutable {
-                    block->specialtyButtonPressed(*this->TimersCounter, mainWedgetTools, RightSide, MiddleSide, SpecialtyName);
-                })
-                ;
+                    block->specialtyButtonPressed(*this->TimersCounter, mainWedgetTools, RightSide, MiddleSide, SpecialtyName, *SandSBlocks);
+                });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         },
         mainWedgetTools, 
-        *this->TimersCounter
+        *this->TimersCounter, 
+        "Cпеціальності"
     );
     //коли натиснуто на блок з групою, весь віджет оновлюється щоб показати студентів у цій групі по центру
     block.setWidget(MiddleSide);
+    block.setLayout(MiddleSideLayout);
     block.setConfigBlock(
         [this, &mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
         ///////////////////////////////////////////////////////////////////////////////////////////////////
-        //todo: Отримати всі групи послідовно і записувати у GroupName
+        //HERE: відбувається поступове отримання всіх груп із об'єкта SandSBlocks за допомогою counter            
         static int counter = 0;
-        QString GroupName;
-        auto ExampleGetOneGroup = []() {
-            static int counter = 0;
-            //якщо в бд більше немає  груп, лічильник очищається і повертається виключення
-            if (counter + 1 > 3) {
-                counter = 0;
-                throw 5;
-            }
-            //в іншому випадку повертається рядок зі групою
-            else {
-                vector<QString> VectorArr;
-                VectorArr.push_back("Група 1");
-                VectorArr.push_back("Група 2");
-                VectorArr.push_back("Група 3");
-                return VectorArr[counter++];
-            }
-            };
-        try {
-            // тут GroupName повинно отримувати з бд рядок групи
-            GroupName = ExampleGetOneGroup();
-
-        }
-        catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення груп
-            counter = 0;
-            return true;
-        }
+        QString GroupName = "Групи";
+        if (counter++ >= 3) { return true;  counter = 0; }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         blockWidget* block = new blockWidget(GroupName, widget);
-        connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, GroupName]() { block->GroupButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", ""); });
+        connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, GroupName]() { block->GroupButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", "", *SandSBlocks); });
         block->AddStructure();
         layout->addWidget(block, counter++ + 1, 0);
         return false;
-    },
+        },
         mainWedgetTools,
-        * this->TimersCounter
+        * this->TimersCounter,
+        "Групи"
     );
     //коли натиснуто блок з факультету, оновлюється блоки з групами
     block.setWidget(RightSide);
+    block.setLayout(RightSideLayout);
     block.setConfigBlock(
         [this, &mainWedgetTools, MiddleSide](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: Отримати всі факультети послідовно і записувати у FacultyName
+            //HERE: відбувається поступове отримання всіх факультетів із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
-            QString FacultyName;
-            auto ExampleGetOneFaculty = []() {
-                static int counter = 0;
-                //якщо в бд більше немає  факультетів, лічильник очищається і повертається виключення
-                if (counter  + 1> 3) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі факультетом
-                else {
-                    vector<QString> VectorArr;
-                    VectorArr.push_back("Факультет 1");
-                    VectorArr.push_back("Факультет 2");
-                    VectorArr.push_back("Факультет 3");
-                    return VectorArr[counter++];
-                }
-                };
-            try {
-                //here: тут FacultyName повинно отримувати з бд рядок факультету
-                FacultyName = ExampleGetOneFaculty();
-
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення факультетів
-                counter = 0;
-                return true;
-            }
+            QString FacultyName = "факультети";
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
-            connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, FacultyName]() { block->FacultyButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, FacultyName, ""); });
+            connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, FacultyName]() { block->FacultyButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, FacultyName, "", *SandSBlocks); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         }, 
         mainWedgetTools,
-        *this->TimersCounter
+        *this->TimersCounter,
+        "Факультети"
     );
     parent_grid->addWidget(LeftSide, 0, 0);
     parent_grid->addWidget(MiddleSide, 0, 1);
     parent_grid->addWidget(RightSide, 0, 2);
 }
 
-
 //кнопка про нас
 void MainWindow_C::AboutUsButtonPressed() {
-    //нове вікно про нас 
+    //нове вікно про нас
     QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
-    
     QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
+
+    settingsWidget->setWindowTitle("Про нас");
+    QIcon mainIcon("Images/title.png");
+    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+    settingsLayout->setRowStretch(0, 6);
+    
+
+    QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
+    QGridLayout* bodyLayout = new QGridLayout(Body);
+
+    settingsWidget->setFixedSize(400, 400);
+    settingsLayout->addWidget(Body, 0, 0);
     //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
     settingsLayout->setRowStretch(1, 1);
     QWidget* Pagination = new QWidget(settingsWidget); Pagination->setObjectName("Pagination");
+    QGridLayout* PaginationLayout = new QGridLayout(Pagination);
+    PaginationLayout->setSpacing(5);
+    PaginationLayout->setContentsMargins(5, 5, 5, 5);
+    QPushButton* ButtonNavigateLright = new QPushButton(Pagination);
+    QPushButton* ButtonNavigateLeft = new QPushButton(Pagination);
+    ButtonNavigateLeft->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #787878;"
+        "   border: none;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:focus {"
+        "   outline: 0px;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: #828282;"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: #a0a0a0;"
+        "}"
+    );
+    ButtonNavigateLright->setStyleSheet(
+        "QPushButton {"
+        "   background-color: #787878;"
+        "   border: none;"
+        "   border-radius: 5px;"
+        "}"
+        "QPushButton:focus {"
+        "   outline: 0px;"
+        "}"
+        "QPushButton:hover {"
+        "   background-color: #828282;"
+        "}"
+        "QPushButton:pressed {"
+        "   background-color: #a0a0a0;"
+        "}"
+    );
+
+    ButtonNavigateLeft->setFixedSize(30, 30);
+    ButtonNavigateLright->setFixedSize(30, 30);
+
+    ButtonNavigateLeft->setIcon(QIcon("Images/arrowL.png"));
+    ButtonNavigateLright->setIcon(QIcon("Images/arrowR.png"));
+
+    PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
+    PaginationLayout->addWidget(ButtonNavigateLright, 0, 1, Qt::AlignLeft);
+
+    auto showDev = [this, Body, bodyLayout](int &currentDevelopVar) {
+        if (currentDevelopVar == 0) {
+            showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+        }
+        else if (currentDevelopVar == 1) {
+            showWindowAboutUs("Images/vladMamont.jpg", "Мамонт Владислав", "Базу даних", "https://github.com/Teensik", Body, bodyLayout);
+        }
+        else if (currentDevelopVar == 2) {
+            showWindowAboutUs("Images/anonim.png", "Третяк Олександр", "Алгоритми", "https://github.com/MrS1ngULaR1TY", Body, bodyLayout);
+        }
+        else if (currentDevelopVar == 3) {
+            showWindowAboutUs("Images/anonim.png", "Шевченко Родіон", "Розробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
+        }
+        else if (currentDevelopVar == 4) {
+            showWindowAboutUs("Images/anonim.png", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+        }
+        else if (currentDevelopVar > 4) {
+            showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+            currentDevelopVar = 0;
+        }
+        else if (currentDevelopVar < 0) {
+            showWindowAboutUs("Images/anonim.png", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+            currentDevelopVar = 4;
+        }
+        };
+    static int currentDevelopVar = 0;
+
+    connect(ButtonNavigateLright, &QPushButton::released, [this, showDev]() {
+        showDev(++currentDevelopVar);
+        });
+    connect(ButtonNavigateLeft, &QPushButton::released, [this, showDev]() {
+        showDev(--currentDevelopVar);
+        });
+
     settingsLayout->addWidget(Pagination, 1, 0);
     QString styleForWidget =
         "#Pagination {"
-        "   background-color: rgb(90,90,90);"
+        "   background-color: rgb(70,70,70);"
         "   border-radius: 10px;"
         "   padding: 10px;"
         "}";
@@ -369,17 +462,11 @@ void MainWindow_C::AboutUsButtonPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     Pagination->setStyleSheet(styleForWidget);
     //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
-    showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", settingsWidget, settingsLayout);
-
+    showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+    settingsWidget->exec();
 }
 //загальне вікно для виведення інформації про нас
-void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, const QString& responsible, const QString& linkToGit, QDialog* settingsWidget, QGridLayout* settingsLayout)  {
-    settingsWidget->setWindowTitle("Про нас");
-    QIcon mainIcon("Images/title.png");
-    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    settingsLayout->setRowStretch(0, 6);
-    QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
-    settingsLayout->addWidget(Body, 0, 0);
+void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, const QString& responsible, const QString& linkToGit, QWidget* Body, QGridLayout* bodyLayout)  {
     QString styleForWidget =
         "#Body {"
         "   background-color: rgb(90,90,90);"
@@ -388,7 +475,7 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
         "}";
     Body->setStyleSheet(styleForWidget);
     // для основного віджету встановлюю компоновщик і два віджети для фото і для тексту
-    QGridLayout* bodyLayout = new QGridLayout(Body);
+
     QWidget* textLocation = new QWidget(Body); textLocation->setObjectName("textLocation");
     textLocation->setStyleSheet(
         "#textLocation {"
@@ -401,7 +488,7 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     //для текстового віджету додаю компоновщик щоб красиво розприділити текст
     QGridLayout* textLayout = new QGridLayout(textLocation);
     //додаю текст
-    QLabel* textName = new QLabel("Гайлунь Владислав", textLocation); textName->setObjectName("textName");
+    QLabel* textName = new QLabel(name, textLocation); textName->setObjectName("textName");
     QLabel* textLink = new QLabel(
         "<a href='" + linkToGit + "' style='color: rgb(53, 133, 129);'>Github</a>", textLocation
     );
@@ -419,27 +506,11 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     );
     textLink->setOpenExternalLinks(true); //відкриття зовнішніх посилань
     //налаштовую фото
-    QPixmap photoLocationPixmap(path);
+    
     QLabel* photoLabel = new QLabel(Body);  photoLabel->setObjectName("photoLabel");
-    photoLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    photoLabel->setPixmap(QPixmap(path).scaled(215, 215, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     photoLabel->setAlignment(Qt::AlignCenter);
-    /*
-    Щоб додати зображення до вікна (і маштабувати його правильно)
-    треба отримати розмір мітки, в якій зберігається фото, однак до моменту виклику
-    обробника подій exec НЕМОЖЛИВО отримати розмір.
-    Тому я додав таймер який спрацює одразу ж як тільки обробник подій до нього дійде.
-    Як це працює:
-    Коли запускається обробник подій, він запускає таймер на 0 секунд, після того, як таймер
-    вийшов, обробник подій виконує код у SetAutoSizeForImg а там автоматичні підлаштування для фото
-    */
-    auto SetAutoSizeForImg = [photoLabel, photoLocationPixmap]() {
-        photoLabel->setPixmap(
-            photoLocationPixmap.scaled(
-                photoLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation
-            )
-        );
-        };
-    QTimer::singleShot(0, SetAutoSizeForImg);
+   
     photoLabel->setObjectName("photoLabel");
     photoLabel->setStyleSheet(
         "#photoLabel {"
@@ -460,10 +531,6 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     textLink->setAlignment(Qt::AlignRight);
     textLayout->addWidget(textResponsible, 1, 0);
     textResponsible->setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
-    //розміри, пам'ять обробка подій
-    settingsWidget->setFixedSize(400, 400);
-    settingsWidget->exec();
 }
 
 void MainWindow_C::HelpButtonPressed() {
@@ -486,22 +553,6 @@ void MainWindow_C::HelpButtonPressed() {
     MainText->setWordWrap(true); // Увімкнути перенесення тексту
     WidgetScroll->setWidget(MainText);
     WidgetScroll->setWidgetResizable(true);
-    /*
-    <b>жжрний</b> <br>
-    <i>курсив</i> <br>
-    <u>підкреслення</u> <br>
-    <sup>верхній індекс</sup> <br>
-    <sub>нижній індекс</sub> <br>
-    <mark>виділення тексту</mark> <br>
-    <h1>заголовок1</h1> <br>
-    <h2>заголовок2</h2> <br>
-    <h3>заголовок3</h3> <br>
-    <h4>заголовок4</h4> <br>
-    <h5>заголовок5</h5> <br>
-    <h6>заголовок6</h6> <br>
-
-    */
-
     QApplication::setOverrideCursor(Qt::WaitCursor);
     this->setEnabled(false);
     MainText->setText(
@@ -938,7 +989,6 @@ void MainWindow_C::DeleteSpecialtyButtonPressed() {
         saveAction
     );
 }
-
 // БД
 void MainWindow_C::SaveButtonFor_AddSpecialty(QDialog* dialog) {
     // Лямбда-функція для дій з БД спеціальність
@@ -1418,7 +1468,7 @@ QColor blockWidget::generateColorFromString(const QString& input) {
     }
     return QColor::fromHsl(hue, saturation, lightness);
 }
-void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName) {
+void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName, SandS& SandSAllBlocks) {
     cqdout << "specialtyButtonPressed" << '(' << SpecialtyName << ')' << "(None)" << "(None)" << "(None)" << "(None)";
     static QPointer<blockWidget> prevPressedButton = nullptr;
     if (prevPressedButton && prevPressedButton != this) {
@@ -1457,127 +1507,107 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
     
     configBlock block;
     block.setWidget(RightSide);
+    block.setLayout(RightSide->layout());
     block.setConfigBlock(
-        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName, &SandSAllBlocks](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: отримати всі факультети які мають поточну спеціальність SpecialtyName і записувати послідовно у FacultyName 
+            //HERE: відбувається поступове отримання факультетів, які мають спеціальність SpecialtyName із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             //ця зміна повинна мати будь-який факультет, який має спеціальність SpecialtyName
             QString FacultyName = "Факультет з спеціальністю";
-            auto ExampleGetOneFaculty = [SpecialtyName]() {
-                static int counter = 0;
-                //якщо в бд більше немає  факультетів, лічильник очищається і повертається виключення
-                if (counter++ >= 8) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі факультетом
-                else {}
-                };
-            try {
-                // тут FacultyName повинно отримувати з бд рядок факультету
-                ExampleGetOneFaculty();
-
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення факультетів
-                counter = 0;
-                return true;
-            }
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
             connect(block, &QPushButton::released,
-                [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, FacultyName]() {
-                    block->FacultyButtonPressed(counterTimers, mainWedgetTools, MiddleSide, FacultyName, SpecialtyName);
+                [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, FacultyName, &SandSAllBlocks]() {
+                    block->FacultyButtonPressed(counterTimers, mainWedgetTools, MiddleSide, FacultyName, SpecialtyName, SandSAllBlocks);
                 });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         }, 
         mainWedgetTools, 
-        counterTimers
+        counterTimers,
+        "Факультети"
     );
     block.setWidget(MiddleSide);
+    block.setLayout(MiddleSide->layout());
     block.setConfigBlock(
-        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName, &SandSAllBlocks](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: Отримати всі групи, які мають спеціальність SpecialtyName і записувати послідовно у GroupName 
+            //HERE: відбувається поступове отримання груп, які мають спеціальність SpecialtyName із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString GroupName = "Група з спеціальністю ";
-            auto ExampleGetOneGroup = []() {
-                static int counter = 0;
-                //якщо в бд більше немає груп, лічильник очищається і повертається виключення
-                if (counter++ >= 20) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі групою
-                else {}
-                };
-            try {
-                //тут GroupName повинно отримувати з бд рядок з групою
-                ExampleGetOneGroup();
-
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення груп
-                counter = 0;
-                return true;
-            }
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
-            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, "", SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, GroupName, &SandSAllBlocks]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, "", SpecialtyName, SandSAllBlocks); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         }, 
         mainWedgetTools, 
-        counterTimers
+        counterTimers,
+        "Групи"
     );
 }
-void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName) {
+void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, SandS& SandSAllBlocks) {
     cqdout << "GroupButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << "(None)" << "(None)";
     configBlock block;
     block.setWidget(widget);
+    block.setLayout(widget->layout());
     block.setConfigBlock(
-        [&counterTimers, &mainWedgetTools, widget, SpecialtyName, FacultyName, GroupName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, widget, SpecialtyName, FacultyName, GroupName, &SandSAllBlocks](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: зчитати всіх студентів які мають SpecialtyName, FacultyName, GroupName (ці значення можуть бути пусті, тому треба перевіряти їх) і послідовно записувати у StudyName
+            //HERE: відбувається поступове отримання ПІБ студенітів, які мають спеціальність, факультет і групу (спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString StudyName = "Студенти";
-            auto ExampleGetOneStudy = []() {
-                static int counter = 0;
-                //якщо в бд більше немає студентів, лічильник очищається і повертається виключення
-                if (counter++ >= 22) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі студентом
-                else {}
-                };
-            try {
-                //here: тут StudyName повинно отримувати з бд рядок з студентами
-                ExampleGetOneStudy();
-
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення груп
-                counter = 0;
-                return true;
-            }
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(StudyName, widget);
             // кнопки поки не пригвинчую, так як кнопки зі студентами треба привязати до вікна редагування їх оцінок
-            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, widget, FacultyName, StudyName, GroupName, SpecialtyName]() {block->StudyButtonPressed(StudyName, GroupName, FacultyName, SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, widget, FacultyName, StudyName, GroupName, SpecialtyName, &SandSAllBlocks]() {block->StudyButtonPressed(StudyName, GroupName, FacultyName, SpecialtyName, SandSAllBlocks); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         },
         mainWedgetTools,
-        counterTimers
+        counterTimers,
+        "Студенти"
     );
 }
 
-void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName) {
+void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, SandS& SandSAllBlocks) {
     cqdout << "StudyButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << '(' << StudyName << ')';
 
+    QWidget*PredmetBox;
+    QDialog* dialog = this->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
+    configBlock block;
+    block.setWidget(PredmetBox);
+    block.setLayout(PredmetBox->layout());
+    block.setConfigPredmetBlock(
+        [SpecialtyName, FacultyName, GroupName, StudyName, this, PredmetBox, block, &SandSAllBlocks](QGridLayout* layout, QWidget* widget)->bool {
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
+            static int counter = 0;
+            QString PredmetName = "Предмети";
+            if (counter++ >= 3) { counter = 0; return true; }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            blockWidget* block = new blockWidget(PredmetName, PredmetBox);
+            connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
+                this->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
+            });
+
+            block->AddStructure();
+            layout->addWidget(block, counter++ + 1, 0);
+            return false;
+        },
+        PredmetBox,
+        "Предмети"
+    );
+    dialog->exec();    
+}
+QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, QWidget** PredmetBoxM) {
     QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
     settingsWidget->setStyleSheet(
         "#settingsWidget {"
@@ -1590,6 +1620,8 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
     settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
 
     QWidget* PredmetBox = new QWidget(settingsWidget); PredmetBox->setObjectName("PredmetBox");
+    *PredmetBoxM = PredmetBox;
+    QGridLayout* PredmetBoxLayout = new QGridLayout(PredmetBox);
     QWidget* WidgetButton = new QWidget(settingsWidget); WidgetButton->setObjectName("WidgetButton");
     QGridLayout* layoutButton = new QGridLayout(WidgetButton);
 
@@ -1605,50 +1637,8 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         "   background-color: rgb(90,90,90);"
         "}"
     );
-    
-    configBlock block;
-    block.setWidget(PredmetBox);
-    
-    block.setConfigPredmetBlock(
-        [SpecialtyName, FacultyName, GroupName, StudyName, this, PredmetBox, block](QGridLayout* layout, QWidget* widget)->bool {
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: зчитати всі предмети, які мають SpecialtyName, FacultyName, GroupName, StudyName (ці поля можуть бути пусті) і послідовно виводити у PredmetName
-            static int counter = 0;
-            QString PredmetName = "Предмети";
-            auto ExampleGetOnePredmet = []() {
-                static int counter = 0;
-                //якщо в бд більше немає спеціальностей, лічильник очищається і повертається виключення
-                if (counter++ >= 10) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі предметом
-                else {}
-                };
-            try {
-                //here: тут PredmetName  повинно отримувати з бд рядок предмету
-                ExampleGetOnePredmet();
 
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення предметів
-                counter = 0;
-                return true;
-            }
-            ///////////////////////////////////////////////////////////////////////////////////////////////////
-            blockWidget* block = new blockWidget(PredmetName, widget);
-            connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
 
-                this->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
-            });
-
-            block->AddStructure();
-            layout->addWidget(block, counter++ + 1, 0);
-            return false;
-        },
-        PredmetBox
-    );
-
-    
     //частина з кнопками 
     QPushButton* addPredmet = new QPushButton("Додати предмет", WidgetButton); addPredmet->setObjectName("addPredmet");
     QPushButton* delPredmet = new QPushButton("Видалити предмет", WidgetButton); delPredmet->setObjectName("delPredmet");
@@ -1675,7 +1665,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             else {
                 PredmetName = line->text();
                 SmallMessage_C* smallWindow = new SmallMessage_C(settingsWidget);
-                smallWindow->show(textW, color, settingsLayout, Qt::AlignHCenter| Qt::AlignTop, 0,0, 1,2);
+                smallWindow->show(textW, color, settingsLayout, Qt::AlignHCenter | Qt::AlignTop, 0, 0, 1, 2);
                 dialog->accept();
             }
             });
@@ -1712,17 +1702,17 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             "  background-color: rgb(150, 150, 150);"
             "}"
         );
-        layout->addWidget(text,0,0);
+        layout->addWidget(text, 0, 0);
         layout->addWidget(line, 0, 1);
         layout->addWidget(button, 1, 0, 1, 2);
 
         dialog->setWindowIcon(icon);
         dialog->setWindowTitle(title);
-        
+
 
         dialog->exec();
-    };
-    connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
+        };
+    QObject::connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
         WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName, "Успішно додано!", "8, 82, 79");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1730,14 +1720,14 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         cqdout << SpecialtyName << ", " << FacultyName << ", " << GroupName << ", " << StudyName << ", " << PredmetName;
         });
-    connect(delPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
+    QObject::connect(delPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         });
-      
+
     settingsLayout->setRowStretch(0, 25);
     settingsLayout->setRowStretch(1, 1);
     settingsLayout->addWidget(PredmetBox, 0, 0, 1, 2);
@@ -1745,7 +1735,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
 
     addPredmet->setFixedHeight(30);
     delPredmet->setFixedHeight(30);
-    
+
     addPredmet->setStyleSheet(
         "#addPredmet {"
         "   border-radius: 5px;"
@@ -1791,7 +1781,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
 
     settingsWidget->setFixedSize(600, 600);
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
-    settingsWidget->exec();
+    return settingsWidget;
 }
 
 void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName, const QString& StudentName, const QString& PredmetName) {
@@ -1896,7 +1886,7 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
 
     dialog->exec();
 }
-void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* MiddleSide, const QString& FacultyName, const QString& SpecialtyName) {
+void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* MiddleSide, const QString& FacultyName, const QString& SpecialtyName, SandS& SandSAllBlocks) {
     cqdout << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << "(None)" << "(None)" << "(None)";
     static QPointer<blockWidget> prevPressedButton = nullptr;
     if (prevPressedButton && prevPressedButton != this) {
@@ -1935,71 +1925,130 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mai
 
     configBlock block;
     block.setWidget(MiddleSide);
+    block.setLayout(MiddleSide->layout());
     block.setConfigBlock(
-        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName, FacultyName](QGridLayout* layout, QWidget* widget)->bool {
+        [&counterTimers, &mainWedgetTools, MiddleSide, SpecialtyName, FacultyName, &SandSAllBlocks](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
-            //todo: Отримати всі групи які мають поточний факультет і спеціальність (спеціальність може бути пуста) і послідовно записувати у GroupName
+            //HERE: відбувається поступове отримання груп, які мають факультет і спеціальність (спеціальність може бути пуста) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString GroupName = "Група з спеціальністю і факультетом";
-            auto ExampleGetOneGroup = []() {
-                static int counter = 0;
-                //якщо в бд більше немає груп, лічильник очищається і повертається виключення
-                if (counter++ >= 2) {
-                    counter = 0;
-                    throw 5;
-                }
-                //в іншому випадку повертається рядок зі групою
-                else {}
-                };
-            try {
-                //here: тут GroupName повинно отримувати з бд рядок з групою
-                ExampleGetOneGroup();
-
-            }
-            catch (int) {//поки ловлю виняток int, але треба зробити щоб ловилась тільки певне виключеня яке генеруватиме метод повернення груп
-                counter = 0;
-                return true;
-            }
+            if (counter++ >= 3) { return true;  counter = 0; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
-            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, FacultyName, SpecialtyName, GroupName]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, FacultyName, SpecialtyName); });
+            connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, FacultyName, SpecialtyName, GroupName, &SandSAllBlocks]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, FacultyName, SpecialtyName, SandSAllBlocks); });
             block->AddStructure();
             layout->addWidget(block, counter++ + 1, 0);
             return false;
         }, 
         mainWedgetTools,
-        counterTimers
+        counterTimers,
+        "Групи"
     );
 }
 configBlock::configBlock() {}
 void configBlock::setWidget(QWidget* widget) {
     this->widget = widget;
 }
+void configBlock::setLayout(QLayout* layout ) {
+    this->layout = layout;
+}
 
 template<typename LaFunc>
-void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counterTimer& counterTimers) {
-
-    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(widget->layout());
-    if (!layout) {
-        layout = new QVBoxLayout(widget);
+void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counterTimer& counterTimers, const QString& textTitle) {
+    //видалення всіх блоків (якщо вони є) з сітки
+    QLayoutItem* item;
+    while ((item = this->layout->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
     }
-    else {
-        QLayoutItem* item;
-        while ((item = layout->takeAt(0)) != nullptr) {
-            delete item->widget(); // видалення всіх вкладених віджетів
-            delete item;
-        }
-    }
-
     QScrollArea* WidgetScroll = new QScrollArea(widget);
     QWidget* WidgetCapasity = new QWidget(WidgetScroll);
     QGridLayout* LayoutCapasity = new QGridLayout(WidgetCapasity);
+    LayoutCapasity->setAlignment(Qt::AlignTop);
+
     WidgetScroll->setWidget(WidgetCapasity);
     WidgetScroll->setWidgetResizable(true);
     WidgetScroll->setContentsMargins(0, 0, 0, 0);
-    layout->setContentsMargins(5, 5, 5, 5);
+    this->layout->setContentsMargins(5, 5, 5, 5);
 
-    layout->addWidget(WidgetScroll);
+    //віджет зверху щоб додати текст і кнопку сортування
+    QWidget* WidgetTop = new QWidget(WidgetCapasity); WidgetTop->setObjectName("WidgetTop");
+    WidgetTop->setFixedHeight(50);
+    QHBoxLayout* LayoutTop = new QHBoxLayout(WidgetTop); 
+    LayoutTop->setSpacing(10);
+    LayoutTop->setContentsMargins(10, 5, 10, 5);
+    QLabel* TextTop = new QLabel(textTitle, WidgetTop); TextTop->setObjectName("TextTop");
+    QPushButton* ButtonSort = new QPushButton(WidgetTop); ButtonSort->setObjectName("ButtonSort");
+
+    WidgetTop->setStyleSheet(
+        "#WidgetTop {"
+        "   background-color: rgb(70,70,70);"
+        "   border-radius: 10px;"
+        "}"
+    );
+    TextTop->setStyleSheet(
+        "#TextTop {"
+        "   font-weight: bold;"
+        "}"
+    );
+    ButtonSort->setStyleSheet(
+        "#ButtonSort {"
+        "   background-color: rgb(120,120,120);"
+        "   border-radius: 5px;"
+        "   color: rgb(255,255,255);"
+        "   font-weight: bold;"
+        "}"
+        "#ButtonSort:focus {"
+        "   outline: 0px;"
+        "}"
+        "#ButtonSort:hover {"
+        "   background-color: rgb(140, 140, 140);"
+        "}"
+        "#ButtonSort:pressed {"
+        "  background-color: rgb(160, 160, 160);"
+        "}"
+    );
+    enum ButtonSortStatusEnum {
+        sortZ_A,
+        sortA_Z
+    };
+    
+    ButtonSort->setFixedSize(30, 30);
+    ButtonSort->setIcon(QIcon("Images/sortUP.png"));
+    QObject::connect(ButtonSort, &QPushButton::released, [ButtonSort, textTitle]() {
+        static ButtonSortStatusEnum ButtonSortStatus = sortA_Z;
+        if (ButtonSortStatus == sortA_Z) {
+            QApplication::setOverrideCursor(Qt::BusyCursor);
+            if (textTitle == "Cпеціальності") {}
+            else if (textTitle == "Факультети") {}
+            else if (textTitle == "Групи") {}
+            else if (textTitle == "Студенти") {}
+            QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
+            
+            ButtonSort->setIcon(QIcon("Images/sortDOWN.png"));
+            ButtonSortStatus = sortZ_A;
+        }
+        else {
+            QApplication::setOverrideCursor(Qt::BusyCursor);
+            if (textTitle == "Cпеціальності") {}
+            else if (textTitle == "Факультети") {}
+            else if (textTitle == "Групи") {}
+            else if (textTitle == "Студенти") {}
+            QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
+            ButtonSort->setIcon(QIcon("Images/sortUP.png"));
+            ButtonSortStatus = sortA_Z;
+        }
+        });
+
+
+    TextTop->setAlignment(Qt::AlignCenter);
+
+    LayoutTop->addWidget(TextTop, 0);
+    LayoutTop->addWidget(ButtonSort, 1);
+    
+    this->layout->addWidget(WidgetTop);
+    this->layout->addWidget(WidgetScroll);
+
     // Гіфка завантаження
     QLabel* gifLoad = new QLabel(WidgetCapasity);
     QMovie* gif = new QMovie("Images/load.gif");
@@ -2007,7 +2056,6 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
     gifLoad->setMovie(gif);
     LayoutCapasity->addWidget(gifLoad, 0, 0);
     gifLoad->setAlignment(Qt::AlignCenter);
-    LayoutCapasity->setAlignment(Qt::AlignTop);
     gif->start();
 
     // Таймер для поступового додавання віджетів
@@ -2068,29 +2116,101 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
 }
 
 template<typename LaFunc>
-void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools) {
-
-    QVBoxLayout* layout = qobject_cast<QVBoxLayout*>(widget->layout());
-    if (!layout) {
-        layout = new QVBoxLayout(widget);
+void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools, const QString& textTitle) {
+    //видалення всіх блоків (якщо вони є) з сітки
+    QLayoutItem* item;
+    while ((item = this->layout->takeAt(0)) != nullptr) {
+        delete item->widget();
+        delete item;
     }
-    else {
-        QLayoutItem* item;
-        while ((item = layout->takeAt(0)) != nullptr) {
-            delete item->widget(); // видалення всіх вкладених віджетів
-            delete item;
-        }
-    }
-
     QScrollArea* WidgetScroll = new QScrollArea(widget);
     QWidget* WidgetCapasity = new QWidget(WidgetScroll);
     QGridLayout* LayoutCapasity = new QGridLayout(WidgetCapasity);
+    LayoutCapasity->setAlignment(Qt::AlignTop);
+
     WidgetScroll->setWidget(WidgetCapasity);
     WidgetScroll->setWidgetResizable(true);
     WidgetScroll->setContentsMargins(0, 0, 0, 0);
-    layout->setContentsMargins(5, 5, 5, 5);
+    this->layout->setContentsMargins(5, 5, 5, 5);
 
-    layout->addWidget(WidgetScroll);
+    //віджет зверху щоб додати текст і кнопку сортування
+    QWidget* WidgetTop = new QWidget(WidgetCapasity); WidgetTop->setObjectName("WidgetTop");
+    WidgetTop->setFixedHeight(50);
+    QHBoxLayout* LayoutTop = new QHBoxLayout(WidgetTop);
+    LayoutTop->setSpacing(10);
+    LayoutTop->setContentsMargins(10, 5, 10, 5);
+    QLabel* TextTop = new QLabel(textTitle, WidgetTop); TextTop->setObjectName("TextTop");
+    QPushButton* ButtonSort = new QPushButton(WidgetTop); ButtonSort->setObjectName("ButtonSort");
+
+    WidgetTop->setStyleSheet(
+        "#WidgetTop {"
+        "   background-color: rgb(70,70,70);"
+        "   border-radius: 10px;"
+        "}"
+    );
+    TextTop->setStyleSheet(
+        "#TextTop {"
+        "   font-weight: bold;"
+        "}"
+    );
+    ButtonSort->setStyleSheet(
+        "#ButtonSort {"
+        "   background-color: rgb(120,120,120);"
+        "   border-radius: 5px;"
+        "   color: rgb(255,255,255);"
+        "   font-weight: bold;"
+        "}"
+        "#ButtonSort:focus {"
+        "   outline: 0px;"
+        "}"
+        "#ButtonSort:hover {"
+        "   background-color: rgb(140, 140, 140);"
+        "}"
+        "#ButtonSort:pressed {"
+        "  background-color: rgb(160, 160, 160);"
+        "}"
+    );
+    enum ButtonSortStatusEnum {
+        sortZ_A,
+        sortA_Z
+    };
+
+    ButtonSort->setFixedSize(30, 30);
+    ButtonSort->setIcon(QIcon("Images/sortUP.png"));
+    QObject::connect(ButtonSort, &QPushButton::released, [ButtonSort, textTitle]() {
+        static ButtonSortStatusEnum ButtonSortStatus = sortA_Z;
+        if (ButtonSortStatus == sortA_Z) {
+            QApplication::setOverrideCursor(Qt::BusyCursor);
+            if (textTitle == "Cпеціальності") {}
+            else if (textTitle == "Факультети") {}
+            else if (textTitle == "Групи") {}
+            else if (textTitle == "Студенти") {}
+            QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
+
+            ButtonSort->setIcon(QIcon("Images/sortDOWN.png"));
+            ButtonSortStatus = sortZ_A;
+        }
+        else {
+            QApplication::setOverrideCursor(Qt::BusyCursor);
+            if (textTitle == "Cпеціальності") {}
+            else if (textTitle == "Факультети") {}
+            else if (textTitle == "Групи") {}
+            else if (textTitle == "Студенти") {}
+            QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
+            ButtonSort->setIcon(QIcon("Images/sortUP.png"));
+            ButtonSortStatus = sortA_Z;
+        }
+        });
+
+
+    TextTop->setAlignment(Qt::AlignCenter);
+
+    LayoutTop->addWidget(TextTop, 0);
+    LayoutTop->addWidget(ButtonSort, 1);
+
+    this->layout->addWidget(WidgetTop);
+    this->layout->addWidget(WidgetScroll);
+
     // Гіфка завантаження
     QLabel* gifLoad = new QLabel(WidgetCapasity);
     QMovie* gif = new QMovie("Images/load.gif");
@@ -2098,7 +2218,6 @@ void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools)
     gifLoad->setMovie(gif);
     LayoutCapasity->addWidget(gifLoad, 0, 0);
     gifLoad->setAlignment(Qt::AlignCenter);
-    LayoutCapasity->setAlignment(Qt::AlignTop);
     gif->start();
 
     // Таймер для поступового додавання віджетів
