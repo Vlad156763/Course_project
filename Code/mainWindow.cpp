@@ -284,7 +284,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             //HERE: відбувається поступове отримання всіх спеціальностей із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString SpecialtyName = "спеціальність";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0; return true;  }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(SpecialtyName, widget);
             connect(block, &QPushButton::released, block, 
@@ -329,7 +329,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             //HERE: відбувається поступове отримання всіх факультетів із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString FacultyName = "факультети";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0;  return true; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
             connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, FacultyName]() { block->FacultyButtonPressed(*this->TimersCounter, mainWedgetTools, MiddleSide, FacultyName, "", *SandSBlocks); });
@@ -1515,7 +1515,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             static int counter = 0;
             //ця зміна повинна мати будь-який факультет, який має спеціальність SpecialtyName
             QString FacultyName = "Факультет з спеціальністю";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0;  return true; }
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(FacultyName, widget);
             connect(block, &QPushButton::released,
@@ -1538,7 +1538,8 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             //HERE: відбувається поступове отримання груп, які мають спеціальність SpecialtyName із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString GroupName = "Група з спеціальністю ";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0;  return true; }
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
             connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, SpecialtyName, GroupName, &SandSAllBlocks]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, "", SpecialtyName, SandSAllBlocks); });
@@ -1562,7 +1563,8 @@ void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainW
             //HERE: відбувається поступове отримання ПІБ студенітів, які мають спеціальність, факультет і групу (спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString StudyName = "Студенти";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0;  return true; }
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(StudyName, widget);
             // кнопки поки не пригвинчую, так як кнопки зі студентами треба привязати до вікна редагування їх оцінок
@@ -1591,7 +1593,8 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString PredmetName = "Предмети";
-            if (counter++ >= 3) { counter = 0; return true; }
+            if (counter++ >= 3) { counter = 0;  return true; }
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(PredmetName, PredmetBox);
             connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
@@ -1932,7 +1935,8 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mai
             //HERE: відбувається поступове отримання груп, які мають факультет і спеціальність (спеціальність може бути пуста) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString GroupName = "Група з спеціальністю і факультетом";
-            if (counter++ >= 3) { return true;  counter = 0; }
+            if (counter++ >= 3) { counter = 0;  return true; }
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(GroupName, widget);
             connect(block, &QPushButton::released, [&counterTimers, &mainWedgetTools, block, MiddleSide, FacultyName, SpecialtyName, GroupName, &SandSAllBlocks]() {block->GroupButtonPressed(counterTimers, mainWedgetTools, MiddleSide, GroupName, FacultyName, SpecialtyName, SandSAllBlocks); });
@@ -1989,6 +1993,7 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
     TextTop->setStyleSheet(
         "#TextTop {"
         "   font-weight: bold;"
+        "   color: #ffffff;"
         "}"
     );
     ButtonSort->setStyleSheet(
