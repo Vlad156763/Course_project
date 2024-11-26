@@ -51,18 +51,26 @@ using std::vector;
 void CreateTables();
 void addSpecialty(QSqlQuery& query, const QString& specialty);
 void addFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
-void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group);
-void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, const QString& specialty, int class_group);
+void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group);
+void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, const QString& specialty, const QString& class_group);
+void addSubject(QSqlQuery& query, const QString& predmet, int studentId);
+void addGrades(QSqlQuery& query, const QStringList& grade, int predmetId);
+
+int getStudentID(QSqlQuery& query, const QString& StudyName, int studentId);
+int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId);
+int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 
 void getAllStudents(QSqlQuery& query);
 void getFaculty(QSqlQuery& query);
 void getSpecialty(QSqlQuery& query);
 void getGroup(QSqlQuery& query);
+void getSubject(QSqlQuery& query, const QString& Predmet, int studentId);
+void getGrades(QSqlQuery& query, const QStringList& grade, int predmetId);
+
 void DeleteSpecialty(QSqlQuery& query, const QString& specialty);
 void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
-void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group);
-void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, int class_group);
-int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
+void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group);
+void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group);
 void dropAllTables();
 
 
