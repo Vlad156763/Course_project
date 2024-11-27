@@ -7,7 +7,8 @@ void CreateTables() {
     if (db.open()) {
         cqdout << "Database is open.";
         QSqlQuery query;
-        // ������� ��� �������������
+        query.exec("PRAGMA foreign_keys = ON;");
+        // БД для спеціальностей
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS specialty ("
             "id INTEGER PRIMARY KEY,"
@@ -16,7 +17,7 @@ void CreateTables() {
             cqdout << "Error creating specialty table:" << query.lastError().text();
         }
 
-        // ������� ��� ����������
+        // БД для факультетів
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS faculty ("
             "id INTEGER PRIMARY KEY,"
@@ -26,7 +27,7 @@ void CreateTables() {
             cqdout << "Error creating faculty table:" << query.lastError().text();
         }
 
-        // ������� ��� ����
+        // БД для груп
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS class_group ("
             "id INTEGER PRIMARY KEY,"
@@ -37,7 +38,7 @@ void CreateTables() {
             cqdout << "Error creating class_group table:" << query.lastError().text();
         }
 
-        // ������� ��� ��������
+        // БД для студентів
         if (!query.exec(
             "CREATE TABLE IF NOT EXISTS students ("
             "id INTEGER PRIMARY KEY,"
@@ -48,7 +49,39 @@ void CreateTables() {
             "class_group INTEGER);"
         )) {
             cqdout << "Error creating students table:" << query.lastError().text();
+
         }
+
+        // БД для предметів
+        if (!query.exec(
+            "CREATE TABLE IF NOT EXISTS predmet ("
+            "id INTEGER PRIMARY KEY,"
+            "predmet TEXT,"
+            "student_id TEXT,"
+            "FOREIGN KEY(student_id) REFERENCES students(id)"
+            " ON DELETE CASCADE"  // Видаляє предмет, якщо видален студент
+            " ON UPDATE CASCADE"  // Оновлює посилання при зміненні айді
+            ");"
+        ))  {
+            cqdout << "Error creating predmet table:" << query.lastError().text();
+        }
+
+        // БД для оцінок
+        if (!query.exec(
+            "CREATE TABLE IF NOT EXISTS grades ("
+            "id INTEGER PRIMARY KEY, " 
+            "predmet_id TEXT,"
+            "student_id TEXT,"
+            "grade TEXT, "   
+            "FOREIGN KEY(predmet_id) REFERENCES predmet(id),"
+            "FOREIGN KEY(student_id) REFERENCES students(id)"
+            " ON DELETE CASCADE "
+            " ON UPDATE CASCADE "
+            ");"
+        )) {
+            cqdout << "Error creating grades table:" << query.lastError().text();
+        }
+
 
         cqdout << "Database is ready to write!";
     }
@@ -136,8 +169,7 @@ void addFaculty(QSqlQuery& query, const QString& specialty, const QString& facul
     }
 }
 
-
-void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group) {
+void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group) {
     // Перевірка існування спеціальності
     query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
     query.bindValue(":specialty", specialty);
@@ -193,7 +225,7 @@ void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty
     }
 }
 
-void addStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, int class_group) {
+void addStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group) {
 
     // Перевірка існування спеціальності
     query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
@@ -261,6 +293,55 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
     else {
         cqdout << "Student added successfully!";
         getAllStudents(query);
+    }
+}
+
+void addSubject(QSqlQuery& query, const QString& predmet, int studentId) {
+    query.prepare("INSERT INTO predmet (predmet, student_id) VALUES (:predmet, :studentId)");
+    query.bindValue(":predmet", predmet);
+    query.bindValue(":studentId", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error adding predmet:" << query.lastError().text();
+    }
+    else {
+        qDebug() << "Predmet added successfully! Subject:" << predmet << ", Student ID:" << studentId;
+    }
+}
+
+void addGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
+
+    query.prepare("SELECT student_id FROM predmet WHERE id = :predmetId");
+    query.bindValue(":predmetId", predmetId);
+
+    if (!query.exec()) {
+        qDebug() << "Error fetching student_id from predmet:" << query.lastError().text();
+        return;
+    }
+
+    int studentId = -1;
+
+    if (query.next()) {
+        studentId = query.value("student_id").toInt();
+    }
+    else {
+        qDebug() << "Error: No student found for predmet ID:" << predmetId;
+        return;
+    }
+    clearGradesForStudentAndPredmet(query, predmetId, studentId);
+    for (const QString& grade : grades) {
+        query.prepare("INSERT INTO grades (grade, predmet_id, student_id) VALUES (:grade, :predmetId, :studentId)");
+        query.bindValue(":grade", grade); 
+        query.bindValue(":predmetId", predmetId);
+        query.bindValue(":studentId", studentId);
+
+        if (!query.exec()) {
+            qDebug() << "Error adding grade:" << query.lastError().text();
+            break;
+        }
+        else {
+            qDebug() << "Grade added successfully! Grade:" << grade << ", Predmet ID:" << predmetId;
+        }
     }
 }
 
@@ -333,7 +414,7 @@ void getGroup(QSqlQuery& query) {
             cqdout << "ID:" << query.value("id").toInt()
                 << ", Specialty:" << query.value("specialty").toString()
                 << ", Faculty:" << query.value("faculty").toString()
-                << ", Class Group:" << query.value("class_group").toInt();
+                << ", Class Group:" << query.value("class_group").toString();
             found = true;
         }
         if (!found) {
@@ -344,6 +425,89 @@ void getGroup(QSqlQuery& query) {
         cqdout << "Error fetching group: " << query.lastError().text();
     }
 }
+
+int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId){
+    query.prepare(
+        "SELECT id FROM students "
+        "WHERE specialty = :specialty AND faculty = :faculty "
+        "AND class_group = :classGroup AND name = :StudyName"
+    );
+    query.bindValue(":specialty", "1");
+    query.bindValue(":faculty", "1");
+    query.bindValue(":classGroup", "Групи");
+    query.bindValue(":StudyName", "Студенти");
+
+    if (query.exec() && query.next()) {
+        studentId = query.value(0).toInt();
+        return studentId;
+    }
+    else {
+        cqdout << "Error: Cannot find student ID. Reason:" << query.lastError().text();
+        return studentId = -1;
+    }
+}
+
+int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
+    query.prepare(
+        "SELECT id FROM predmet "
+        "WHERE predmet = :predmet;"
+    );
+    
+    query.bindValue(":predmet", "Предмети");
+
+    if (query.exec() && query.next()) {
+        predmetId = query.value(0).toInt(); 
+        return predmetId;
+    }
+    else {
+        cqdout << "Error: Cannot find predmet ID. Reason:" << query.lastError().text();
+        return predmetId = -1;
+    }
+}
+void getSubject(QSqlQuery& query, const QString& predmet, int studentId) {
+    // поки залишу
+}
+
+void getGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
+
+    query.prepare("SELECT student_id FROM predmet WHERE id = :predmetId;");
+    query.bindValue(":predmetId", predmetId);
+
+    if (!query.exec()) {
+        qDebug() << "Error fetching student_id from predmet:" << query.lastError().text();
+        return;
+    }
+
+    int studentId = -1;
+
+    if (query.next()) {
+        studentId = query.value("student_id").toInt();
+    }
+    else {
+        qDebug() << "Error: No student found for predmet ID:" << predmetId;
+        return;
+    }
+
+    query.prepare("SELECT grade FROM grades WHERE predmet_id = :predmet_id AND student_id = :student_id;");
+    query.bindValue(":predmet_id", predmetId);
+    query.bindValue(":student_id", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error getting grade:" << query.lastError().text();
+        return;
+    }
+
+    bool found = false;
+    while (query.next()) {
+        found = true;
+        cqdout << "Grade:" << query.value("grade").toString();
+    }
+
+    if (!found) {
+        cqdout << "No grade found in the database.";
+    }
+}
+
 
 void DeleteSpecialty(QSqlQuery& query, const QString& specialty) {
     // Перевірка наявності факультету в таблиці
@@ -405,7 +569,7 @@ void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& fa
     }
 }
 
-void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, int class_group){
+void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group){
     // Перевірка наявності групи в таблиці
     query.prepare("SELECT id FROM class_group WHERE class_group = :class_group");
     query.bindValue(":class_group", class_group);
@@ -435,7 +599,7 @@ void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& facu
     }
 }
 
-void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, int class_group) {
+void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group) {
     // Перевірка наявності студента в групі 
     query.prepare("SELECT id FROM students WHERE name = :name AND class_group = :class_group");
     query.bindValue(":name", name);
@@ -466,6 +630,21 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
     }
 }
 
+void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
+    
+    query.prepare("DELETE FROM predmet WHERE predmet = :predmet AND student_id = :studentId");
+
+    query.bindValue(":predmet", predmet);
+    query.bindValue(":studentId", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error deleting subject:" << query.lastError().text();
+    }
+    else {
+        qDebug() << "Subject deleted successfully. Predmet:" << predmet << ", Student ID:" << studentId;
+    }
+}
+
 int getNextAvailableId(QSqlQuery& query, const QString& table, const QString& idField) {
     // Отримаємо всі айді з таблиці
     query.prepare(QString("SELECT %1 FROM %2 ORDER BY %1 ASC").arg(idField, table));
@@ -488,6 +667,113 @@ int getNextAvailableId(QSqlQuery& query, const QString& table, const QString& id
     return nextId;
 }
 
+QStringList initializeSpecialties(QSqlQuery& query) {
+    QStringList specialties;
+    if (!query.exec("SELECT * FROM specialty;")) {
+        qDebug() << "Error fetching specialties:" << query.lastError().text();
+        return specialties;
+    }
+
+    while (query.next()) {
+        QString specialtyData = QString("ID: %1, Specialty: %2")
+            .arg(query.value("id").toInt())
+            .arg(query.value("specialty").toString());
+        specialties << specialtyData;
+    }
+    return specialties;
+}
+
+QStringList initializeFaculties(QSqlQuery& query) {
+    QStringList faculties;
+    if (!query.exec("SELECT * FROM faculty;")) {
+        qDebug() << "Error fetching faculties:" << query.lastError().text();
+        return faculties;
+    }
+
+    while (query.next()) {
+        QString facultyData = QString("ID: %1, Specialty: %2, Faculty: %3")
+            .arg(query.value("id").toInt())
+            .arg(query.value("specialty").toString())
+            .arg(query.value("faculty").toString());
+        faculties << facultyData;
+    }
+    return faculties;
+}
+
+QStringList initializeClassGroups(QSqlQuery& query) {
+    QStringList classGroups;
+    if (!query.exec("SELECT * FROM class_group;")) {
+        qDebug() << "Error fetching class groups:" << query.lastError().text();
+        return classGroups;
+    }
+
+    while (query.next()) {
+        QString classGroupData = QString("ID: %1, Specialty: %2, Faculty: %3, Class Group: %4")
+            .arg(query.value("id").toInt())
+            .arg(query.value("specialty").toString())
+            .arg(query.value("faculty").toString())
+            .arg(query.value("class_group").toInt());
+        classGroups << classGroupData;
+    }
+    return classGroups;
+}
+
+QStringList initializeStudents(QSqlQuery& query) {
+    QStringList students;
+    if (!query.exec("SELECT * FROM students;")) {
+        qDebug() << "Error fetching students:" << query.lastError().text();
+        return students;
+    }
+
+    while (query.next()) {
+        QString studentData = QString("ID: %1, Name: %2, Age: %3, Faculty: %4, Specialty: %5, Class Group: %6")
+            .arg(query.value("id").toInt())
+            .arg(query.value("name").toString())
+            .arg(query.value("age").toInt())
+            .arg(query.value("faculty").toString())
+            .arg(query.value("specialty").toString())
+            .arg(query.value("class_group").toInt());
+        students << studentData;
+    }
+    return students;
+}
+
+QStringList initializePredmets(QSqlQuery& query) {
+    QStringList predmets;
+    if (!query.exec("SELECT * FROM predmet;")) {
+        qDebug() << "Error fetching predmets:" << query.lastError().text();
+        return predmets;
+    }
+
+    while (query.next()) {
+        QString predmetData = QString("ID: %1, Predmet: %2, Student ID: %3")
+            .arg(query.value("id").toInt())
+            .arg(query.value("predmet").toString())
+            .arg(query.value("student_id").toInt());
+        predmets << predmetData;
+    }
+    return predmets;
+}
+
+QStringList initializeGrades(QSqlQuery& query) {
+    QStringList grades;
+    if (!query.exec("SELECT * FROM grades;")) {
+        qDebug() << "Error fetching grades:" << query.lastError().text();
+        return grades;
+    }
+
+    while (query.next()) {
+        QString gradeData = QString("ID: %1, Grade: %2, Predmet ID: %3, Student ID: %4")
+            .arg(query.value("id").toInt())
+            .arg(query.value("grade").toString())
+            .arg(query.value("predmet_id").toInt())
+            .arg(query.value("student_id").toInt());
+        grades << gradeData;
+    }
+    return grades;
+}
+
+
 // Функция для полной очистки бд
 void dropAllTables() {
     QSqlDatabase db = QSqlDatabase::database();
@@ -505,5 +791,19 @@ void dropAllTables() {
         else {
             qDebug() << "Table" << tableName << "dropped successfully!";
         }
+    }
+}
+void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId) {
+
+    query.prepare("DELETE FROM grades WHERE predmet_id = :predmetId AND student_id = :studentId");
+
+    query.bindValue(":predmetId", predmetId);
+    query.bindValue(":studentId", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error clearing grades:" << query.lastError().text();
+    }
+    else {
+        qDebug() << "Grades cleared for Predmet ID:" << predmetId << "and Student ID:" << studentId;
     }
 }

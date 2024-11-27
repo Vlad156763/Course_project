@@ -285,7 +285,21 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QGridLayout* MiddleSideLayout = new QGridLayout(MiddleSide);
     QGridLayout* RightSideLayout = new QGridLayout(RightSide);
     //HERE: зчитування всіх: спеціальностей, факультетів, груп, студентів, предметів, з БД і запис у масиви класу sortBlock
-    
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    QStringList specialties = initializeSpecialties(query);
+    QStringList faculties = initializeFaculties(query);
+    QStringList classGroups = initializeClassGroups(query);
+    QStringList students = initializeStudents(query);
+    QStringList predmets = initializePredmets(query);
+
+    qDebug() << "Specialties:" << specialties;
+    qDebug() << "Faculties:" << faculties;
+    qDebug() << "Class Groups:" << classGroups;
+    qDebug() << "Students:" << students;
+    qDebug() << "Predmets:" << predmets;
+
     //підключення натиску на спеціальність для факульетів
 
     configBlock block;
@@ -1051,18 +1065,10 @@ void MainWindow_C::SaveButtonFor_AddGroup(QDialog* dialog) {
         QString faculty = AllLineEdits[1]; ; // Факультет
         QString groupString = AllLineEdits[2]; // Група как строка
 
-        bool conversionOk;
-        int class_group = groupString.toInt(&conversionOk);
-
-        if (!conversionOk) {
-            cqdout << "Помилка при перетворенні";
-            return;
-        }
-
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
 
-        addGroup(query, specialty, faculty, class_group); // Функція для додавання групи
+        addGroup(query, specialty, faculty, groupString); // Функція для додавання групи
         };
 
     // Викликаю загальний метод 
@@ -1082,20 +1088,11 @@ void MainWindow_C::SaveButtonFor_AddStudent(QDialog* dialog) {
         QString groupString = AllLineEdits[2]; // Група как строка
         QString name = AllLineEdits[3]; // ПІБ
 
-        // Перетворимо строку в int для групи
-        bool conversionOk;
-        int class_group = groupString.toInt(&conversionOk);
-
-        if (!conversionOk) {
-            cqdout << "Помилка при перетворенні";
-            return;
-        }
-
         QSqlDatabase db = QSqlDatabase::database(); 
         QSqlQuery query(db); // Створюємл обьект базиданих
 
         // Функція додавання студента
-        addStudent(query, name, faculty, specialty, class_group); // Функція для додавання студента
+        addStudent(query, name, faculty, specialty, groupString); // Функція для додавання студента
         };
 
     // Загальний метод
@@ -1116,19 +1113,10 @@ void MainWindow_C::DeleteButtonFor_DeleteStudent(QDialog* dialog) {
         QString groupString = AllLineEdits[2]; // Група как строка
         QString name = AllLineEdits[3]; // ПІБ
 
-        // Перетворимо строку в int для групи
-        bool conversionOk;
-        int class_group = groupString.toInt(&conversionOk);
-
-        if (!conversionOk) {
-            cqdout << "Помилка при перетворенні";
-            return;
-        }
-
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db); // Створюємл обьект базиданих
         
-        DeleteStudent(query, name, faculty, specialty, class_group);
+        DeleteStudent(query, name, faculty, specialty, groupString);
         };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
@@ -1145,17 +1133,9 @@ void MainWindow_C::DeleteButtonFor_DeleteGroup(QDialog* dialog) {
         QString faculty = AllLineEdits[1]; ; // Факультет
         QString groupString = AllLineEdits[2]; // Група как строка
 
-        bool conversionOk;
-        int class_group = groupString.toInt(&conversionOk);
-
-        if (!conversionOk) {
-            cqdout << "Помилка при перетворенні";
-            return;
-        }
-
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
-        DeleteGroup(query, specialty, faculty, class_group);
+        DeleteGroup(query, specialty, faculty, groupString);
         };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup" });
@@ -1732,6 +1712,20 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        int studentId = -1;
+
+        // Запрос на отримання студента
+        studentId = getStudentIDforPredmet(query, StudyName, studentId);
+
+        if (studentId != -1) {
+            addSubject(query, PredmetName, studentId);
+            cqdout << "Subject added successfully for student ID:" << studentId;
+        }
+        else {
+            cqdout << "Failed to add subject. No matching student found.";
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         cqdout << SpecialtyName << ", " << FacultyName << ", " << GroupName << ", " << StudyName << ", " << PredmetName;
         });
@@ -1741,6 +1735,20 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        int studentId = -1;
+
+        // Запрос на отримання студента
+        studentId = getStudentIDforPredmet(query, StudyName, studentId);
+
+        if (studentId != -1) {
+            DeleteSubject(query, PredmetName, studentId);
+            cqdout << "Subject deleted successfully for student ID:" << studentId;
+        }
+        else {
+            cqdout << "Failed to delete subject. No matching student found.";
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         });
 
@@ -1869,7 +1877,15 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
 
     addOneEval->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     addOneEval->setFixedHeight(30);
+    ///////////////////////////////////////////////////////////////////////////////////////////////////
+    // todo: зчитую всі оцінки, які є SpecialtyName, FacultyName, GroupName, StudentName, PredmetName
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    QStringList grades = initializeGrades(query);
     //для прикладу запишу уже в рядок для редагування трохи чисел
+
+    qDebug() << "Grades:" << grades;
     Edit->setText("1, 2, 3, 4, 18, 100, 1, 100");
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1887,6 +1903,21 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //todo: запис оцінок по PredmetName для SpecialtyName, FacultyName, GroupName, StudentName 
+        QString PredmetName;
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        int predmet_id = -1;
+
+        predmet_id = getPredmetId(query, PredmetName, predmet_id);
+
+        if (predmet_id != -1) {
+            addGrades(query, numbers, predmet_id);
+            cqdout << "Grade added successfully for predment ID:" << predmet_id;
+        }
+        else {
+            cqdout << "Failed to add grade. No matching predmet found.";
+        }
+        getGrades(query, numbers, predmet_id);
         cqdout << numbers; //оцінки певного студента
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         dialog->accept();
