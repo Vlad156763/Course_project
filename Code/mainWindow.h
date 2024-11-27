@@ -71,6 +71,7 @@ void DeleteSpecialty(QSqlQuery& query, const QString& specialty);
 void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
 void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group);
 void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group);
+void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId);
 
 QStringList initializeSpecialties(QSqlQuery& query);
 QStringList initializeFaculties(QSqlQuery& query);

@@ -1722,6 +1722,20 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+        QSqlDatabase db = QSqlDatabase::database();
+        QSqlQuery query(db);
+        int studentId = -1;
+
+        // Запрос на отримання студента
+        studentId = getStudentIDforPredmet(query, StudyName, studentId);
+
+        if (studentId != -1) {
+            DeleteSubject(query, PredmetName, studentId);
+            cqdout << "Subject deleted successfully for student ID:" << studentId;
+        }
+        else {
+            cqdout << "Failed to delete subject. No matching student found.";
+        }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         });
 

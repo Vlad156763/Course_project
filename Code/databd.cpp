@@ -630,6 +630,21 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
     }
 }
 
+void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
+    
+    query.prepare("DELETE FROM predmet WHERE predmet = :predmet AND student_id = :studentId");
+
+    query.bindValue(":predmet", predmet);
+    query.bindValue(":studentId", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error deleting subject:" << query.lastError().text();
+    }
+    else {
+        qDebug() << "Subject deleted successfully. Predmet:" << predmet << ", Student ID:" << studentId;
+    }
+}
+
 int getNextAvailableId(QSqlQuery& query, const QString& table, const QString& idField) {
     // Отримаємо всі айді з таблиці
     query.prepare(QString("SELECT %1 FROM %2 ORDER BY %1 ASC").arg(idField, table));
