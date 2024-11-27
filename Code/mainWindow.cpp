@@ -1,7 +1,20 @@
 #include "mainWindow.h"
 
+//#ifdef Q_OS_WIN
+//#include <Windows.h>
+//static void createConsole() {
+//    if (GetConsoleWindow() == nullptr) {
+//        AllocConsole(); // Створюю вікно консолі 
+//        FILE* stream;
+//        freopen_s(&stream, "CONOUT$", "w", stdout); // Перенаправляю stdout у консоль
+//        freopen_s(&stream, "CONOUT$", "w", stderr); // Перенаправляю stderr у консоль
+//    }
+//    else cerr << "Консоль запущена!\n";
+//}
+//#endif // Q_OS_WIN
 
 MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
+    //createConsole();
     //встановлення таймеру
     this->TimersCounter = new counterTimer();
     this->SandSBlocks = new SandS();
@@ -427,14 +440,14 @@ void MainWindow_C::AboutUsButtonPressed() {
             showWindowAboutUs("Images/anonim.png", "Шевченко Родіон", "Розробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
         }
         else if (currentDevelopVar == 4) {
-            showWindowAboutUs("Images/anonim.png", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+            showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
         }
         else if (currentDevelopVar > 4) {
             showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
             currentDevelopVar = 0;
         }
         else if (currentDevelopVar < 0) {
-            showWindowAboutUs("Images/anonim.png", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+            showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
             currentDevelopVar = 4;
         }
         };
@@ -807,7 +820,6 @@ void MainWindow_C::setingsButtonPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
-
 void MainWindow_C::AddStudentButtonPressed() {
     /*
     Коли слот викликаний у відповідь на сигнал,  я за допомогою sender можу отримати покажчик
@@ -993,7 +1005,6 @@ void MainWindow_C::DeleteSpecialtyButtonPressed() {
 void MainWindow_C::SaveButtonFor_AddSpecialty(QDialog* dialog) {
     // Лямбда-функція для дій з БД спеціальність
     auto dbAction = [this](vector<QString> AllLineEdits) {
-
         if (AllLineEdits.size() < 1) {
             cqdout << "No data to add Specialty!";
             return;
@@ -1718,6 +1729,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
     QObject::connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
         WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName, "Успішно додано!", "8, 82, 79");
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1725,6 +1737,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         });
     QObject::connect(delPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
+
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
@@ -1856,8 +1869,6 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
 
     addOneEval->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding));
     addOneEval->setFixedHeight(30);
-    ///////////////////////////////////////////////////////////////////////////////////////////////////
-    // todo: зчитую всі оцінки, які є SpecialtyName, FacultyName, GroupName, StudentName, PredmetName
     //для прикладу запишу уже в рядок для редагування трохи чисел
     Edit->setText("1, 2, 3, 4, 18, 100, 1, 100");
     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2156,6 +2167,7 @@ void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools,
     TextTop->setStyleSheet(
         "#TextTop {"
         "   font-weight: bold;"
+        "   color: #ffffff;"
         "}"
     );
     ButtonSort->setStyleSheet(

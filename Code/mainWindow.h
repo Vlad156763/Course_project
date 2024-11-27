@@ -65,9 +65,7 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
 int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 void dropAllTables();
 
-
 //TODO: клас для сортування блоків у масиві
-
 
 class SandS {
 
@@ -105,7 +103,7 @@ private:
     QString originalText; // зберігає повний текст
     void updateElidedText();
     void resizeEvent(QResizeEvent*) override;
-};
+};  
 class blockWidget : public QPushButton {
     Q_OBJECT
 private:
@@ -159,7 +157,7 @@ public:
     template<typename LaFunc>
     void setConfigPredmetBlock(LaFunc, QWidget*, const QString&);
     friend class MainWindow_C;
-};
+}; 
 class MainWindow_C : public QWidget {
     Q_OBJECT;
 private:
@@ -183,7 +181,6 @@ private:
     void showWindowAboutUs(const QString&, const QString&, const QString&, const QString&, QWidget*, QGridLayout*);//загальний метод для відображення вікон про нас
     template<typename LaFunc>
     void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
-
     //віджет для головної частини 
     void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);
 
