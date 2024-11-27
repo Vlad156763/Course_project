@@ -272,7 +272,21 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QGridLayout* MiddleSideLayout = new QGridLayout(MiddleSide);
     QGridLayout* RightSideLayout = new QGridLayout(RightSide);
     //HERE: зчитування всіх: спеціальностей, факультетів, груп, студентів, предметів, з БД і запис у масиви класу sortBlock
-    
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    QStringList specialties = initializeSpecialties(query);
+    QStringList faculties = initializeFaculties(query);
+    QStringList classGroups = initializeClassGroups(query);
+    QStringList students = initializeStudents(query);
+    QStringList predmets = initializePredmets(query);
+
+    qDebug() << "Specialties:" << specialties;
+    qDebug() << "Faculties:" << faculties;
+    qDebug() << "Class Groups:" << classGroups;
+    qDebug() << "Students:" << students;
+    qDebug() << "Predmets:" << predmets;
+
     //підключення натиску на спеціальність для факульетів
 
     configBlock block;
@@ -1690,10 +1704,9 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         QSqlQuery query(db);
         int studentId = -1;
 
-        // Запрос для получения studentId
-        studentId = getStudentID(query, StudyName, studentId);
+        // Запрос на отримання студента
+        studentId = getStudentIDforPredmet(query, StudyName, studentId);
 
-        // Если студент найден, добавляем предмет
         if (studentId != -1) {
             addSubject(query, PredmetName, studentId);
             cqdout << "Subject added successfully for student ID:" << studentId;
@@ -1839,7 +1852,13 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
     addOneEval->setFixedHeight(30);
     ///////////////////////////////////////////////////////////////////////////////////////////////////
     // todo: зчитую всі оцінки, які є SpecialtyName, FacultyName, GroupName, StudentName, PredmetName
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    QStringList grades = initializeGrades(query);
     //для прикладу запишу уже в рядок для редагування трохи чисел
+
+    qDebug() << "Grades:" << grades;
     Edit->setText("1, 2, 3, 4, 18, 100, 1, 100");
     ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1864,7 +1883,6 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
 
         predmet_id = getPredmetId(query, PredmetName, predmet_id);
 
-        // Если студент найден, добавляем предмет
         if (predmet_id != -1) {
             addGrades(query, numbers, predmet_id);
             cqdout << "Grade added successfully for predment ID:" << predmet_id;

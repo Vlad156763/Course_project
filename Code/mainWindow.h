@@ -56,7 +56,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, c
 void addSubject(QSqlQuery& query, const QString& predmet, int studentId);
 void addGrades(QSqlQuery& query, const QStringList& grade, int predmetId);
 
-int getStudentID(QSqlQuery& query, const QString& StudyName, int studentId);
+int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId);
 int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId);
 int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 
@@ -65,12 +65,21 @@ void getFaculty(QSqlQuery& query);
 void getSpecialty(QSqlQuery& query);
 void getGroup(QSqlQuery& query);
 void getSubject(QSqlQuery& query, const QString& Predmet, int studentId);
-void getGrades(QSqlQuery& query, const QStringList& grade, int predmetId);
+void getGrades(QSqlQuery& query, const QStringList& grades, int predmetId);
 
 void DeleteSpecialty(QSqlQuery& query, const QString& specialty);
 void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& faculty);
 void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group);
 void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group);
+
+QStringList initializeSpecialties(QSqlQuery& query);
+QStringList initializeFaculties(QSqlQuery& query);
+QStringList initializeClassGroups(QSqlQuery& query);
+QStringList initializeStudents(QSqlQuery& query);
+QStringList initializePredmets(QSqlQuery& query);
+QStringList initializeGrades(QSqlQuery& query);
+
+void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId);
 void dropAllTables();
 
 
