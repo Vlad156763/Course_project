@@ -24,7 +24,7 @@
 #include <qmovie.h>
 #include <qtextedit.h>
 #include <qgraphicsproxywidget.h>
-
+#include <qdir.h>
 
 
 
@@ -43,7 +43,6 @@ using std::vector;
 
 #define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define cqdout (qDebug() << "┌[msg]" << FILENAME << __LINE__ << "\n└TEXT:" )
-
 
 
 
@@ -202,6 +201,7 @@ private:
     //віджет для головної частини 
     void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);
 
+    
     //таймер для відслідковування віджетів головної частини
     counterTimer* TimersCounter = nullptr;
     //клас сортування для сортування всіх блоків 
@@ -224,6 +224,7 @@ private slots:
 public:
     MainWindow_C(QWidget* = nullptr);
     ~MainWindow_C();
+
 };
 //логіка для вікон з додаванням та видаленням
 

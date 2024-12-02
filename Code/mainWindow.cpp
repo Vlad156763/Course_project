@@ -1,4 +1,5 @@
 #include "mainWindow.h"
+#include "ex.h"
 
 //#ifdef Q_OS_WIN
 //#include <Windows.h>
@@ -16,81 +17,167 @@
 MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
     //createConsole();
     //встановлення таймеру
-    this->TimersCounter = new counterTimer();
-    this->SandSBlocks = new SandS();
-    //присворюю до змінної встановлення стилів
-    this->setObjectName("mainWidget");
-    this->setStyleSheet(
-        "#mainWidget {"
-        "   background-color: rgb(30,30,30);"
-        "}"
-    );
-    this->mainLayout = new QGridLayout(this);
-    this->mainLayout->setSpacing(5);
-    this->mainLayout->setContentsMargins(10, 10, 10, 10);
-    this->setWindowTitle("Успішність студентів");
-    QIcon mainIcon("Images/title.png"); // Іконка для вікна програми
-    this->setWindowIcon(mainIcon); // Встановлюю іконку
+    try {
+        QIcon mainIcon("Images/title.png"); // Іконка для вікна програми
+        QDir imagesDir("Images"); // Директорія Images
+        if (!imagesDir.exists()) {
+            throw ex(1);
+        }
+        QString photoNames[16]{
+            "Add_icon.png",
+            "arrowL.png",
+            "arrowR.png",
+            "Delete_icon.png",
+            "IvanBondarenko.jpg",
+            "load.gif",
+            "photo_Gaulun.jpg",
+            "RodionShevchenko.jpg",
+            "sashaTretiak.jpg",
+            "searchIcon.png",
+            "sortDOWN.png",
+            "sortUP.png",
+            "title.png",
+            "title_Setings.png",
+            "vladMamont.jpg",
+            "warning.png"
+        };
+        for (int i = 0; i < 16; i++) {
+            if (QIcon("Images/"+ photoNames[i]).isNull()) {
+                throw ex(2);
+            }
+        }
+        this->setWindowIcon(mainIcon); // Встановлюю іконку
+        //віджети для інструментів та для головної частини
+        this->TimersCounter = new counterTimer();
+        this->SandSBlocks = new SandS();
+        //присворюю до змінної встановлення стилів
+        this->setObjectName("mainWidget");
+        this->setStyleSheet(
+            "#mainWidget {"
+            "   background-color: rgb(30,30,30);"
+            "}"
+        );
+        this->mainLayout = new QGridLayout(this);
+        this->mainLayout->setSpacing(5);
+        this->mainLayout->setContentsMargins(10, 10, 10, 10);
+        this->setWindowTitle("Успішність студентів");
 
-    //віджети для інструментів та для головної частини
-    QWidget* mainWindowToolsWidget = new QWidget(this);
-    QWidget* mainWindowMainAreaWidget = new QWidget(this);
-    //компоновщики для інструментальної та для головної частин
-    QGridLayout* mainWindowToolsLayout = new QGridLayout(mainWindowToolsWidget);
-    QGridLayout* mainWindownMainAreaLayout = new QGridLayout(mainWindowMainAreaWidget);
-    //віджети головної частини
-    QWidget* mainWindowAreaWidgetMiddle = new QWidget(mainWindowMainAreaWidget);
-    QWidget* mainWindowAreaWidgetRight = new QWidget(mainWindowMainAreaWidget);
-    
-    //для головної частини встановлюю коефіцієнт розтягування
-    mainWindownMainAreaLayout->setColumnStretch(0, 3);
-    mainWindownMainAreaLayout->setColumnStretch(1, 5);
-    mainWindownMainAreaLayout->setColumnStretch(2, 3);
-    //для головної частини встановлюю відступи 
-    mainWindownMainAreaLayout->setSpacing(5);
-    mainWindownMainAreaLayout->setContentsMargins(0, 0, 0, 0);
-    //для віджету інструментів встановлюю відступи 
-    mainWindowToolsLayout->setSpacing(5);
-    mainWindowToolsLayout->setContentsMargins(0, 0, 0, 0);
-    //для віджету інструментів встановлюю коефіцієнт розтягування
-    mainWindowToolsLayout->setColumnStretch(0, 3);
-    mainWindowToolsLayout->setColumnStretch(1, 5);
-    mainWindowToolsLayout->setColumnStretch(2, 3);
+        QWidget* mainWindowToolsWidget = new QWidget(this);
+        QWidget* mainWindowMainAreaWidget = new QWidget(this);
+        //компоновщики для інструментальної та для головної частин
+        QGridLayout* mainWindowToolsLayout = new QGridLayout(mainWindowToolsWidget);
+        QGridLayout* mainWindownMainAreaLayout = new QGridLayout(mainWindowMainAreaWidget);
+        //віджети головної частини
+        QWidget* mainWindowAreaWidgetMiddle = new QWidget(mainWindowMainAreaWidget);
+        QWidget* mainWindowAreaWidgetRight = new QWidget(mainWindowMainAreaWidget);
 
-    //викликаю методи для роботи з віджетом інструментів
-    leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
-    rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
-    ToolsMiddleWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+        //для головної частини встановлюю коефіцієнт розтягування
+        mainWindownMainAreaLayout->setColumnStretch(0, 3);
+        mainWindownMainAreaLayout->setColumnStretch(1, 5);
+        mainWindownMainAreaLayout->setColumnStretch(2, 3);
+        //для головної частини встановлюю відступи 
+        mainWindownMainAreaLayout->setSpacing(5);
+        mainWindownMainAreaLayout->setContentsMargins(0, 0, 0, 0);
+        //для віджету інструментів встановлюю відступи 
+        mainWindowToolsLayout->setSpacing(5);
+        mainWindowToolsLayout->setContentsMargins(0, 0, 0, 0);
+        //для віджету інструментів встановлюю коефіцієнт розтягування
+        mainWindowToolsLayout->setColumnStretch(0, 3);
+        mainWindowToolsLayout->setColumnStretch(1, 5);
+        mainWindowToolsLayout->setColumnStretch(2, 3);
 
-    //викликаю метод для роботи з головною частиною
-    mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, *mainWindowMainAreaWidget);
-    
-    QString styleWidgets =
-        "   border-radius: 10px;"
-        "   background-color: rgb(90,90,90);";
-    mainWindowAreaWidgetMiddle->setStyleSheet(styleWidgets);
-    mainWindowAreaWidgetRight->setStyleSheet(styleWidgets);
-    mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
-    mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
+        //викликаю методи для роботи з віджетом інструментів
+        leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+        rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+        ToolsMiddleWidget(mainWindowToolsWidget, mainWindowToolsLayout);
 
-    //для головного вікна встановлюю коефіцієнт розгтягування
-    this->mainLayout->setRowStretch(0, 1);
-    this->mainLayout->setRowStretch(1, 12);
-    //до головного вікна додаю віджети інструментів та головну частину
-    this->mainLayout->addWidget(mainWindowToolsWidget, 0, 0);
-    this->mainLayout->addWidget(mainWindowMainAreaWidget, 1, 0);
+        //викликаю метод для роботи з головною частиною
+        mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, *mainWindowMainAreaWidget);
 
+        QString styleWidgets =
+            "   border-radius: 10px;"
+            "   background-color: rgb(90,90,90);";
+        mainWindowAreaWidgetMiddle->setStyleSheet(styleWidgets);
+        mainWindowAreaWidgetRight->setStyleSheet(styleWidgets);
+        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetMiddle, 0, 1);
+        mainWindownMainAreaLayout->addWidget(mainWindowAreaWidgetRight, 0, 2);
 
-    //мінімальний розмір вікна WSVGA
-    this->setMinimumSize(1024, 600);
+        //для головного вікна встановлюю коефіцієнт розгтягування
+        this->mainLayout->setRowStretch(0, 1);
+        this->mainLayout->setRowStretch(1, 12);
+        //до головного вікна додаю віджети інструментів та головну частину
+        this->mainLayout->addWidget(mainWindowToolsWidget, 0, 0);
+        this->mainLayout->addWidget(mainWindowMainAreaWidget, 1, 0);
 
+        //мінімальний розмір вікна WSVGA
+        this->setMinimumSize(1024, 600);
+        this->update();
+        this->showMaximized();
+    }
+    catch (ex& error) {
+        auto showErrorDialog = [this](const char* msg) {
+            QLabel* iconLabel = new QLabel();
+            iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxCritical).pixmap(40, 40));
+
+            QGridLayout* layout = new QGridLayout(this);
+            this->setObjectName("this");
+            this->setStyleSheet(
+                "#this {"
+                "   color: rgb(255,255,255);"
+                "   background-color: rgb(30,30,30);"
+                "}"
+            );
+            this->setWindowTitle("Помилка");
+            //текст
+            QLabel* textLabel = new QLabel(msg, this);
+            textLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+            textLabel->setObjectName("textLabel");
+            textLabel->setStyleSheet(
+                "#textLabel {"
+                "   color: #ffffff;"
+                "}"
+            );
+            iconLabel->setParent(this);
+            iconLabel->setAlignment(Qt::AlignCenter);
+            //кнопка
+            QPushButton* button = new QPushButton("Ок", this);
+            button->setObjectName("button");
+            button->setStyleSheet(
+                "#button {"
+                "   color: rgb(255,255,255);"
+                "   background-color: rgb(60,60,60);"
+                "}"
+                "#button:focus {"
+                "   outline: 0px;"  // Видаляє фокусне виділення        
+                "}"
+            );
+            button->setFixedSize(75, 25);
+            connect(button, &QPushButton::released, [this]() {
+                this->close();
+                }
+            );
+            //додаю віджети у сітку
+            layout->setColumnStretch(0, 1);
+            layout->setColumnStretch(1, 2);
+            layout->addWidget(iconLabel, 0, 0);
+            layout->addWidget(textLabel, 0, 1);
+            layout->addWidget(button, 1, 1, 1, 2, Qt::AlignRight);
+            this->setFixedHeight(100);
+            this->show();
+        };
+        if (error.getErrorCode() == 1) {
+            showErrorDialog("Перевстановіть програму!\nКаталог з фото незнайдено!");
+        }
+        else if (error.getErrorCode() == 2) {
+            showErrorDialog("Перевстановіть програму!\nДеякі фото пошкоджені або видалені!");
+        }  
+    }  
 }
 MainWindow_C::~MainWindow_C() {
 delete this->TimersCounter;
 this->close();
 delete this->SandSBlocks;
 }
-
 
 void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
     QWidget* mainWindowToolsMiddle = new QWidget(parentWidget);
@@ -121,40 +208,58 @@ QString GroupName = "3";
 QString StudyName = "4";
 
     */
-    QObject::connect(lineEdit, &QLineEdit::returnPressed, [lineEdit, mainWindowToolsMiddle, mainWindowToolsMiddleLayout, this]() {
-        QString StudyName, GroupName, FacultyName, SpecialtyName;
-        QWidget* PredmetBox;
-        blockWidget *tmp = new blockWidget(mainWindowToolsMiddle);
-        QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
-        configBlock block;
-        block.setWidget(PredmetBox);
-        block.setLayout(PredmetBox->layout());
-        block.setConfigPredmetBlock(
-            [this, SpecialtyName, FacultyName, GroupName, StudyName, tmp, PredmetBox, block](QGridLayout* layout, QWidget* widget)->bool {
-                //SandSBlocks
-                ///////////////////////////////////////////////////////////////////////////////////////////////////
-                //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
-                static int counter = 0;
-                QString PredmetName = "Предмети";
-                if (counter++ >= 3) { counter = 0; return true; }
-                ///////////////////////////////////////////////////////////////////////////////////////////////////
-                blockWidget* block = new blockWidget(PredmetName, PredmetBox);
-                connect(block, &QPushButton::released, [this, block, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
-                    block->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
-                    });
+    auto is_correct = [](QLineEdit* lineEdit)->bool {
+        QRegularExpression regex(R"(^s:\s*+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*f:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*g:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*n:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*$)");
+        QString text = lineEdit->text();
+        return regex.match(text).hasMatch();
+        };
+    QObject::connect(lineEdit, &QLineEdit::returnPressed, [is_correct, lineEdit, mainWindowToolsMiddle, mainWindowToolsMiddleLayout, this]() {
+        try {
+            if (!is_correct(lineEdit)) { throw ex(0); };
+            QString StudyName, GroupName, FacultyName, SpecialtyName;
+            //todo: запит на отримання предметів студента за спеціальністю, факультетом, групою і піб
+            QWidget* PredmetBox;
+            blockWidget* tmp = new blockWidget(mainWindowToolsMiddle);
+            QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
+            configBlock block;
+            block.setWidget(PredmetBox);
+            block.setLayout(PredmetBox->layout());
+            block.setConfigPredmetBlock(
+                [this, SpecialtyName, FacultyName, GroupName, StudyName, tmp, PredmetBox, block](QGridLayout* layout, QWidget* widget)->bool {
+                    //SandSBlocks
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+                    //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
+                    static int counter = 0;
+                    QString PredmetName = "Предмети";
+                    if (counter++ >= 3) { counter = 0; return true; }
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+                    blockWidget* block = new blockWidget(PredmetName, PredmetBox);
+                    connect(block, &QPushButton::released, [this, block, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName]() {
+                        block->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
+                        });
 
-                block->AddStructure();
-                layout->addWidget(block, counter++ + 1, 0);
-                return false;
-            },
-            PredmetBox,
-            "Предмети"
-        );
-        dialog->exec();
+                    block->AddStructure();
+                    layout->addWidget(block, counter++ + 1, 0);
+                    return false;
+                },
+                PredmetBox,
+                "Предмети"
+            );
+            dialog->exec();
+        }
+        catch (ex& error) {
+            auto TextInLineEditIsWrong = [this](const char* msg) {
+                QLabel* iconLabel = new QLabel();
+                iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+                iconLabel->setAttribute(Qt::WA_DeleteOnClose);
+                WarningDialog warning(this, msg, "Попередження", "Images/warning.png", iconLabel, "Ок");
+                warning.show();
+                };
+            if (error.getErrorCode() == 0) {
+                TextInLineEditIsWrong("Введено неправильний запит!");
+            }
+        }  
     });
-
-
-
     iconSearch->setPixmap(QPixmap("Images/searchIcon.png").scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     mainWindowToolsMiddleLayout->addWidget(iconSearch, 0, 0);
@@ -301,7 +406,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     qDebug() << "Predmets:" << predmets;
 
     //підключення натиску на спеціальність для факульетів
-
+    
     configBlock block;
     block.setWidget(LeftSide);
     block.setLayout(LeftSideLayout);
@@ -311,7 +416,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             //HERE: відбувається поступове отримання всіх спеціальностей із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
             QString SpecialtyName = "спеціальність";
-            if (counter++ >= 3) { counter = 0; return true;  }
+            if (counter++ >= 300) { counter = 0; return true; }
+
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             blockWidget* block = new blockWidget(SpecialtyName, widget);
             connect(block, &QPushButton::released, block, 
@@ -325,6 +431,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         mainWedgetTools, 
         *this->TimersCounter, 
         "Cпеціальності"
+
     );
     //коли натиснуто на блок з групою, весь віджет оновлюється щоб показати студентів у цій групі по центру
     block.setWidget(MiddleSide);
@@ -375,122 +482,167 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
 
 //кнопка про нас
 void MainWindow_C::AboutUsButtonPressed() {
-    //нове вікно про нас
-    QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
-    QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
-
-    settingsWidget->setWindowTitle("Про нас");
-    QIcon mainIcon("Images/title.png");
-    settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    settingsLayout->setRowStretch(0, 6);
-    
-
-    QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
-    QGridLayout* bodyLayout = new QGridLayout(Body);
-
-    settingsWidget->setFixedSize(400, 400);
-    settingsLayout->addWidget(Body, 0, 0);
-    //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
-    settingsLayout->setRowStretch(1, 1);
-    QWidget* Pagination = new QWidget(settingsWidget); Pagination->setObjectName("Pagination");
-    QGridLayout* PaginationLayout = new QGridLayout(Pagination);
-    PaginationLayout->setSpacing(5);
-    PaginationLayout->setContentsMargins(5, 5, 5, 5);
-    QPushButton* ButtonNavigateLright = new QPushButton(Pagination);
-    QPushButton* ButtonNavigateLeft = new QPushButton(Pagination);
-    ButtonNavigateLeft->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #787878;"
-        "   border: none;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:focus {"
-        "   outline: 0px;"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: #828282;"
-        "}"
-        "QPushButton:pressed {"
-        "   background-color: #a0a0a0;"
-        "}"
-    );
-    ButtonNavigateLright->setStyleSheet(
-        "QPushButton {"
-        "   background-color: #787878;"
-        "   border: none;"
-        "   border-radius: 5px;"
-        "}"
-        "QPushButton:focus {"
-        "   outline: 0px;"
-        "}"
-        "QPushButton:hover {"
-        "   background-color: #828282;"
-        "}"
-        "QPushButton:pressed {"
-        "   background-color: #a0a0a0;"
-        "}"
-    );
-
-    ButtonNavigateLeft->setFixedSize(30, 30);
-    ButtonNavigateLright->setFixedSize(30, 30);
-
-    ButtonNavigateLeft->setIcon(QIcon("Images/arrowL.png"));
-    ButtonNavigateLright->setIcon(QIcon("Images/arrowR.png"));
-
-    PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
-    PaginationLayout->addWidget(ButtonNavigateLright, 0, 1, Qt::AlignLeft);
-
-    auto showDev = [this, Body, bodyLayout](int &currentDevelopVar) {
-        if (currentDevelopVar == 0) {
-            showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+    try {
+        QIcon mainIcon("Images/title.png"); // Іконка для вікна програми
+        QDir imagesDir("Images"); // Директорія Images
+        if (!imagesDir.exists()) {
+            throw ex(1);
         }
-        else if (currentDevelopVar == 1) {
-            showWindowAboutUs("Images/vladMamont.jpg", "Мамонт Владислав", "Базу даних", "https://github.com/Teensik", Body, bodyLayout);
+        if (mainIcon.isNull()) {
+            throw ex(2);
         }
-        else if (currentDevelopVar == 2) {
-            showWindowAboutUs("Images/anonim.png", "Третяк Олександр", "Алгоритми", "https://github.com/MrS1ngULaR1TY", Body, bodyLayout);
-        }
-        else if (currentDevelopVar == 3) {
-            showWindowAboutUs("Images/anonim.png", "Шевченко Родіон", "Розробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
-        }
-        else if (currentDevelopVar == 4) {
-            showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
-        }
-        else if (currentDevelopVar > 4) {
-            showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
-            currentDevelopVar = 0;
-        }
-        else if (currentDevelopVar < 0) {
-            showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
-            currentDevelopVar = 4;
-        }
-        };
-    static int currentDevelopVar = 0;
+        //нове вікно про нас
+        QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
+        QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
+        settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
+        settingsWidget->setWindowTitle("Про нас");
+        settingsLayout->setRowStretch(0, 6);
 
-    connect(ButtonNavigateLright, &QPushButton::released, [this, showDev]() {
-        showDev(++currentDevelopVar);
-        });
-    connect(ButtonNavigateLeft, &QPushButton::released, [this, showDev]() {
-        showDev(--currentDevelopVar);
-        });
 
-    settingsLayout->addWidget(Pagination, 1, 0);
-    QString styleForWidget =
-        "#Pagination {"
-        "   background-color: rgb(70,70,70);"
-        "   border-radius: 10px;"
-        "   padding: 10px;"
-        "}";
-    settingsWidget->setStyleSheet(
-        "#settingsWidget {"
-        "   background-color: rgb(30,30,30);"
-        "}"
-    );
-    settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
-    Pagination->setStyleSheet(styleForWidget);
-    //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
-    showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
-    settingsWidget->exec();
+        QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
+        QGridLayout* bodyLayout = new QGridLayout(Body);
+
+        settingsWidget->setFixedSize(400, 400);
+        settingsLayout->addWidget(Body, 0, 0);
+        //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
+        settingsLayout->setRowStretch(1, 1);
+        QWidget* Pagination = new QWidget(settingsWidget); Pagination->setObjectName("Pagination");
+        QGridLayout* PaginationLayout = new QGridLayout(Pagination);
+        PaginationLayout->setSpacing(5);
+        PaginationLayout->setContentsMargins(5, 5, 5, 5);
+        QPushButton* ButtonNavigateLright = new QPushButton(Pagination);
+        QPushButton* ButtonNavigateLeft = new QPushButton(Pagination);
+        ButtonNavigateLeft->setStyleSheet(
+            "QPushButton {"
+            "   background-color: #787878;"
+            "   border: none;"
+            "   border-radius: 5px;"
+            "}"
+            "QPushButton:focus {"
+            "   outline: 0px;"
+            "}"
+            "QPushButton:hover {"
+            "   background-color: #828282;"
+            "}"
+            "QPushButton:pressed {"
+            "   background-color: #a0a0a0;"
+            "}"
+        );
+        ButtonNavigateLright->setStyleSheet(
+            "QPushButton {"
+            "   background-color: #787878;"
+            "   border: none;"
+            "   border-radius: 5px;"
+            "}"
+            "QPushButton:focus {"
+            "   outline: 0px;"
+            "}"
+            "QPushButton:hover {"
+            "   background-color: #828282;"
+            "}"
+            "QPushButton:pressed {"
+            "   background-color: #a0a0a0;"
+            "}"
+        );
+
+        ButtonNavigateLeft->setFixedSize(30, 30);
+        ButtonNavigateLright->setFixedSize(30, 30);
+        if (QIcon("Images/arrowL.png").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/arrowR.png").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/photo_Gaulun.jpg").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/vladMamont.jpg").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/IvanBondarenko.jpg").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/sashaTretiak.jpg").isNull()) {
+            throw ex(2);
+        }
+        if (QIcon("Images/RodionShevchenko.jpg").isNull()) {
+            throw ex(2);
+        }
+
+        ButtonNavigateLeft->setIcon(QIcon("Images/arrowL.png"));
+        ButtonNavigateLright->setIcon(QIcon("Images/arrowR.png"));
+
+        PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
+        PaginationLayout->addWidget(ButtonNavigateLright, 0, 1, Qt::AlignLeft);
+
+        auto showDev = [this, Body, bodyLayout](int& currentDevelopVar) {
+            if (currentDevelopVar == 0) {
+                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+            }
+            else if (currentDevelopVar == 1) {
+                showWindowAboutUs("Images/vladMamont.jpg", "Мамонт Владислав", "Базу даних", "https://github.com/Teensik", Body, bodyLayout);
+            }
+            else if (currentDevelopVar == 2) {
+                showWindowAboutUs("Images/sashaTretiak.jpg", "Третяк Олександр", "Алгоритми", "https://github.com/MrS1ngULaR1TY", Body, bodyLayout);
+            }
+            else if (currentDevelopVar == 3) {
+                showWindowAboutUs("Images/RodionShevchenko.jpg", "Шевченко Родіон", "Розробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
+            }
+            else if (currentDevelopVar == 4) {
+                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+            }
+            else if (currentDevelopVar > 4) {
+                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+                currentDevelopVar = 0;
+            }
+            else if (currentDevelopVar < 0) {
+                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+                currentDevelopVar = 4;
+            }
+            };
+        static int currentDevelopVar = 0;
+
+        connect(ButtonNavigateLright, &QPushButton::released, [this, showDev]() {
+            showDev(++currentDevelopVar);
+            });
+        connect(ButtonNavigateLeft, &QPushButton::released, [this, showDev]() {
+            showDev(--currentDevelopVar);
+            });
+
+        settingsLayout->addWidget(Pagination, 1, 0);
+        QString styleForWidget =
+            "#Pagination {"
+            "   background-color: rgb(90,90,90);"
+            "   border-radius: 10px;"
+            "   padding: 10px;"
+            "}";
+        settingsWidget->setStyleSheet(
+            "#settingsWidget {"
+            "   background-color: rgb(30,30,30);"
+            "}"
+        );
+        settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
+        Pagination->setStyleSheet(styleForWidget);
+        //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
+        showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+        settingsWidget->exec();
+    }
+    catch (ex& error) {
+        auto dialogEW = [this](const char* msg, const char* title, QStyle::StandardPixmap style) {
+            QLabel* iconLabel = new QLabel();
+            iconLabel->setPixmap(this->style()->standardIcon(style).pixmap(40, 40));
+            iconLabel->setAttribute(Qt::WA_DeleteOnClose);
+            WarningDialog warning(this, msg, title, "", iconLabel, "Ок");
+            warning.show();
+            };
+        if (error.getErrorCode() == 1) {
+            dialogEW("Перевстановіть програму!\nКаталог з фото незнайдено!!", "Помилка", QStyle::SP_MessageBoxCritical);
+        }
+        else if (error.getErrorCode() == 2) {
+            dialogEW("Перевстановіть програму!\nДеякі фото пошкоджені або видалені!", "Помилка", QStyle::SP_MessageBoxCritical);
+        }
+    }
+   
 }
 //загальне вікно для виведення інформації про нас
 void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, const QString& responsible, const QString& linkToGit, QWidget* Body, QGridLayout* bodyLayout)  {
@@ -611,14 +763,16 @@ void MainWindow_C::HelpButtonPressed() {
         "               </div>"
         "               <div style = 'font-size: 14px; color: #ffffff;'>"
         "                   Поточне вікно зустрічає вас 2-ма частинами <i>верхньою </i> та <i>нижньою</i> які візуально поділені на 3 підчастини кожна."
-        //here: якщо буде доданий пошук, то ось текст який відповідає за його опис
-        "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою та перейти до налаштувань."
-        "                   <br><u>Нижня частина</u>- відповідає за навігацію та пошук студента вручну натискаючи на <i>блоки</i>."
+        "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою, знайти студента та перейти до налаштувань." 
+        "                   Пошук студента відбувається за специфічним стандартом вказуючи спеціальність, факультет, групу та піб студента. Наприклад: (s: спеціальність f: факультет g: група n: піб) "
+        "                   де, все що в () це записується в поле пошуку. Також не можна вводити інші символи окрім: англійських, українських літер (будь-якого регістру), цифри, символи ( ` ' \" - _) та пробіл. Всі інші символи викликатимуть помилку. "
+        "                   <br><u>Нижня частина</u>- відповідає за навігацію та пошук студента вручну натискаючи на <i>блоки</i>. "/*сортування тут*/
         "                   <br><u>Блоки</u> - це кнопки, які допомагають знайти оцінки студента. "
         "                   <br><u>Лівий віджет блоків</u> - відповідає за блоки із (спеціальністю), і якщо натиснути на нього, Ви отримаєте всі групи, факультети і тд. які мають обрану спеціальність."
-        "                   <br><u>Центральний віджет блоків</u> - відповідає одразу за групи, та за студентів. Одразу Вам буде видно тільки групи, так щоб отримати, блоки із студентами треба зробити *клік* "
+        "                   <br><u>Центральний віджет блоків</u> - відповідає одразу за групи, та за студентів. Одразу Вам буде видно тільки групи, так щоб отримати блоки із студентами треба зробити *клік* "
         "                   по блоку з групою. Після цього у Вас з'явиться доступ до студентів які є у групі. Натиснувши на будь-який блок із студентом ви відкриєте вікно з <i>предметами студента </i>."
-        "                   <br><u>Правий віджет блоків</u> - у цьому віджеті ви можете обрати певний факультет щоб зменшити пошуки груп та студентів.<br>"
+        "                   <br><u>Правий віджет блоків</u> - у цьому віджеті ви можете обрати певний факультет щоб зменшити пошуки груп та студентів."
+      
         "               </div>"
         "           </li>"
         "           <li>"
@@ -627,6 +781,7 @@ void MainWindow_C::HelpButtonPressed() {
         "               </div>"
         "               <div  style = 'font-size: 14px; color: #ffffff;'>"
         "                   Це вікно призначене для перегляду розробників, їх акаунтів на Github, фото яке розробники бажали вставити, а також хто за що був відповідальний.<br>"  
+        "                   Для навігації використовуйте пагінацію яка розташована знизу (стрілочки вліво-вправо) щоб переглядати всіх розробників.<br>"
         "               </div>"
         "           </li>"
         "           <li>"
@@ -644,7 +799,7 @@ void MainWindow_C::HelpButtonPressed() {
         "               </div>"
         "               <div  style = 'font-size: 14px; color: #ffffff;'>"
         "                   Вікно зустріне вас 8-ма кнопками, які додають студетів/групи/факультети і тд. (Після натиску на будь-яку кнопку з цього меню Вам буде надано поле для введеня "
-        "                   і підказака що саме треба ввести у поле. Якщо ви спробуєте одразу зберегти (нічого не написавши у поле/поля буде попередження. Якщо ви додасте спеціальність/факультет/групу і тд. "
+        "                   і підказака що саме треба ввести у поле. Якщо ви спробуєте одразу зберегти (нічого не написавши у поле/поля буде попередження. Якщо міститиме символи, які не були перелічені \"пошуку\" буде попередження. Якщо ви додасте спеціальність/факультет/групу і тд. "
         "                   яка вам більше не потрібна, ви можете її в будь-який час видалити за допомогою відповідних кнопок. "
         "                   Якщо ви заповнили поля для додавання/видалення і натиснули збереги (або видалити) то у правому нижньому куту екрану з'явиться повідомлення про це."  
         "               </div>"
@@ -668,6 +823,10 @@ void MainWindow_C::HelpButtonPressed() {
         "               </div>"
         "           </li>"
         "       </ol>"
+        "       <hr>"
+        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"  
+        "           Бажаємо приємного користування!"
+        "       </div>"
         "   </body>"
         "</html>"
     );
@@ -1189,16 +1348,29 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
     //створення вектора для запису у БД всіх полів
     vector<QString> AllLineEdits;
     AllLineEdits.reserve(fieldNames.size());//резервні місця під текст
-
+    auto is_correct = [](QLineEdit* lineEdit)->bool {
+        QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+$)");
+        QString text = lineEdit->text();
+        return regex.match(text).hasMatch();
+        };
     // Перевірка полів за допомогою ітератора
     // Перевіряємо, чи є діти
     for (const QString& fieldName : fieldNames) { //проходжусь по кожній комірці списку 
         QLineEdit* lineEdit = dialog->findChild<QLineEdit*>(fieldName);
+        
         if (lineEdit == nullptr || lineEdit->text().isEmpty()) { //якщо дитина з такою унікальною назовю знайдена і пуста - попередження
             QLabel* iconLabel = new QLabel();
             iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
             iconLabel->setAttribute(Qt::WA_DeleteOnClose);
             WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
+            warning.show();
+            return;
+        }
+        if (!is_correct(lineEdit)) {
+            QLabel* iconLabel = new QLabel();
+            iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+            iconLabel->setAttribute(Qt::WA_DeleteOnClose);
+            WarningDialog warning(dialog, "Некоректні символи!", "Попередження", "Images/warning.png", iconLabel, "Ок");
             warning.show();
             return;
         }
@@ -1301,7 +1473,7 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
         "}"
     );
     //іконка
-    QIcon mainIcon("Images/warning.png");
+    QIcon mainIcon(wayIconTitle);
     this->setWindowIcon(mainIcon);
     this->setWindowTitle(titleText);
     //іконка
@@ -1314,6 +1486,7 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
     textLabel->setStyleSheet(
         "#textLabel {"
         "   color: #ffffff;"
+        "   margin-left: 20px;"
         "}"
     );
     //кнопка
@@ -1323,12 +1496,12 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
         "#button {"
         "   color: rgb(255,255,255);"
         "   background-color: rgb(60,60,60);"
-        "   margin-left: 35px;"
         "}"
         "#button:focus {"
         "   outline: 0px;"  // Видаляє фокусне виділення        
         "}"
     );
+    button->setFixedSize(75, 25);
     button->setFixedHeight(25);
     connect(button, &QPushButton::released, [this]() {
             this->accept();
@@ -1339,10 +1512,10 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
     layout->setColumnStretch(1, 2);
     layout->addWidget(IconMsg, 0, 0);
     layout->addWidget(textLabel, 0, 1);
-    layout->addWidget(button, 1, 1);
+    layout->addWidget(button, 1, 1, 1, 2, Qt::AlignRight);
 }
 void WarningDialog::show() {
-    this->setFixedSize(200, 100);
+    this->setFixedHeight(100);
     this->exec();
 }
 smartText::smartText(const QString& text, QWidget* parent) : QLabel(text, parent), originalText(text) {}
@@ -1638,7 +1811,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
     QPushButton* delPredmet = new QPushButton("Видалити предмет", WidgetButton); delPredmet->setObjectName("delPredmet");
     //вікно з додаванням та видаленням предметів
 
-    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget](const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
+    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget, this](const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
         QDialog* dialog = new QDialog(); dialog->setObjectName("dialog");
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         QGridLayout* layout = new QGridLayout(dialog); layout->setObjectName("layout");
@@ -1648,13 +1821,25 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         QLineEdit* line = new QLineEdit(dialog); line->setObjectName("line");
         QPushButton* button = new QPushButton(textButton, dialog); button->setObjectName("button");
 
-
-        QObject::connect(button, &QPushButton::released, [settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line]() {
+        auto is_correct = [](QLineEdit* lineEdit)->bool {
+            QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+$)");
+            QString text = lineEdit->text();
+            return regex.match(text).hasMatch();
+            };
+        QObject::connect(button, &QPushButton::released, [settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line, is_correct, this]() {
+            
             if (line->text().isEmpty()) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(dialog->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
                 WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
                 warning.show();
+            } else if (!is_correct(line)) {
+                QLabel* iconLabel = new QLabel();
+                iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+                iconLabel->setAttribute(Qt::WA_DeleteOnClose);
+                WarningDialog warning(dialog, "Некоректні символи!", "Попередження", "Images/warning.png", iconLabel, "Ок");
+                warning.show();
+                return;
             }
             else {
                 PredmetName = line->text();
@@ -2000,7 +2185,7 @@ void configBlock::setLayout(QLayout* layout ) {
 }
 
 template<typename LaFunc>
-void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counterTimer& counterTimers, const QString& textTitle) {
+void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counterTimer& counterTimers, const QString& textTitle ) {
     //видалення всіх блоків (якщо вони є) з сітки
     QLayoutItem* item;
     while ((item = this->layout->takeAt(0)) != nullptr) {
