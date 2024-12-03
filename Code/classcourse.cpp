@@ -2,7 +2,7 @@
 
 //=== SubjectInfo ===
 //
-// перевантажені оператори
+// РїРµСЂРµРІР°РЅС‚Р°Р¶РµРЅС– РѕРїРµСЂР°С‚РѕСЂРё
 bool operator<(const SubjectInfo& sub1, const SubjectInfo& sub2) {
     return sub1.Subject < sub2.Subject;
 }
@@ -13,11 +13,11 @@ bool operator>(const SubjectInfo& sub1, const SubjectInfo& sub2) {
 
 // === StudInfo ===
 //
-// методи додавання і вилучення StudInfo (інформація про студента)
+// РјРµС‚РѕРґРё РґРѕРґР°РІР°РЅРЅСЏ С– РІРёР»СѓС‡РµРЅРЅСЏ StudInfo (С–РЅС„РѕСЂРјР°С†С–СЏ РїСЂРѕ СЃС‚СѓРґРµРЅС‚Р°)
 void StudInfo::addSubject(const QString& subjectName, const QVector<int>& grades) {
     for (const auto& subject : StudSubjects) {
         if (subject.getSubject() == subjectName) {
-            qWarning("Предмет вже існує!");
+            qWarning("ГЏГ°ГҐГ¤Г¬ГҐГІ ГўГ¦ГҐ ВіГ±Г­ГіВє!");
             return;
         }
     }
@@ -31,10 +31,10 @@ bool StudInfo::removeSubject(const QString& subjectName) {
             return true;
         }
     }
-    qWarning("Предмет не знайдено!");
+    qWarning("ГЏГ°ГҐГ¤Г¬ГҐГІ Г­ГҐ Г§Г­Г Г©Г¤ГҐГ­Г®!");
     return false;
 }
-// Перевантажені оператори
+// РџРµСЂРµРІР°РЅС‚Р°Р¶РµРЅС– РѕРїРµСЂР°С‚РѕСЂРё
 
 
 bool operator ==(const StudInfo& exmpl1, const StudInfo& exmpl2) {
@@ -59,11 +59,11 @@ bool operator<(const StudInfo& exmpl1, const StudInfo& exmpl2) {
 
 // ===StudentBlock===
 //
-// додавання студента з масиву
+// РґРѕРґР°РІР°РЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° РІ РјР°СЃРёРІ
 void StudentBlock::addStudent(const StudInfo& student) {
     students.append(student);
 }
-// видалення студента з масиву
+// РІРёРґР°Р»РµРЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° Р· РјР°СЃРёРІСѓ
  bool StudentBlock::removeStudent(const QString& fullName) {
 for (int i = 0; i < students.size(); ++i) {
     if (students[i].getStudFullName() == fullName) {
@@ -74,11 +74,11 @@ for (int i = 0; i < students.size(); ++i) {
 }
 
 }
-//сортування в буфері за групою
+//СЃРѕСЂС‚СѓРІР°РЅРЅСЏ РІ Р±СѓС„РµСЂС– Р·Р° РіСЂСѓРїРѕСЋ
 void StudentBlock::sortBufferByGroup() {
 
     if (specialtyBuffer.isEmpty()) {
-        qWarning("Буфер порожній, сортування неможливе!");
+        qWarning("ГЃГіГґГҐГ° ГЇГ®Г°Г®Г¦Г­ВіГ©, Г±Г®Г°ГІГіГўГ Г­Г­Гї Г­ГҐГ¬Г®Г¦Г«ГЁГўГҐ!");
         return;
     }
     int n = specialtyBuffer.size();
@@ -87,7 +87,7 @@ void StudentBlock::sortBufferByGroup() {
         const StudInfo* key = specialtyBuffer[i];
         int j = i - 1;
 
-        // Переміщуємо елементи, що більші за key (за групою), на одну позицію вперед
+        // РџРµСЂРµРјС–С‰СѓС”РјРѕ РµР»РµРјРµРЅС‚Рё, С‰Рѕ Р±С–Р»СЊС€С– Р·Р° key (Р·Р° РіСЂСѓРїРѕСЋ), РЅР° РѕРґРЅСѓ РїРѕР·РёС†С–СЋ РІРїРµСЂРµРґ
         while (j >= 0 && specialtyBuffer[j]->getStudGroup() > key->getStudGroup()) {
             specialtyBuffer[j + 1] = specialtyBuffer[j];
             j--;
@@ -97,16 +97,16 @@ void StudentBlock::sortBufferByGroup() {
     }
 }
 
-// фільтрація за спеціальністю 
+// С„С–Р»СЊС‚СЂР°С†С–СЏ Р·Р° СЃРїРµС†С–Р°Р»СЊРЅС–СЃС‚СЋ  
 void StudentBlock::filterBySpecialty(const QString& specialty) {
-    specialtyBuffer.clear(); // Очищуємо буфер
+    specialtyBuffer.clear();    // РћС‡РёС‰СѓС”РјРѕ Р±СѓС„РµСЂ
     for (const auto& student : students) {
         if (student.getStudSpecialty() == specialty) {
-            specialtyBuffer.append(&student); // Додаємо покажчик на студента
+            specialtyBuffer.append(&student);  // Р”РѕРґР°С”РјРѕ РїРѕРєР°Р¶С‡РёРє РЅР° СЃС‚СѓРґРµРЅС‚Р°
         }
     }
 
-    // Сортуємо буферний масив за групою (скоріш за всього не потрібно зараз)
+    // РЎРѕСЂС‚СѓС”РјРѕ Р±СѓС„РµСЂРЅРёР№ РјР°СЃРёРІ Р·Р° РіСЂСѓРїРѕСЋ (СЃРєРѕСЂС–С€ Р·Р° РІСЃСЊРѕРіРѕ РЅРµ РїРѕС‚СЂС–Р±РЅРѕ Р·Р°СЂР°Р·)
      sortBufferByGroup();
 }
 
