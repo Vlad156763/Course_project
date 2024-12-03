@@ -70,8 +70,8 @@ for (int i = 0; i < students.size(); ++i) {
         students.removeAt(i);
         return true;
     }
-    return false;
 }
+     return false;
 
 }
 //сортування в буфері за групою
