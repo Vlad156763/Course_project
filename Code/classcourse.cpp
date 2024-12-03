@@ -17,7 +17,7 @@ bool operator>(const SubjectInfo& sub1, const SubjectInfo& sub2) {
 void StudInfo::addSubject(const QString& subjectName, const QVector<int>& grades) {
     for (const auto& subject : StudSubjects) {
         if (subject.getSubject() == subjectName) {
-            qWarning("Ïðåäìåò âæå ³ñíóº!");
+            qWarning("Предмет вже існує!");
             return;
         }
     }
@@ -31,7 +31,7 @@ bool StudInfo::removeSubject(const QString& subjectName) {
             return true;
         }
     }
-    qWarning("Ïðåäìåò íå çíàéäåíî!");
+    qWarning("Предмет не знайдено!");
     return false;
 }
 // Перевантажені оператори
@@ -78,7 +78,7 @@ for (int i = 0; i < students.size(); ++i) {
 void StudentBlock::sortBufferByGroup() {
 
     if (specialtyBuffer.isEmpty()) {
-        qWarning("Áóôåð ïîðîæí³é, ñîðòóâàííÿ íåìîæëèâå!");
+        qWarning("Буфер порожній, сортування неможливе!");
         return;
     }
     int n = specialtyBuffer.size();
