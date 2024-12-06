@@ -1,3 +1,4 @@
+
 #include "classcourse.h"
 
 //=== SubjectInfo ===
@@ -133,4 +134,9 @@ void StudentBlock::filterByCriteria(
         specialtyBuffer.append(&student);
     }
 }
+
+
+
+
+
 

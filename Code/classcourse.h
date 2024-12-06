@@ -1,3 +1,4 @@
+
 #pragma once
 #ifndef STUDINFO_H
 #define STUDINFO_H
@@ -112,3 +113,10 @@ public:
 
 
 #endif // STUDINFO_H
+
+
+
+  
+
+
+
