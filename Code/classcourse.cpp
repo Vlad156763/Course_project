@@ -123,7 +123,7 @@ void StudentBlock::filterByCriteria(
             for (const auto& studSubject : student.getStudSubjects()) {
                 if (studSubject.getSubject() == subject) {
                     subjectFound = true;
-                    break;
+                    break; // вих≥д (достатньо знайти 1 зб≥г)
                 }
             }
             if (!subjectFound) continue; // якщо предмет не знайдено, пропускаЇмо
