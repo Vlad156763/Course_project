@@ -3,7 +3,7 @@
 
 //=== SubjectInfo ===
 //
-// перевантажені оператори
+// РїРµСЂРµРІР°РЅС‚Р°Р¶РµРЅС– РѕРїРµСЂР°С‚РѕСЂРё
 bool operator<(const SubjectInfo& sub1, const SubjectInfo& sub2) {
     return sub1.Subject < sub2.Subject;
 }
@@ -14,11 +14,11 @@ bool operator>(const SubjectInfo& sub1, const SubjectInfo& sub2) {
 
 // === StudInfo ===
 //
-// методи додавання і вилучення StudInfo (інформація про студента)
+// РјРµС‚РѕРґРё РґРѕРґР°РІР°РЅРЅСЏ С– РІРёР»СѓС‡РµРЅРЅСЏ StudInfo (С–РЅС„РѕСЂРјР°С†С–СЏ РїСЂРѕ СЃС‚СѓРґРµРЅС‚Р°)
 void StudInfo::addSubject(const QString& subjectName, const QVector<int>& grades) {
     for (const auto& subject : StudSubjects) {
         if (subject.getSubject() == subjectName) {
-            qWarning("Предмет вже існує!");
+            qWarning("РџСЂРµРґРјРµС‚ РІР¶Рµ С–СЃРЅСѓС”!");
             return;
         }
     }
@@ -32,10 +32,10 @@ bool StudInfo::removeSubject(const QString& subjectName) {
             return true;
         }
     }
-    qWarning("Предмет не знайдено!");
+    qWarning("РџСЂРµРґРјРµС‚ РЅРµ Р·РЅР°Р№РґРµРЅРѕ!");
     return false;
 }
-// Перевантажені оператори
+// РџРµСЂРµРІР°РЅС‚Р°Р¶РµРЅС– РѕРїРµСЂР°С‚РѕСЂРё
 
 
 bool operator ==(const StudInfo& exmpl1, const StudInfo& exmpl2) {
@@ -60,11 +60,11 @@ bool operator<(const StudInfo& exmpl1, const StudInfo& exmpl2) {
 
 // ===StudentBlock===
 //
-// додавання студента в масив
+// РґРѕРґР°РІР°РЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° РІ РјР°СЃРёРІ
 void StudentBlock::addStudent(const StudInfo& student) {
     students.append(student);
 }
-// видалення студента з масиву
+// РІРёРґР°Р»РµРЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° Р· РјР°СЃРёРІСѓ
 bool StudentBlock::removeStudent(const QString& fullName) {
     for (int i = 0; i < students.size(); ++i) {
         if (students[i].getStudFullName() == fullName) {
@@ -75,11 +75,11 @@ bool StudentBlock::removeStudent(const QString& fullName) {
     return false;
 
 }
-//сортування в буфері за групою
+//СЃРѕСЂС‚СѓРІР°РЅРЅСЏ РІ Р±СѓС„РµСЂС– Р·Р° РіСЂСѓРїРѕСЋ
 void StudentBlock::sortBufferByGroup() {
 
     if (specialtyBuffer.isEmpty()) {
-        qWarning("Буфер порожній, сортування неможливе!");
+        qWarning("Р‘СѓС„РµСЂ РїРѕСЂРѕР¶РЅС–Р№, СЃРѕСЂС‚СѓРІР°РЅРЅСЏ РЅРµРјРѕР¶Р»РёРІРµ!");
         return;
     }
     int n = specialtyBuffer.size();
@@ -88,7 +88,7 @@ void StudentBlock::sortBufferByGroup() {
         const StudInfo* key = specialtyBuffer[i];
         int j = i - 1;
 
-        // Переміщуємо елементи, що більші за key (за групою), на одну позицію вперед
+        // РџРµСЂРµРјС–С‰СѓС”РјРѕ РµР»РµРјРµРЅС‚Рё, С‰Рѕ Р±С–Р»СЊС€С– Р·Р° key (Р·Р° РіСЂСѓРїРѕСЋ), РЅР° РѕРґРЅСѓ РїРѕР·РёС†С–СЋ РІРїРµСЂРµРґ
         while (j >= 0 && specialtyBuffer[j]->getStudGroup() > key->getStudGroup()) {
             specialtyBuffer[j + 1] = specialtyBuffer[j];
             j--;
@@ -98,7 +98,7 @@ void StudentBlock::sortBufferByGroup() {
     }
 }
 
-// фільтрація студентів за критеріями на власний вибір
+// С„С–Р»СЊС‚СЂР°С†С–СЏ СЃС‚СѓРґРµРЅС‚С–РІ Р·Р° РєСЂРёС‚РµСЂС–СЏРјРё РЅР° РІР»Р°СЃРЅРёР№ РІРёР±С–СЂ
   
 void StudentBlock::filterByCriteria(
     const QString& specialty = "",
@@ -107,30 +107,30 @@ void StudentBlock::filterByCriteria(
     const QString& name = "",
     const QString& subject = "") {
 
-    specialtyBuffer.clear(); // Очищуємо буфер
+    specialtyBuffer.clear(); // РћС‡РёС‰СѓС”РјРѕ Р±СѓС„РµСЂ
 
     for (const auto& student : students) {
-        // Перевірка критеріїв
+        // РџРµСЂРµРІС–СЂРєР° РєСЂРёС‚РµСЂС–С—РІ
         if ((!specialty.isEmpty() && student.getStudSpecialty() != specialty) ||
             (!faculty.isEmpty() && student.getStudFaculty() != faculty) ||
             (!group.isEmpty() && student.getStudGroup() != group) ||
             (!name.isEmpty() && student.getStudFullName() != name)) {
-            continue; // Пропускаємо, якщо критерій не виконується
+            continue; // РџСЂРѕРїСѓСЃРєР°С”РјРѕ, СЏРєС‰Рѕ РєСЂРёС‚РµСЂС–Р№ РЅРµ РІРёРєРѕРЅСѓС”С‚СЊСЃСЏ
         }
 
-        // Додаткова перевірка на предмет
+        // Р”РѕРґР°С‚РєРѕРІР° РїРµСЂРµРІС–СЂРєР° РЅР° РїСЂРµРґРјРµС‚
         if (!subject.isEmpty()) {
             bool subjectFound = false;
             for (const auto& studSubject : student.getStudSubjects()) {
                 if (studSubject.getSubject() == subject) {
                     subjectFound = true;
-                    break; // вихід (достатньо знайти 1 збіг)
+                    break; // РІРёС…С–Рґ (РґРѕСЃС‚Р°С‚РЅСЊРѕ Р·РЅР°Р№С‚Рё 1 Р·Р±С–Рі)
                 }
             }
-            if (!subjectFound) continue; // Якщо предмет не знайдено, пропускаємо
+            if (!subjectFound) continue; // РЇРєС‰Рѕ РїСЂРµРґРјРµС‚ РЅРµ Р·РЅР°Р№РґРµРЅРѕ, РїСЂРѕРїСѓСЃРєР°С”РјРѕ
         }
 
-        // Додаємо студента до буферу
+        // Р”РѕРґР°С”РјРѕ СЃС‚СѓРґРµРЅС‚Р° РґРѕ Р±СѓС„РµСЂСѓ
         specialtyBuffer.append(&student);
     }
 }
