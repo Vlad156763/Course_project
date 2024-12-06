@@ -11,19 +11,19 @@ private:
     QVector<int> Grades;
 
 public:
-    // Конструктори
+    // РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРё
     SubjectInfo() = default;
     SubjectInfo(const QString& subject, const QVector<int>& grades)
         : Subject(subject), Grades(grades) {}
 
-    // Геттери
+    // Р“РµС‚С‚РµСЂРё
     QString getSubject() const { return Subject; }
     QVector<int> getGrades() const { return Grades; }
 
-    // Сеттер
+    // РЎРµС‚С‚РµСЂ
     void setGrades(const QVector<int>& grades) { Grades = grades; }
 
-    // Оператори порівняння
+    // РћРїРµСЂР°С‚РѕСЂРё РїРѕСЂС–РІРЅСЏРЅРЅСЏ
     friend bool operator<(const SubjectInfo& sub1, const SubjectInfo& sub2);
     friend bool operator>(const SubjectInfo& sub1, const SubjectInfo& sub2);
 };
@@ -37,14 +37,14 @@ private:
     QVector<SubjectInfo> StudSubjects;
 
 public:
-    // Конструктори
+    // РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРё
     StudInfo() = default;
     StudInfo(const QString& studFullName, const QString& studSpecialty,
         const QString& studGroup, const QString& studFaculty)
         : StudFullName(studFullName), StudSpecialty(studSpecialty),
         StudGroup(studGroup), StudFaculty(studFaculty) {}
 
-    //Оператори порівняння
+    //РћРїРµСЂР°С‚РѕСЂРё РїРѕСЂС–РІРЅСЏРЅРЅСЏ
     friend bool operator<(const StudInfo& exmpl1, const StudInfo& exmpl2);
     friend bool operator>(const StudInfo& exmpl1, const StudInfo& exmpl2);
     friend bool operator ==(const StudInfo& exmpl1, const StudInfo& exmpl2);
@@ -52,61 +52,61 @@ public:
 
 
 
-    // Геттери
+    // Р“РµС‚С‚РµСЂРё
     QString getStudFullName() const { return StudFullName; }
     QString getStudSpecialty() const { return StudSpecialty; }
     QString getStudGroup() const { return StudGroup; }
     QString getStudFaculty() const { return StudFaculty; }
     const QVector<SubjectInfo>& getStudSubjects() const { return StudSubjects; }
 
-    // Сеттери
+    // РЎРµС‚С‚РµСЂРё
     void setStudFullName(const QString& studFullName) { StudFullName = studFullName; }
     void setStudSpecialty(const QString& studSpecialty) { StudSpecialty = studSpecialty; }
     void setStudGroup(const QString& studGroup) { StudGroup = studGroup; }
     void setStudFaculty(const QString& studFaculty) { StudFaculty = studFaculty; }
 
-    // Методи додавання і вилучення предметів
+    // РњРµС‚РѕРґРё РґРѕРґР°РІР°РЅРЅСЏ С– РІРёР»СѓС‡РµРЅРЅСЏ РїСЂРµРґРјРµС‚С–РІ
     void addSubject(const QString& subjectName, const QVector<int>& grades);
     bool removeSubject(const QString& subjectName);
 };
 class StudentBlock {
 private:
-    QVector<StudInfo> students;              // Основний масив студентів та всієї інфо
-    QVector<const StudInfo*> specialtyBuffer; // Буферний масив покажчиків для однієї спеціальності
+    QVector<StudInfo> students;              // РћСЃРЅРѕРІРЅРёР№ РјР°СЃРёРІ СЃС‚СѓРґРµРЅС‚С–РІ С‚Р° РІСЃС–С”С— С–РЅС„Рѕ
+    QVector<const StudInfo*> specialtyBuffer; // Р‘СѓС„РµСЂРЅРёР№ РјР°СЃРёРІ РїРѕРєР°Р¶С‡РёРєС–РІ РґР»СЏ РѕРґРЅС–С”С— СЃРїРµС†С–Р°Р»СЊРЅРѕСЃС‚С–
 
 public:
 
-    //конструктори
+    //РєРѕРЅСЃС‚СЂСѓРєС‚РѕСЂРё
     StudentBlock() {}
     StudentBlock(const QVector<StudInfo>& initialStudents) : students(initialStudents) {}
 
-    //геттери
+    //РіРµС‚С‚РµСЂРё
     const QVector<StudInfo>& getStudents() const { return students; }
     const QVector<const StudInfo*>& getSpecialtyBuffer() const { return specialtyBuffer; }
 
-    // Додавання студента в масив
+    // Р”РѕРґР°РІР°РЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° РІ РјР°СЃРёРІ
     void addStudent(const StudInfo& student);
 
-    // Видалення студента з масиву
+    // Р’РёРґР°Р»РµРЅРЅСЏ СЃС‚СѓРґРµРЅС‚Р° Р· РјР°СЃРёРІСѓ
     bool removeStudent(const QString& fullName);
 
-    // Видалення групи
+    // Р’РёРґР°Р»РµРЅРЅСЏ РіСЂСѓРїРё
    // bool removeGroup(const QString& group);
 
-    // Видалення факультету
+    // Р’РёРґР°Р»РµРЅРЅСЏ С„Р°РєСѓР»СЊС‚РµС‚Сѓ
    // bool removeFaculty(const QString& faculty);
 
-    // Видалення спеціальності
+    // Р’РёРґР°Р»РµРЅРЅСЏ СЃРїРµС†С–Р°Р»СЊРЅРѕСЃС‚С–
     //bool removeSpecialty(const QString& specialty);
 
-    // Фільтрація студентів за критеріями на власний вибір
+    // Р¤С–Р»СЊС‚СЂР°С†С–СЏ СЃС‚СѓРґРµРЅС‚С–РІ Р·Р° РєСЂРёС‚РµСЂС–СЏРјРё РЅР° РІР»Р°СЃРЅРёР№ РІРёР±С–СЂ
     void filterByCriteria(const QString& specialty = "",
         const QString& faculty = "",
         const QString& group = "",
         const QString& name = "",
         const QString& subject = "");
 
-    // Сортування буферу за групою
+    // РЎРѕСЂС‚СѓРІР°РЅРЅСЏ Р±СѓС„РµСЂСѓ Р·Р° РіСЂСѓРїРѕСЋ
     void sortBufferByGroup();
 };
 
