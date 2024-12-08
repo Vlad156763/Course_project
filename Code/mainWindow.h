@@ -25,6 +25,7 @@
 #include <qtextedit.h>
 #include <qgraphicsproxywidget.h>
 #include <qdir.h>
+#include "classcourse.h"
 
 
 
@@ -81,14 +82,6 @@ QStringList initializeGrades(QSqlQuery& query);
 
 void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId);
 void dropAllTables();
-
-//TODO: клас для сортування блоків у масиві
-
-class SandS {
-
-public:
-    int k = 0;
-};
 
 class counterTimer {
     int counter = 0;
@@ -155,10 +148,10 @@ private:
     QHBoxLayout* layout = nullptr;
 
 public slots:
-    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&, SandS&);
-    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&, SandS&);
-    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&, SandS&);
-    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, SandS&);
+    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&);
+    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&);
+    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&);
+    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
 };
 class configBlock{
@@ -205,7 +198,7 @@ private:
     //таймер для відслідковування віджетів головної частини
     counterTimer* TimersCounter = nullptr;
     //клас сортування для сортування всіх блоків 
-    SandS* SandSBlocks = nullptr;
+    StudentBlock* arrayStudentBlock = nullptr;
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"

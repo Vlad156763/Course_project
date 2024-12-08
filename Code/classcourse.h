@@ -56,7 +56,7 @@ public:
     QString getStudSpecialty() const { return StudSpecialty; }
     QString getStudGroup() const { return StudGroup; }
     QString getStudFaculty() const { return StudFaculty; }
-    QVector<SubjectInfo>& getStudSubjects() const { return StudSubjects; }
+    QVector<SubjectInfo> getStudSubjects() const { return StudSubjects; }
 
     // Сеттери
     void setStudFullName(const QString& studFullName) { StudFullName = studFullName; }
@@ -77,7 +77,7 @@ public:
 
     //конструктори
     StudentBlock(){}
-    StudentBlock(const Qvector<StudInfo>& initialStudents): students(initialStudents) {}
+    StudentBlock(const QVector<StudInfo>& initialStudents): students(initialStudents) {}
 
     //геттери
     const QVector<StudInfo>& getStudents() const {return students;}

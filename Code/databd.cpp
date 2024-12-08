@@ -1,4 +1,5 @@
 #include "mainWindow.h"
+#include "ex.h"
 
 void CreateTables() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
@@ -100,7 +101,7 @@ void addSpecialty(QSqlQuery& query, const QString& specialty) {
 
     if (query.next() && query.value(0).toInt() > 0) {
         qDebug() << "Error: Specialty already exists:" << specialty;
-        return;
+        throw ex(-1, "Спеціальність вже існує!");
     }
     // Видача ID
     int nextId = getNextAvailableId(query, "specialty", "id");
@@ -129,10 +130,9 @@ void addFaculty(QSqlQuery& query, const QString& specialty, const QString& facul
     query.bindValue(":specialty", specialty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This specialty is not exist";
-        return;
+        throw ex(-1, "Неможливо створити факультет! Немає спеціальності!");
     }
 
-    // Перевірка на повтор
 
     query.prepare("SELECT COUNT(*) FROM faculty WHERE faculty = :faculty");
     query.bindValue(":faculty", faculty);
@@ -144,7 +144,7 @@ void addFaculty(QSqlQuery& query, const QString& specialty, const QString& facul
 
     if (query.next() && query.value(0).toInt() > 0) {
         qDebug() << "Error: Faculty already exists:" << faculty;
-        return;
+        throw ex(-1, "Факультет вже існує!");
     }
     // Видача ID
     int nextId = getNextAvailableId(query, "faculty", "id");
@@ -175,7 +175,7 @@ void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty
     query.bindValue(":specialty", specialty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This specialty is not exist";
-        return;
+        throw ex(-1, "Неможливо створити групу! Немає спеціальності!");
     }
 
     // Перевірка існування факультету
@@ -184,7 +184,7 @@ void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty
     query.bindValue(":faculty", faculty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This faculty is not exist";
-        return;
+        throw ex(-1, "Неможливо створити групу! Немає факультету!");
     }
 
     // Перевірка на повтор
@@ -199,7 +199,7 @@ void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty
 
     if (query.next() && query.value(0).toInt() > 0) {
         qDebug() << "Error: Group already exists:" << class_group;
-        return;
+        throw ex(-1, "Група вже існує!");
     }
     // Видача id
     int nextId = getNextAvailableId(query, "class_group", "id");
@@ -232,7 +232,8 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
     query.bindValue(":specialty", specialty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This specialty is not exist";
-        return;
+        throw ex(-1, "Неможливо додати студента! Немає факультету!");
+
     }
 
     // Перевірка існування факультету
@@ -241,7 +242,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
     query.bindValue(":faculty", faculty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This faculty is not exist";
-        return;
+        throw ex(-1, "Неможливо додати студента! Немає факультету!");
     }
 
     // Перевірка існування групи
@@ -251,7 +252,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
     query.bindValue(":class_group", class_group);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This group is not exist";
-        return;
+        throw ex(-1, "Неможливо додати студента! Немає групи!");
     }
 
     // Перевірка на повтор
@@ -267,7 +268,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
 
     if (query.next() && query.value(0).toInt() > 0) {
         qDebug() << "Error: A student with this name already exists in group:" << class_group;
-        return;
+        throw ex(-1, "Студент вже існує!");
     }
     // Видача id
     int nextId = getNextAvailableId(query, "students", "id");
@@ -326,7 +327,7 @@ void addGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
     }
     else {
         qDebug() << "Error: No student found for predmet ID:" << predmetId;
-        return;
+        throw ex(-1, "Неможливо додати оцінки! Незнайдено студента!");
     }
     clearGradesForStudentAndPredmet(query, predmetId, studentId);
     for (const QString& grade : grades) {
@@ -521,7 +522,7 @@ void DeleteSpecialty(QSqlQuery& query, const QString& specialty) {
 
     if (!query.next()) {
         qDebug() << "Error: No such specialty found";
-        return;
+        throw ex(0, "Cпеціальності не знайдено!");
     }
 
     // Беремо айді факультети
@@ -551,7 +552,7 @@ void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& fa
 
     if (!query.next()) {
         qDebug() << "Error: No such faculty found";
-        return;
+        throw ex(0, "Факультет не знайдено!");
     }
 
     // Беремо айді факультети
@@ -581,7 +582,7 @@ void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& facu
 
     if (!query.next()) {
         qDebug() << "Error: No such group found";
-        return;
+        throw ex(0, "Групу не знайдено!");
     }
 
     // Беремо айді групи
@@ -612,7 +613,7 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
 
     if (!query.next()) {
         qDebug() << "Error: No such student found in the specified group";
-        return;
+        throw ex(0, "Студента не знайдено!");
     }
 
     // Беремо айді студента
