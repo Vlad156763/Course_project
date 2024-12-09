@@ -106,14 +106,21 @@ public:
     WarningDialog(QWidget*, const QString&, const QString&, const QString&, QLabel*, const QString&);
     void show();
 };
-class smartText : public QLabel {
+//додав абстрактний клас
+class smartTextBase : public QLabel {
 public:
-    smartText(const QString&, QWidget* = nullptr);
-private:
-    QString originalText; // зберігає повний текст
-    void updateElidedText();
+    smartTextBase(const QString&, QWidget* = nullptr);
+protected:
+    virtual void updateElidedText() = 0;
     void resizeEvent(QResizeEvent*) override;
 };  
+class smartText : public smartTextBase {
+private:
+    QString originalText; // зберігає повний текст
+    void updateElidedText() override;
+public:
+    smartText(const QString&, QWidget* = nullptr);
+};
 class blockWidget : public QPushButton {
     Q_OBJECT
 private:

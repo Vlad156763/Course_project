@@ -1535,16 +1535,19 @@ void WarningDialog::show() {
     this->setMinimumSize(120, 30);
     this->exec();
 }
-smartText::smartText(const QString& text, QWidget* parent) : QLabel(text, parent), originalText(text) {}
+smartTextBase::smartTextBase(const QString& text, QWidget* parent) : QLabel(text, parent) {}
+smartText::smartText(const QString& text, QWidget* parent) : smartTextBase(text, parent), originalText(text) {}
+
 void smartText::updateElidedText() {
     QFontMetrics metrics(font());
-    QString elidedText = metrics.elidedText(originalText, Qt::ElideRight, width());
+    QString elidedText = metrics.elidedText(this->originalText, Qt::ElideRight, width());
     QLabel::setText(elidedText);
 }
-void smartText::resizeEvent(QResizeEvent* event) {
+void smartTextBase::resizeEvent(QResizeEvent* event) {
     QLabel::resizeEvent(event);
     updateElidedText();
 }
+
 blockWidget::circleQWidget::circleQWidget(QWidget* parent) : QWidget(parent) {}
 void blockWidget::circleQWidget::SetCoordinats(const int& x, const int& y) {
         this->x = x;
@@ -1828,7 +1831,8 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
     QPushButton* delPredmet = new QPushButton("Видалити предмет", WidgetButton); delPredmet->setObjectName("delPredmet");
     //вікно з додаванням та видаленням предметів
 
-    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget, this](const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
+    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget, this, SpecialtyName, FacultyName, GroupName, StudyName]
+    (const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
         QDialog* dialog = new QDialog(); dialog->setObjectName("dialog");
         dialog->setAttribute(Qt::WA_DeleteOnClose);
         QGridLayout* layout = new QGridLayout(dialog); layout->setObjectName("layout");
@@ -1843,13 +1847,13 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
             QString text = lineEdit->text();
             return regex.match(text).hasMatch();
             };
-        QObject::connect(button, &QPushButton::released, [settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line, is_correct, this]() {
-            
+        QObject::connect(button, &QPushButton::released, [textButton, settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line, is_correct, this, SpecialtyName, FacultyName, GroupName, StudyName]() {
             if (line->text().isEmpty()) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(dialog->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
                 WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
                 warning.show();
+
             } else if (!is_correct(line)) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
@@ -1860,6 +1864,56 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
             }
             else {
                 PredmetName = line->text();
+                ///////////////////////////////////////////////////////////////////////////////////////////////////
+       // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+                try {
+
+                if (textButton == "Додати") {
+                    QSqlDatabase db = QSqlDatabase::database();
+                    QSqlQuery query(db);
+                    int studentId = -1;
+
+                    // Запрос на отримання студента
+                    studentId = getStudentIDforPredmet(query, StudyName, studentId);
+
+                    if (studentId != -1) {
+                        addSubject(query, PredmetName, studentId);
+                        cqdout << "Subject added successfully for student ID:" << studentId;
+                    }
+                    else {
+                        cqdout << "Failed to add subject. No matching student found.";
+                        throw ex(-1, "Студента не знайдено!");
+                    }
+                }
+                else {
+                    ///////////////////////////////////////////////////////////////////////////////////////////////////
+       // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+                    QSqlDatabase db = QSqlDatabase::database();
+                    QSqlQuery query(db);
+                    int studentId = -1;
+
+                    // Запрос на отримання студента
+                    studentId = getStudentIDforPredmet(query, StudyName, studentId);
+
+                    if (studentId != -1) {
+                        DeleteSubject(query, PredmetName, studentId);
+                        cqdout << "Subject deleted successfully for student ID:" << studentId;
+                    }
+                    else {
+                        cqdout << "Failed to delete subject. No matching student found.";
+                        throw ex(-1, "Студента не знайдено!");
+                    }
+                }
+                }
+                catch (const ex& error) {
+                    QLabel* iconLabel = new QLabel();
+                    iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
+                    iconLabel->setAttribute(Qt::WA_DeleteOnClose);
+                    WarningDialog warning(dialog, error.getErrorMsg(), "Попередження", "Images/warning.png", iconLabel, "Ок");
+                    warning.show();
+                    return;
+                }
+
                 SmallMessage_C* smallWindow = new SmallMessage_C(settingsWidget);
                 smallWindow->show(textW, color, settingsLayout, Qt::AlignHCenter | Qt::AlignTop, 0, 0, 1, 2);
                 dialog->accept();
@@ -1910,24 +1964,9 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         };
     QObject::connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
+        
         WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName, "Успішно додано!", "8, 82, 79");
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query(db);
-        int studentId = -1;
-
-        // Запрос на отримання студента
-        studentId = getStudentIDforPredmet(query, StudyName, studentId);
-
-        if (studentId != -1) {
-            addSubject(query, PredmetName, studentId);
-            cqdout << "Subject added successfully for student ID:" << studentId;
-        }
-        else {
-            cqdout << "Failed to add subject. No matching student found.";
-        }
+       
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         cqdout << SpecialtyName << ", " << FacultyName << ", " << GroupName << ", " << StudyName << ", " << PredmetName;
         });
@@ -1935,22 +1974,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         QString PredmetName;
 
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query(db);
-        int studentId = -1;
-
-        // Запрос на отримання студента
-        studentId = getStudentIDforPredmet(query, StudyName, studentId);
-
-        if (studentId != -1) {
-            DeleteSubject(query, PredmetName, studentId);
-            cqdout << "Subject deleted successfully for student ID:" << studentId;
-        }
-        else {
-            cqdout << "Failed to delete subject. No matching student found.";
-        }
+       
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         });
 
