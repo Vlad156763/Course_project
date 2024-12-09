@@ -298,6 +298,22 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
 }
 
 void addSubject(QSqlQuery& query, const QString& predmet, int studentId) {
+
+    // Перевірка на повтор
+    query.prepare("SELECT COUNT(*) FROM predmet WHERE predmet = :predmet AND student_id = :student_id");
+    query.bindValue(":predmet", predmet);
+    query.bindValue(":student_id", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error checking subject existence:" << query.lastError().text();
+        return;
+    }
+
+    if (query.next() && query.value(0).toInt() > 0) {
+        qDebug() << "Error: A subject with this name already exists:" << predmet;
+        throw ex(-1, "Цей предмет вже додано до студента!");
+    }
+
     query.prepare("INSERT INTO predmet (predmet, student_id) VALUES (:predmet, :studentId)");
     query.bindValue(":predmet", predmet);
     query.bindValue(":studentId", studentId);
@@ -308,6 +324,7 @@ void addSubject(QSqlQuery& query, const QString& predmet, int studentId) {
     else {
         qDebug() << "Predmet added successfully! Subject:" << predmet << ", Student ID:" << studentId;
     }
+
 }
 
 void addGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
@@ -427,16 +444,17 @@ void getGroup(QSqlQuery& query) {
     }
 }
 
+//:todo нужно исправить логику
 int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId){
     query.prepare(
         "SELECT id FROM students "
         "WHERE specialty = :specialty AND faculty = :faculty "
         "AND class_group = :classGroup AND name = :StudyName"
     );
-    query.bindValue(":specialty", "1");
-    query.bindValue(":faculty", "1");
-    query.bindValue(":classGroup", "Групи");
-    query.bindValue(":StudyName", "Студенти");
+    query.bindValue(":specialty", "1"); // specialty
+    query.bindValue(":faculty", "1"); // faculty
+    query.bindValue(":classGroup", "Групи"); // class_group
+    query.bindValue(":StudyName", "Студенти"); // name
 
     if (query.exec() && query.next()) {
         studentId = query.value(0).toInt();
@@ -454,7 +472,7 @@ int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
         "WHERE predmet = :predmet;"
     );
     
-    query.bindValue(":predmet", "Предмети");
+    query.bindValue(":predmet", "Предмети"); // predmet
 
     if (query.exec() && query.next()) {
         predmetId = query.value(0).toInt(); 
@@ -464,9 +482,6 @@ int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
         cqdout << "Error: Cannot find predmet ID. Reason:" << query.lastError().text();
         return predmetId = -1;
     }
-}
-void getSubject(QSqlQuery& query, const QString& predmet, int studentId) {
-    // поки залишу
 }
 
 void getGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
@@ -633,6 +648,20 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
 
 void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
     
+    query.prepare("SELECT id FROM predmet WHERE predmet = :predmet AND student_id = :student_id");
+    query.bindValue(":predmet", predmet);
+    query.bindValue(":student_id", studentId);
+
+    if (!query.exec()) {
+        qDebug() << "Error checking subject existence:" << query.lastError().text();
+        return;
+    }
+
+    if (!query.next()) {
+        qDebug() << "Error: This subject isn`t exist!" << predmet;
+        throw ex(-1, "Цього предмету не існує!");
+    }
+
     query.prepare("DELETE FROM predmet WHERE predmet = :predmet AND student_id = :studentId");
 
     query.bindValue(":predmet", predmet);

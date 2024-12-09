@@ -1298,7 +1298,7 @@ void MainWindow_C::DeleteButtonFor_DeleteGroup(QDialog* dialog) {
         DeleteGroup(query, specialty, faculty, groupString);
         };
     // Викликаю загальний метод 
-    SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup" });
+    SaveButtonFor_AllType(dialog, "Успішно видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup" });
 }
 void MainWindow_C::DeleteButtonFor_DeleteFaculty(QDialog* dialog) {
     // Лямбда-функція для дій з БД (додати факультет)
