@@ -647,7 +647,7 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
 }
 
 void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
-    
+
     query.prepare("SELECT id FROM predmet WHERE predmet = :predmet AND student_id = :student_id");
     query.bindValue(":predmet", predmet);
     query.bindValue(":student_id", studentId);
@@ -658,14 +658,27 @@ void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
     }
 
     if (!query.next()) {
-        qDebug() << "Error: This subject isn`t exist!" << predmet;
+        qDebug() << "Error: This subject does not exist!" << predmet;
         throw ex(-1, "Цього предмету не існує!");
     }
 
-    query.prepare("DELETE FROM predmet WHERE predmet = :predmet AND student_id = :studentId");
+    int predmetId = query.value(0).toInt();
 
-    query.bindValue(":predmet", predmet);
-    query.bindValue(":studentId", studentId);
+    // Видалення оцінок , які прив'язані до цього предмету
+    query.prepare("DELETE FROM grades WHERE predmet_id = :predmetId");
+    query.bindValue(":predmetId", predmetId);
+
+    if (!query.exec()) {
+        qDebug() << "Error deleting grades for subject ID:" << predmetId << ". Error:" << query.lastError().text();
+        return;
+    }
+    else {
+        qDebug() << "Grades deleted successfully for subject ID:" << predmetId;
+    }
+
+    // Видалення предмету
+    query.prepare("DELETE FROM predmet WHERE id = :predmetId");
+    query.bindValue(":predmetId", predmetId);
 
     if (!query.exec()) {
         qDebug() << "Error deleting subject:" << query.lastError().text();
@@ -674,6 +687,7 @@ void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId) {
         qDebug() << "Subject deleted successfully. Predmet:" << predmet << ", Student ID:" << studentId;
     }
 }
+
 
 int getNextAvailableId(QSqlQuery& query, const QString& table, const QString& idField) {
     // Отримаємо всі айді з таблиці
