@@ -81,7 +81,7 @@ QStringList initializePredmets(QSqlQuery& query);
 QStringList initializeGrades(QSqlQuery& query);
 
 void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId);
-void dropAllTables();
+
 
 class counterTimer {
     int counter = 0;

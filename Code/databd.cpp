@@ -4,7 +4,6 @@
 void CreateTables() {
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("mydatabase.db");
-   // dropAllTables();
     if (db.open()) {
         cqdout << "Database is open.";
         QSqlQuery query;
@@ -232,8 +231,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& specialty,
     query.bindValue(":specialty", specialty);
     if (!query.exec() || !query.next() || query.value(0).toInt() == 0) {
         cqdout << "This specialty is not exist";
-        throw ex(-1, "Неможливо додати студента! Немає факультету!");
-
+        throw ex(-1, "Неможливо створити групу! Немає спеціальності!");
     }
 
     // Перевірка існування факультету
@@ -526,8 +524,8 @@ void getGrades(QSqlQuery& query, const QStringList& grades, int predmetId) {
 
 
 void DeleteSpecialty(QSqlQuery& query, const QString& specialty) {
-    // Перевірка наявності факультету в таблиці
-    query.prepare("SELECT id FROM specialty WHERE specialty = :specialty");
+    // Перевірка на наявність спеціальності
+    query.prepare("SELECT COUNT(*) FROM specialty WHERE specialty = :specialty");
     query.bindValue(":specialty", specialty);
 
     if (!query.exec()) {
@@ -535,23 +533,44 @@ void DeleteSpecialty(QSqlQuery& query, const QString& specialty) {
         return;
     }
 
-    if (!query.next()) {
+    if (!query.next() || query.value(0).toInt() == 0) {
         qDebug() << "Error: No such specialty found";
-        throw ex(0, "Cпеціальності не знайдено!");
+        throw ex(0, "Спеціальність не знайдено!");
     }
 
-    // Беремо айді факультети
-    int specialtyid = query.value(0).toInt();
+    // Видалення пов'язаних факультетів , груп та студентів
+    query.prepare("DELETE FROM students WHERE specialty = :specialty");
+    query.bindValue(":specialty", specialty);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related students:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related students deleted for specialty:" << specialty;
 
-    // Видаляємо всі факультети з таким айді
-    query.prepare("DELETE FROM specialty WHERE id = :id");
-    query.bindValue(":id", specialtyid);
+    query.prepare("DELETE FROM class_group WHERE specialty = :specialty");
+    query.bindValue(":specialty", specialty);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related class groups:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related class groups deleted for specialty:" << specialty;
 
+    query.prepare("DELETE FROM faculty WHERE specialty = :specialty");
+    query.bindValue(":specialty", specialty);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related faculties:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related faculties deleted for specialty:" << specialty;
+
+    // Видалення спеціальності
+    query.prepare("DELETE FROM specialty WHERE specialty = :specialty");
+    query.bindValue(":specialty", specialty);
     if (!query.exec()) {
         qDebug() << "Error deleting specialty:" << query.lastError().text();
     }
     else {
-        qDebug() << "Specialty deleted successfully with id:" << specialtyid;
+        qDebug() << "Specialty deleted successfully:" << specialty;
     }
 }
 
@@ -570,18 +589,31 @@ void DeleteFaculty(QSqlQuery& query, const QString& specialty, const QString& fa
         throw ex(0, "Факультет не знайдено!");
     }
 
-    // Беремо айді факультети
-    int facultyid = query.value(0).toInt();
+    // Видалення пов'язаних груп та студентів
+    query.prepare("DELETE FROM students WHERE faculty = :faculty");
+    query.bindValue(":faculty", faculty);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related students:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related students deleted for faculty:" << faculty;
 
-    // Видаляємо всі факультети з таким айді
-    query.prepare("DELETE FROM faculty WHERE id = :id");
-    query.bindValue(":id", facultyid);
+    query.prepare("DELETE FROM class_group WHERE faculty = :faculty");
+    query.bindValue(":faculty", faculty);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related class groups:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related class groups deleted for faculty:" << faculty;
 
+    // Видалення факультету
+    query.prepare("DELETE FROM faculty WHERE faculty = :faculty");
+    query.bindValue(":faculty", faculty);
     if (!query.exec()) {
         qDebug() << "Error deleting faculty:" << query.lastError().text();
     }
     else {
-        qDebug() << "Faculty deleted successfully with id:" << facultyid;
+        qDebug() << "Faculty deleted successfully:" << faculty;
     }
 }
 
@@ -600,18 +632,23 @@ void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& facu
         throw ex(0, "Групу не знайдено!");
     }
 
-    // Беремо айді групи
-    int groupid = query.value(0).toInt();
+    // Видалення пов'язаних студентів
+    query.prepare("DELETE FROM students WHERE class_group = :class_group");
+    query.bindValue(":class_group", class_group);
+    if (!query.exec()) {
+        qDebug() << "Error deleting related class_group:" << query.lastError().text();
+        return;
+    }
+    qDebug() << "Related students deleted for class_group:" << class_group;
 
-    // Видаляємо всіх групи з таким айді
-    query.prepare("DELETE FROM class_group WHERE id = :id");
-    query.bindValue(":id", groupid);
+    query.prepare("DELETE FROM class_group WHERE class_group = :class_group");
+    query.bindValue(":class_group", class_group);
 
     if (!query.exec()) {
         qDebug() << "Error deleting group:" << query.lastError().text();
     }
     else {
-        qDebug() << "Group deleted successfully with id:" << groupid;
+        qDebug() << "Group deleted successfully: " << class_group;
     }
 }
 
@@ -770,10 +807,9 @@ QStringList initializeStudents(QSqlQuery& query) {
     }
 
     while (query.next()) {
-        QString studentData = QString("ID: %1, Name: %2, Age: %3, Faculty: %4, Specialty: %5, Class Group: %6")
+        QString studentData = QString("ID: %1, Name: %2, Faculty: %3, Specialty: %4, Class Group: %5")
             .arg(query.value("id").toInt())
             .arg(query.value("name").toString())
-            .arg(query.value("age").toInt())
             .arg(query.value("faculty").toString())
             .arg(query.value("specialty").toString())
             .arg(query.value("class_group").toInt());
@@ -817,26 +853,6 @@ QStringList initializeGrades(QSqlQuery& query) {
     return grades;
 }
 
-
-// Функция для полной очистки бд
-void dropAllTables() {
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query(db);
-
-    // ������ ���� ������ ��� ��������
-    QStringList tables = { "specialty", "faculty", "class_group", "students" };
-
-    // ���� ��� �������� ������ �������
-    for (const QString& tableName : tables) {
-        QString dropQuery = QString("DROP TABLE IF EXISTS %1").arg(tableName);
-        if (!query.exec(dropQuery)) {
-            qDebug() << "Error dropping table" << tableName << ":" << query.lastError().text();
-        }
-        else {
-            qDebug() << "Table" << tableName << "dropped successfully!";
-        }
-    }
-}
 void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId) {
 
     query.prepare("DELETE FROM grades WHERE predmet_id = :predmetId AND student_id = :studentId");
