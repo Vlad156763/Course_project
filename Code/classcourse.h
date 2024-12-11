@@ -1,3 +1,4 @@
+
 #pragma once
 #ifndef STUDINFO_H
 #define STUDINFO_H
@@ -42,21 +43,21 @@ public:
         const QString& studGroup, const QString& studFaculty)
         : StudFullName(studFullName), StudSpecialty(studSpecialty),
         StudGroup(studGroup), StudFaculty(studFaculty) {}
-    
+
     //Оператори порівняння
     friend bool operator<(const StudInfo& exmpl1, const StudInfo& exmpl2);
     friend bool operator>(const StudInfo& exmpl1, const StudInfo& exmpl2);
     friend bool operator ==(const StudInfo& exmpl1, const StudInfo& exmpl2);
     friend bool operator!=(const StudInfo& exmpl1, const StudInfo& exmpl2);
-    
 
 
-   // Геттери
+
+    // Геттери
     QString getStudFullName() const { return StudFullName; }
     QString getStudSpecialty() const { return StudSpecialty; }
     QString getStudGroup() const { return StudGroup; }
     QString getStudFaculty() const { return StudFaculty; }
-    QVector<SubjectInfo> getStudSubjects() const { return StudSubjects; }
+    const QVector<SubjectInfo>& getStudSubjects() const { return StudSubjects; }
 
     // Сеттери
     void setStudFullName(const QString& studFullName) { StudFullName = studFullName; }
@@ -76,12 +77,12 @@ private:
 public:
 
     //конструктори
-    StudentBlock(){}
-    StudentBlock(const QVector<StudInfo>& initialStudents): students(initialStudents) {}
+    StudentBlock() {}
+    StudentBlock(const QVector<StudInfo>& initialStudents) : students(initialStudents) {}
 
     //геттери
-    const QVector<StudInfo>& getStudents() const {return students;}
-    const QVector<const StudInfo*>& getSpecialtyBuffer() const {return specialtyBuffer;}
+    const QVector<StudInfo>& getStudents() const { return students; }
+    const QVector<const StudInfo*>& getSpecialtyBuffer() const { return specialtyBuffer; }
 
     // Додавання студента в масив
     void addStudent(const StudInfo& student);
@@ -98,13 +99,22 @@ public:
     // Видалення спеціальності
     //bool removeSpecialty(const QString& specialty);
 
-    // Фільтрація студентів за спеціальністю
-    void filterBySpecialty(const QString& specialty);
+    // Фільтрація студентів за критеріями на власний вибір
+    void filterByCriteria(const QString& specialty = "",
+        const QString& faculty = "",
+        const QString& group = "",
+        const QString& name = "",
+        const QString& subject = "");
 
     // Сортування буферу за групою
     void sortBufferByGroup();
 };
 
-  
+
 
 #endif // STUDINFO_H
+
+
+
+  
+
