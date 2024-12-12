@@ -1268,7 +1268,7 @@ void MainWindow_C::SaveButtonFor_AddStudent(QDialog* dialog) {
         QSqlQuery query(db); // Створюємл обьект базиданих
 
         // Функція додавання студента
-        addStudent(query, name, faculty, specialty, groupString); // Функція для додавання студента
+        addStudent(query, name, specialty, faculty, groupString); // Функція для додавання студента
         };
 
     // Загальний метод
@@ -1292,7 +1292,7 @@ void MainWindow_C::DeleteButtonFor_DeleteStudent(QDialog* dialog) {
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db); // Створюємл обьект базиданих
         
-        DeleteStudent(query, name, faculty, specialty, groupString);
+        DeleteStudent(query, name, specialty, faculty, groupString);
         };
     // Викликаю загальний метод 
     SaveButtonFor_AllType(dialog, "Успіншо видалено!", "169, 38, 38", dbAction, { "InputSpecialty", "InputFaculty", "InputGroup", "InputStudent" });
