@@ -1,4 +1,3 @@
-
 #include "classcourse.h"
 
 //=== SubjectInfo ===
@@ -99,13 +98,13 @@ void StudentBlock::sortBufferByGroup() {
 }
 
 // фільтрація студентів за критеріями на власний вибір
-  
+
 void StudentBlock::filterByCriteria(
-    const QString& specialty = "",
-    const QString& faculty = "",
-    const QString& group = "",
-    const QString& name = "",
-    const QString& subject = "") {
+    const QString& specialty,
+    const QString& faculty,
+    const QString& group,
+    const QString& name,
+    const QString& subject) {
 
     specialtyBuffer.clear(); // Очищуємо буфер
 
@@ -135,7 +134,16 @@ void StudentBlock::filterByCriteria(
     }
 }
 
+QVector<const StudInfo*>& StudentBlock::getbuffer() {
+    return this->specialtyBuffer;
+}
 
+void StudentBlock::filterByCriteriaTEST() {
 
+    specialtyBuffer.clear(); // Очищуємо буфер
 
-
+    for (const auto& student : students) {
+        // Додаємо студента до буферу
+        specialtyBuffer.append(&student);
+    }
+}

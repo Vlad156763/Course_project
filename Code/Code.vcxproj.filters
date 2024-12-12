@@ -32,6 +32,9 @@
     <ClCompile Include="databd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="classcourse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <QtMoc Include="mainWindow.h">
@@ -40,6 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="classcourse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -25,9 +25,10 @@
 #include <qtextedit.h>
 #include <qgraphicsproxywidget.h>
 #include <qdir.h>
+#include <qvector.h>
+
+
 #include "classcourse.h"
-
-
 
 #include <QtSql/qsqldatabase.h>
 #include <QtSql/qsqlerror.h>
@@ -37,10 +38,14 @@
 #include <iostream>
 #include <vector>
 #include <cstring>//для std::strrchr
+#include "ex.h"
 
 using std::cerr;
+using std::cout;
+using std::endl;
 using std::strrchr;
 using std::vector;
+
 
 #define FILENAME (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #define cqdout (qDebug() << "┌[msg]" << FILENAME << __LINE__ << "\n└TEXT:" )
@@ -170,7 +175,7 @@ public:
     void setWidget(QWidget*);
     void setLayout(QLayout*);
     template<typename LaFunc>
-    void setConfigBlock(LaFunc, QWidget&, counterTimer&, const QString&);
+    void setConfigBlock(LaFunc, QWidget&, counterTimer&, const QString&, StudentBlock* = nullptr);
     template<typename LaFunc>
     void setConfigPredmetBlock(LaFunc, QWidget*, const QString&);
     friend class MainWindow_C;
@@ -205,7 +210,7 @@ private:
     //таймер для відслідковування віджетів головної частини
     counterTimer* TimersCounter = nullptr;
     //клас сортування для сортування всіх блоків 
-    StudentBlock* arrayStudentBlock = nullptr;
+    
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"

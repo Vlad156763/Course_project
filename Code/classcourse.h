@@ -1,8 +1,8 @@
 
-#pragma once
 #ifndef STUDINFO_H
 #define STUDINFO_H
-#include "classcourse_global.h"
+#include <qstring.h>
+#include <qvector.h>
 
 
 class SubjectInfo {
@@ -80,6 +80,8 @@ public:
     StudentBlock() {}
     StudentBlock(const QVector<StudInfo>& initialStudents) : students(initialStudents) {}
 
+    
+
     //геттери
     const QVector<StudInfo>& getStudents() const { return students; }
     const QVector<const StudInfo*>& getSpecialtyBuffer() const { return specialtyBuffer; }
@@ -106,6 +108,10 @@ public:
         const QString& name = "",
         const QString& subject = "");
 
+
+    void filterByCriteriaTEST();
+    QVector<const StudInfo*>& getbuffer();
+
     // Сортування буферу за групою
     void sortBufferByGroup();
 };
@@ -116,5 +122,5 @@ public:
 
 
 
-  
+
 
