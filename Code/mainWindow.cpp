@@ -9,7 +9,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
         if (!imagesDir.exists()) {
             throw ex(1);
         }
-        QString photoNames[15]{
+        QString photoNames[19]{
             "Add_icon.png",
             "arrowL.png",
             "arrowR.png",
@@ -23,9 +23,14 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
             "title.png",
             "title_Setings.png",
             "vladMamont.jpg",
-            "warning.png"
+            "warning.png",
+            "ui.png",
+            "data.png",
+            "class.png",
+            "excep.png",
+            "algoritms.png"
         };
-        for (int i = 0; i < 14; i++) {
+        for (int i = 0; i < 19; i++) {
             if (QIcon("Images/"+ photoNames[i]).isNull()) {
                 throw ex(2);
             }
@@ -516,6 +521,7 @@ void MainWindow_C::AboutUsButtonPressed() {
         }
         //нове вікно про нас
         QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
+
         QGridLayout* settingsLayout = new QGridLayout(settingsWidget);
         settingsWidget->setWindowIcon(mainIcon); // Встановлюю іконку
         settingsWidget->setWindowTitle("Про нас");
@@ -525,7 +531,7 @@ void MainWindow_C::AboutUsButtonPressed() {
         QWidget* Body = new QWidget(settingsWidget); Body->setObjectName("Body");
         QGridLayout* bodyLayout = new QGridLayout(Body);
 
-        settingsWidget->setFixedSize(400, 400);
+        settingsWidget->setFixedSize(450, 450);
         settingsLayout->addWidget(Body, 0, 0);
         //віджет для пагінації (винесено сюди, щоб у майбутньому його налаштувати )
         settingsLayout->setRowStretch(1, 1);
@@ -568,59 +574,127 @@ void MainWindow_C::AboutUsButtonPressed() {
             "}"
         );
 
-        ButtonNavigateLeft->setFixedSize(30, 30);
-        ButtonNavigateLright->setFixedSize(30, 30);
-        if (QIcon("Images/arrowL.png").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/arrowR.png").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/photo_Gaulun.jpg").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/vladMamont.jpg").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/IvanBondarenko.jpg").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/sashaTretiak.jpg").isNull()) {
-            throw ex(2);
-        }
-        if (QIcon("Images/RodionShevchenko.jpg").isNull()) {
+        ButtonNavigateLeft->setFixedSize(40,40);
+        ButtonNavigateLright->setFixedSize(40,40);
+        ButtonNavigateLeft->setIconSize(QSize(25,25));
+        ButtonNavigateLright->setIconSize(QSize(25,25));
+
+        if (
+            QIcon("Images/arrowL.png").isNull() ||
+            QIcon("Images/arrowR.png").isNull() ||
+            QIcon("Images/photo_Gaulun.jpg").isNull() ||
+            QIcon("Images/vladMamont.jpg").isNull() || 
+            QIcon("Images/IvanBondarenko.jpg").isNull() ||
+            QIcon("Images/sashaTretiak.jpg").isNull() || 
+            QIcon("Images/RodionShevchenko.jpg").isNull() ||
+            QIcon("Images/arrowL.png").isNull()  ||
+            QIcon("Images/arrowR.png").isNull() ||
+            QIcon("Images/photo_Gaulun.jpg").isNull() ||
+            QIcon("Images/vladMamont.jpg").isNull() ||
+            QIcon("Images/IvanBondarenko.jpg").isNull()
+            ) {
             throw ex(2);
         }
 
+       
         ButtonNavigateLeft->setIcon(QIcon("Images/arrowL.png"));
         ButtonNavigateLright->setIcon(QIcon("Images/arrowR.png"));
 
-        PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
-        PaginationLayout->addWidget(ButtonNavigateLright, 0, 1, Qt::AlignLeft);
+        PaginationLayout->setColumnStretch(0, 10);
+        PaginationLayout->setColumnStretch(1, 4);
+        PaginationLayout->setColumnStretch(2, 10);
 
-        auto showDev = [this, Body, bodyLayout](int& currentDevelopVar) {
+        auto setIcons = [settingsWidget](QLabel& label, const QString& way) {
+            label.setVisible(false);
+            label.setPixmap(QPixmap(way));
+            label.setFixedSize(40, 40);
+            label.setScaledContents(true);
+            };
+
+        QLabel* ui = new QLabel(settingsWidget);
+        QLabel* algoritms = new QLabel(settingsWidget);
+        QLabel* DataBase = new QLabel(settingsWidget);
+        QLabel* excep = new QLabel(settingsWidget);
+        QLabel* classR = new QLabel(settingsWidget);
+
+
+        setIcons(*ui, "Images/ui.png");
+        setIcons(*algoritms, "Images/algoritms.png");
+        setIcons(*DataBase, "Images/data.png");
+        setIcons(*excep, "Images/excep.png");
+        setIcons(*classR, "Images/class.png");
+
+
+        PaginationLayout->addWidget(ui, 0, 1);
+        PaginationLayout->addWidget(algoritms, 0, 1);
+        PaginationLayout->addWidget(DataBase, 0, 1);
+        PaginationLayout->addWidget(excep, 0, 1);
+        PaginationLayout->addWidget(classR, 0, 1);
+
+
+        
+        PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
+        
+        PaginationLayout->addWidget(ButtonNavigateLright, 0, 2, Qt::AlignLeft);
+
+        auto showDev = [this, Body, bodyLayout, &PaginationLayout, &ui, &algoritms, &DataBase, &excep, &classR](int& currentDevelopVar) {
             if (currentDevelopVar == 0) {
-                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "\nІнтерфейс та дизайн", "https://github.com/Vlad156763", Body, bodyLayout);
+                ui->setVisible(true);
+                algoritms->setVisible(false);
+                DataBase->setVisible(false);
+                excep->setVisible(false);
+                classR->setVisible(false);
             }
             else if (currentDevelopVar == 1) {
-                showWindowAboutUs("Images/vladMamont.jpg", "Мамонт Владислав", "Базу даних", "https://github.com/Teensik", Body, bodyLayout);
+                showWindowAboutUs("Images/vladMamont.jpg", "Мамонт Владислав", "\nБазу даних", "https://github.com/Teensik", Body, bodyLayout);
+                ui->setVisible(false);
+                algoritms->setVisible(false);
+                DataBase->setVisible(true);
+                excep->setVisible(false);
+                classR->setVisible(false);
             }
             else if (currentDevelopVar == 2) {
-                showWindowAboutUs("Images/sashaTretiak.jpg", "Третяк Олександр", "Алгоритми", "https://github.com/MrS1ngULaR1TY", Body, bodyLayout);
+                showWindowAboutUs("Images/sashaTretiak.jpg", "Третяк Олександр", "\nАлгоритми", "https://github.com/MrS1ngULaR1TY", Body, bodyLayout);
+                ui->setVisible(false);
+                algoritms->setVisible(true);
+                DataBase->setVisible(false);
+                excep->setVisible(false);
+                classR->setVisible(false);
             }
             else if (currentDevelopVar == 3) {
-                showWindowAboutUs("Images/RodionShevchenko.jpg", "Шевченко Родіон", "Розробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
+                showWindowAboutUs("Images/RodionShevchenko.jpg", "Шевченко Родіон", "\nРозробку класів", "https://github.com/laidwannabe", Body, bodyLayout);
+                ui->setVisible(false);
+                algoritms->setVisible(false);
+                DataBase->setVisible(false);
+                excep->setVisible(false);
+                classR->setVisible(true);
             }
             else if (currentDevelopVar == 4) {
-                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "\nОбробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+                ui->setVisible(false);
+                algoritms->setVisible(false);
+                DataBase->setVisible(false);
+                excep->setVisible(true);
+                classR->setVisible(false);
             }
             else if (currentDevelopVar > 4) {
-                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+                showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "\nІнтерфейс та дизайн", "https://github.com/Vlad156763", Body, bodyLayout);
                 currentDevelopVar = 0;
+                ui->setVisible(true);
+                algoritms->setVisible(false);
+                DataBase->setVisible(false);
+                excep->setVisible(false);
+                classR->setVisible(false);
             }
             else if (currentDevelopVar < 0) {
-                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "Обробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
+                showWindowAboutUs("Images/IvanBondarenko.jpg", "Бондаренко Іван", "\nОбробку винятків", "https://github.com/butterflyway1", Body, bodyLayout);
                 currentDevelopVar = 4;
+                ui->setVisible(false);
+                algoritms->setVisible(false);
+                DataBase->setVisible(false);
+                excep->setVisible(true);
+                classR->setVisible(false);
             }
             };
         static int currentDevelopVar = 0;
@@ -647,7 +721,13 @@ void MainWindow_C::AboutUsButtonPressed() {
         settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
         Pagination->setStyleSheet(styleForWidget);
         //виклик методу який відповідає за відображення вікна про нас (без пагінації, пагінація додається окремо в поточній області видимост див. вище)
-        showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "Інтерфейс", "https://github.com/Vlad156763", Body, bodyLayout);
+        showWindowAboutUs("Images/photo_Gaulun.jpg", "Гайлунь Владислав", "\nІнтерфейс та дизайн", "https://github.com/Vlad156763", Body, bodyLayout);
+        ui->setVisible(true);
+        algoritms->setVisible(false);
+        DataBase->setVisible(false);
+        excep->setVisible(false);
+        classR->setVisible(false);
+        PaginationLayout->addWidget(ui, 0, 1);
         settingsWidget->exec();
     }
     catch (ex& error) {
@@ -710,7 +790,7 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     //налаштовую фото
     
     QLabel* photoLabel = new QLabel(Body);  photoLabel->setObjectName("photoLabel");
-    photoLabel->setPixmap(QPixmap(path).scaled(215, 215, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    photoLabel->setPixmap(QPixmap(path).scaled(320, 320, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     photoLabel->setAlignment(Qt::AlignCenter);
    
     photoLabel->setObjectName("photoLabel");
@@ -729,7 +809,7 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     bodyLayout->addWidget(photoLabel, 0, 0);
     textLayout->addWidget(textName, 0, 0, 1, 2);
     textName->setAlignment(Qt::AlignCenter);
-    textLayout->addWidget(textLink, 1, 1);
+    textLayout->addWidget(textLink, 1, 1, Qt::AlignVCenter);
     textLink->setAlignment(Qt::AlignRight);
     textLayout->addWidget(textResponsible, 1, 0);
     textResponsible->setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -2498,6 +2578,3 @@ int counterTimer::operator ++ (int) {
 int counterTimer::operator -- (int) {
     return this->counter--;
 }
-
-
-
