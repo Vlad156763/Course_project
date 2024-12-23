@@ -1,4 +1,3 @@
-#include <qapplication.h>
 #ifndef EX_H
 #define EX_H
 class ex {

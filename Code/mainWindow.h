@@ -7,38 +7,31 @@
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qdialog.h>
-#include <qradiobutton.h>
-#include <qbuttongroup.h>
-#include <qmessagebox.h>
 #include <qfont.h>
-#include <qevent.h>
 #include <qtimer.h>
 #include <qstringlist.h>
 #include <qpixmap.h>
 #include <qpainter.h>
-#include <qgraphicsview.h>
-#include <qgraphicsitem.h>
-#include <qstyle.h>
 #include <qpainter.h>
-#include <qrandom.h>
+#include <qscrollarea.h>
 #include <qmovie.h>
 #include <qtextedit.h>
-#include <qgraphicsproxywidget.h>
 #include <qdir.h>
 #include <qvector.h>
-
+#include <qstyle.h>
 
 #include "classcourse.h"
+#include "ex.h"
+
 
 #include <QtSql/qsqldatabase.h>
 #include <QtSql/qsqlerror.h>
 #include <QtSql/qsqlquery.h>
-#include <qabstractitemview.h>
+
+#include <vector>
 
 #include <iostream>
-#include <vector>
 #include <cstring>//для std::strrchr
-#include "ex.h"
 
 using std::cerr;
 using std::cout;
