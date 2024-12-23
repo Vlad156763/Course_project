@@ -152,6 +152,7 @@ public:
     blockWidget(QWidget* = nullptr);
     void AddStructure();
     QDialog* setDialogForPredmet(const QString&, const QString&, const QString&, const QString&, QWidget**);
+    
 private:
     void resizeEvent(QResizeEvent* ) override;
     QColor generateColorFromString(const QString&);
@@ -160,18 +161,18 @@ private:
     QHBoxLayout* layout = nullptr;
 
 public slots:
-    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&);
+    void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&, StudentBlock&);
     void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&);
     void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&);
     void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
 };
-class configBlock{
+class configBlock : public QWidget{
 private:
     QWidget* widget = nullptr;
     QLayout* layout = nullptr; 
 public:
-    configBlock();
+    configBlock(QWidget* parent);
     void setWidget(QWidget*);
     void setLayout(QLayout*);
     template<typename LaFunc>
@@ -204,13 +205,7 @@ private:
     template<typename LaFunc>
     void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
     //віджет для головної частини 
-    void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);
-
-    
-    //таймер для відслідковування віджетів головної частини
-    counterTimer* TimersCounter = nullptr;
-    //клас сортування для сортування всіх блоків 
-    
+    void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);    
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"
