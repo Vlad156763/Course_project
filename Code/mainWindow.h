@@ -155,9 +155,9 @@ private:
 
 public slots:
     void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&, StudentBlock&);
-    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&);
-    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&);
-    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&);
+    void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&, StudentBlock&);
+    void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&, StudentBlock&);
+    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, StudentBlock&);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
 };
 class configBlock : public QWidget{
