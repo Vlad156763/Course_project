@@ -417,8 +417,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         /*
         [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
         */
-        if ((counter) >= arrayStudentBlock.getSpecialtyBuffer().size()) { counter = 0; return true; }
-        QString SpecialtyName = arrayStudentBlock.getSpecialtyBuffer()[counter++]->getStudSpecialty();
+        if ((counter) >= arrayStudentBlock.getStudentsBuffer().size()) { counter = 0; return true; }
+        QString SpecialtyName = arrayStudentBlock.getStudentsBuffer()[counter++]->getStudSpecialty();
         if (SpecialtyName.isEmpty()) {
             return false;
         }
@@ -454,8 +454,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         /*
         [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
         */
-        if ((counter) >= arrayStudentBlock.getSpecialtyBuffer().size()) { counter = 0; return true; }
-        QString GroupName = arrayStudentBlock.getSpecialtyBuffer()[counter++]->getStudGroup();
+        if ((counter) >= arrayStudentBlock.getStudentsBuffer().size()) { counter = 0; return true; }
+        QString GroupName = arrayStudentBlock.getStudentsBuffer()[counter++]->getStudGroup();
         if (GroupName.isEmpty()) {
             return false;
         }
@@ -486,8 +486,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             /*
             [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
             */
-            if ((counter) >= arrayStudentBlock.getSpecialtyBuffer().size()) { counter = 0; return true; }
-            QString FacultyName = arrayStudentBlock.getSpecialtyBuffer()[counter++]->getStudFaculty();
+            if ((counter) >= arrayStudentBlock.getStudentsBuffer().size()) { counter = 0; return true; }
+            QString FacultyName = arrayStudentBlock.getStudentsBuffer()[counter++]->getStudFaculty();
             if (FacultyName.isEmpty()) {
                 return false;
             }
@@ -1803,8 +1803,8 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             /*
             [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
             */
-            if ((counter) >= arrayStudentBlock.getSpecialtyBuffer().size()) { counter = 0; return true; }
-            QString FacultyName = arrayStudentBlock.getSpecialtyBuffer()[counter++]->getStudFaculty();
+            if ((counter) >= arrayStudentBlock.getStudentsBuffer().size()) { counter = 0; return true; }
+            QString FacultyName = arrayStudentBlock.getStudentsBuffer()[counter++]->getStudFaculty();
             if (FacultyName.isEmpty()) {
 
                 return false;
@@ -1830,8 +1830,8 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //HERE: відбувається поступове отримання груп, які мають спеціальність SpecialtyName із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
-            if ((counter) >= arrayStudentBlock.getSpecialtyBuffer().size()) { counter = 0; return true; }
-            QString GroupName = arrayStudentBlock.getSpecialtyBuffer()[counter++]->getStudGroup();
+            if ((counter) >= arrayStudentBlock.getStudentsBuffer().size()) { counter = 0; return true; }
+            QString GroupName = arrayStudentBlock.getStudentsBuffer()[counter++]->getStudGroup();
             if (GroupName.isEmpty()) {
 
                 return false;
