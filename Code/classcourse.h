@@ -104,6 +104,7 @@ public:
     QString getStudGroup() const { return StudGroup; }
     QString getStudFaculty() const { return StudFaculty; }
     const QVector<SubjectInfo>& getStudSubjects() const { return StudSubjects; }
+    QVector<SubjectInfo>& getStudSubjectsWConst() { return StudSubjects; }
 
     // Сеттери
     void setStudFullName(const QString& studFullName) { StudFullName = studFullName; }
@@ -137,6 +138,9 @@ public:
 
     // Геттери
     const QVector<StudInfo>& getStudents() const { return Students; }
+    QVector<StudInfo>& getStudentsWConst() { return Students; }
+
+
     const QVector<const StudInfo*>& getStudentsBuffer() const { return StudentsBuffer; }
     const QVector<const QString*>& getSpecBuffer() const { return SpecialtyBuffer; }
     const QVector<const Faculty*>& getFacultyBuffer() const { return FacultyBuffer; }

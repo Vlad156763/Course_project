@@ -72,8 +72,8 @@ void DeleteStudent(QSqlQuery& query, const QString& name, const QString& special
 void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId);
 
 QStringList initializeSpecialties(QSqlQuery& query);
-QStringList initializeFaculties(QSqlQuery& query);
-QStringList initializeClassGroups(QSqlQuery& query);
+QVector <QVector<QString>> initializeFaculties(QSqlQuery& query);
+QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query);
 QStringList initializeStudents(QSqlQuery& query);
 QStringList initializePredmets(QSqlQuery& query);
 QStringList initializeGrades(QSqlQuery& query);
@@ -158,7 +158,7 @@ public slots:
     void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&, StudentBlock&);
     void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&, StudentBlock&);
     void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, StudentBlock&);
-    void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&);
+    void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&, StudentBlock&);
 };
 class configBlock : public QWidget{
 private:
@@ -180,10 +180,10 @@ private:
     QGridLayout* mainLayout = nullptr;
     void leftSideToolsWidget(QWidget*, QGridLayout*);
     void rightSideToolsWidget(QWidget*, QGridLayout*);
-    void ToolsMiddleWidget(QWidget*, QGridLayout*);
+    void ToolsMiddleWidget(QWidget*, QGridLayout*, StudentBlock&);
     //логіка кнопки збережння та видалення для всіх типів (шаблон для лямбда функції)
     template<typename LaFunc>
-    void SaveButtonFor_AllType(QDialog*, const QString&, const QString&, LaFunc, const QStringList&);
+    void SaveButtonFor_AllType(QDialog*, const QString&, const QString&, LaFunc, const QStringList& );
 
     void SaveButtonFor_AddStudent(QDialog*);//метод для обробки кнопки "зберегти" у "додати студента"
     void SaveButtonFor_AddGroup(QDialog*); //метод для обробки кнопки "зберегти" у "додати групу"
@@ -198,7 +198,7 @@ private:
     template<typename LaFunc>
     void WindowAdd_and_Delete_All_Type(QDialog*, const QString&, const QString&, const QStringList&, const QStringList&, LaFunc, const int& = 375);
     //віджет для головної частини 
-    void mainWidgetArea(QWidget*, QGridLayout*, QWidget&);    
+    void mainWidgetArea(QWidget*, QGridLayout*, QWidget&, StudentBlock&);    
 private slots:
     //слоти для інструментального віджету (лівий віджет)
     void AboutUsButtonPressed(); //вікно "про нас"

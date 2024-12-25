@@ -756,46 +756,41 @@ QStringList initializeSpecialties(QSqlQuery& query) {
     }
 
     while (query.next()) {
-        QString specialtyData = QString("ID: %1, Specialty: %2")
-            .arg(query.value("id").toInt())
+        QString specialtyData = QString("%1")
             .arg(query.value("specialty").toString());
         specialties << specialtyData;
     }
     return specialties;
 }
 
-QStringList initializeFaculties(QSqlQuery& query) {
-    QStringList faculties;
+QVector <QVector<QString>> initializeFaculties(QSqlQuery& query) {
+    QVector <QVector<QString>> tmp;
+
     if (!query.exec("SELECT * FROM faculty;")) {
         qDebug() << "Error fetching faculties:" << query.lastError().text();
-        return faculties;
+        return tmp;
     }
-
+    int i = 0;
     while (query.next()) {
-        QString facultyData = QString("ID: %1, Specialty: %2, Faculty: %3")
-            .arg(query.value("id").toInt())
-            .arg(query.value("specialty").toString())
-            .arg(query.value("faculty").toString());
-        faculties << facultyData;
+        tmp.push_back({ query.value("specialty").toString() , query.value("faculty").toString() });
+        i++;
     }
-    return faculties;
+    return tmp;
 }
 
-QStringList initializeClassGroups(QSqlQuery& query) {
-    QStringList classGroups;
+QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query) {
+    QStringList classGroups1;
+    QVector <QVector<QString>> classGroups;
     if (!query.exec("SELECT * FROM class_group;")) {
         qDebug() << "Error fetching class groups:" << query.lastError().text();
         return classGroups;
     }
-
+    int i = 0;
     while (query.next()) {
-        QString classGroupData = QString("ID: %1, Specialty: %2, Faculty: %3, Class Group: %4")
-            .arg(query.value("id").toInt())
-            .arg(query.value("specialty").toString())
-            .arg(query.value("faculty").toString())
-            .arg(query.value("class_group").toInt());
-        classGroups << classGroupData;
+        classGroups.push_back({ query.value("specialty").toString() , query.value("faculty").toString() , query.value("class_group").toString() });
+        i++;
     }
+
     return classGroups;
 }
 
