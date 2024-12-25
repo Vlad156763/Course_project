@@ -406,13 +406,13 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QVector <QVector<QString>> classGroups = initializeClassGroups(query);
     QStringList students = initializeStudents(query);
     QStringList predmets = initializePredmets(query);
-
+    QVector<student> test =  initializeStudents___(query);
     cqdout << "Specialties:" << specialties << "\n\n";
     cqdout << "Faculties:" << faculties << "\n\n";
     cqdout << "Class Groups:" << classGroups << "\n\n";
     cqdout << "Students:" << students << "\n\n";
     cqdout << "Predmets:" << predmets << "\n\n";
-    //this->arrayStudentBlock TODO: додати до структури даних інфу
+    
      /*
     [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
     */
@@ -427,33 +427,30 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     for (int i = 0; i < classGroups.size(); i++) {
         arrayStudentBlock.addGroup(classGroups[i][0], classGroups[i][1], classGroups[i][2]);
     }
-    //for (int i = 0; i < /*кількість студентів у БД*/; i++) {
-    //    arrayStudentBlock.addStudent(
-    //        StudInfo(
-    //            "ПІБ", "Спеціальність", "Група", "Факультет",
-    //            QVector<SubjectInfo>{
-    //                SubjectInfo("Предмет_1", { "1", "2" , "2309483" }),
-    //                SubjectInfo("Предмет_2", { "0", "1", "20394023" })
-    //            }
-    //        )
-    //    );
-    //}
+    for (int i = 0; i < test.size(); i++) {
+        QVector<SubjectInfo> PredmetsCurStudents;
+        for (int j = 0; j < test[i].sizePredmetsAndTheirGrades(); j++) {
+            PredmetsCurStudents.push_back(
+                SubjectInfo(test[i].operator[](j).first, test[i].operator[](j).second)
+            );
+        }
 
-    //arrayStudentBlock.addSpecialty("Просто тестік");
-    //arrayStudentBlock.addSpecialty("Просто тестовий");
-
-    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
-    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
-    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
-
-    //arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
-    //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
-    //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
-    //arrayStudentBlock.addGroup("Просто тестік", "", "123 тестовий але невідомий"); //ось це не додасть групу і це відповідає логіці додавання
-
-
-
-   /* arrayStudentBlock.addStudent (
+        arrayStudentBlock.addStudent(
+            StudInfo(
+                test[i].getName(), test[i].getspec(), test[i].getGrup(), test[i].getFacl(), PredmetsCurStudents 
+            )
+        );
+    }
+    
+   /* arrayStudentBlock.addSpecialty("Просто тестік");
+    arrayStudentBlock.addSpecialty("Просто тестовий");
+    arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
+    arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
+    arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
+    arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
+    arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
+    arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
+   arrayStudentBlock.addStudent (
         StudInfo(
             "ГАЙЛУНЬ", "Просто тестік", "223 тестовий", "КНТ тестовий",
             QVector<SubjectInfo>{
@@ -462,6 +459,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             }
         )
     );*/
+
     arrayStudentBlock.filterBySpec();
     //підключення натиску на спеціальність для факульетів
     configBlock * block = new configBlock(this);
@@ -2074,7 +2072,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                     int studentId = -1;
 
                     // Запрос на отримання студента
-                    studentId = getStudentIDforPredmet(query, StudyName, studentId);
+                    studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
 
                     if (studentId != -1) {
                         addSubject(query, PredmetName, studentId);
@@ -2093,7 +2091,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                     int studentId = -1;
 
                     // Запрос на отримання студента
-                    studentId = getStudentIDforPredmet(query, StudyName, studentId);
+                    studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
 
                     if (studentId != -1) {
                         DeleteSubject(query, PredmetName, studentId);
@@ -2339,12 +2337,11 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         }
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         //todo: запис оцінок по PredmetName для SpecialtyName, FacultyName, GroupName, StudentName 
-        QString PredmetNametmp;
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
         int predmet_id = -1;
 
-        predmet_id = getPredmetId(query, PredmetNametmp, predmet_id);
+        predmet_id = getPredmetId(query, PredmetName, predmet_id);
 
         if (predmet_id != -1) {
             addGrades(query, numbers, predmet_id);

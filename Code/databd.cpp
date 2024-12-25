@@ -443,16 +443,16 @@ void getGroup(QSqlQuery& query) {
 }
 
 //:todo нужно исправить логику
-int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId){
+int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId, const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName){
     query.prepare(
         "SELECT id FROM students "
         "WHERE specialty = :specialty AND faculty = :faculty "
         "AND class_group = :classGroup AND name = :StudyName"
     );
-    query.bindValue(":specialty", "1"); // specialty
-    query.bindValue(":faculty", "1"); // faculty
-    query.bindValue(":classGroup", "Групи"); // class_group
-    query.bindValue(":StudyName", "Студенти"); // name
+    query.bindValue(":specialty", SpecialtyName); // specialty
+    query.bindValue(":faculty", FacultyName); // faculty
+    query.bindValue(":classGroup", GroupName); // class_group
+    query.bindValue(":StudyName", StudyName); // name
 
     if (query.exec() && query.next()) {
         studentId = query.value(0).toInt();
@@ -470,7 +470,7 @@ int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
         "WHERE predmet = :predmet;"
     );
     
-    query.bindValue(":predmet", "Предмети"); // predmet
+    query.bindValue(":predmet", predmet); // predmet
 
     if (query.exec() && query.next()) {
         predmetId = query.value(0).toInt(); 
@@ -778,8 +778,7 @@ QVector <QVector<QString>> initializeFaculties(QSqlQuery& query) {
     return tmp;
 }
 
-QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query) {
-    QStringList classGroups1;
+QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query) { 
     QVector <QVector<QString>> classGroups;
     if (!query.exec("SELECT * FROM class_group;")) {
         qDebug() << "Error fetching class groups:" << query.lastError().text();
@@ -808,6 +807,7 @@ QStringList initializeStudents(QSqlQuery& query) {
             .arg(query.value("faculty").toString())
             .arg(query.value("specialty").toString())
             .arg(query.value("class_group").toInt());
+        cqdout << query.value("id").toInt() << "initializeStudents";
         students << studentData;
     }
     return students;
@@ -825,6 +825,7 @@ QStringList initializePredmets(QSqlQuery& query) {
             .arg(query.value("id").toInt())
             .arg(query.value("predmet").toString())
             .arg(query.value("student_id").toInt());
+        cqdout << query.value("student_id").toInt() << " - " << query.value("predmet").toString() << "initializePredmets";
         predmets << predmetData;
     }
     return predmets;
@@ -861,4 +862,66 @@ void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studen
     else {
         qDebug() << "Grades cleared for Predmet ID:" << predmetId << "and Student ID:" << studentId;
     }
+}
+
+
+
+
+QVector<student> initializeStudents___(QSqlQuery& query) {
+    QVector<student> students;
+
+    if (!query.exec("SELECT * FROM students;")) {
+        qDebug() << "Error fetching students:" << query.lastError().text();
+        return students;
+    }
+    while (query.next()) {
+        QString studentName = query.value("name").toString();
+        QString faculty = query.value("faculty").toString();
+        QString specialty = query.value("specialty").toString();
+        QString classGroup = query.value("class_group").toString();
+        QString studentId = query.value("id").toString();
+
+        QVector<QString> studentData = { studentName, faculty, specialty, classGroup };
+        student st;
+        st.setspec(specialty);
+        st.setFacl(faculty);
+        st.setGrup(classGroup);
+        st.setName(studentName);        
+
+        QSqlQuery predmetQuery, gradesQuery;
+
+        predmetQuery.prepare("SELECT id, predmet FROM predmet WHERE student_id = :studentId");
+        predmetQuery.bindValue(":studentId", studentId);
+        if (predmetQuery.exec()) {
+            while (predmetQuery.next()) {
+                QStringList grades;
+
+                QString predmetName = predmetQuery.value("predmet").toString();
+                QString predmetId = predmetQuery.value("id").toString();
+
+                gradesQuery.prepare("SELECT grade FROM grades WHERE predmet_id = :predmetId AND student_id = :studentId");
+                gradesQuery.bindValue(":predmetId", predmetId);
+                gradesQuery.bindValue(":studentId", studentId);
+
+                
+                if (gradesQuery.exec()) {
+                    while (gradesQuery.next()) {
+                        grades.push_back(gradesQuery.value("grade").toString());
+                    }
+                }
+                else {
+                    qDebug() << "Error fetching grades for predmet:" << predmetName
+                        << "Reason:" << gradesQuery.lastError().text();
+                }
+                st.pushPredmetAndGraides(predmetName, grades);
+            }
+        }
+        else {
+            qDebug() << "Error fetching subjects for student:" << studentName
+                << "Reason:" << predmetQuery.lastError().text();
+        }
+        students.push_back(st);
+    }
+
+    return students;
 }

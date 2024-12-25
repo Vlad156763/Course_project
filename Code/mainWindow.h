@@ -54,7 +54,7 @@ void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, c
 void addSubject(QSqlQuery& query, const QString& predmet, int studentId);
 void addGrades(QSqlQuery& query, const QStringList& grade, int predmetId);
 
-int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId);
+int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId, const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName);
 int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId);
 int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
 
@@ -71,6 +71,10 @@ void DeleteGroup(QSqlQuery& query, const QString& specialty, const QString& facu
 void DeleteStudent(QSqlQuery& query, const QString& name, const QString& specialty, const QString& faculty, const QString& class_group);
 void DeleteSubject(QSqlQuery& query, const QString& predmet, int studentId);
 
+struct student;
+
+QVector<student> initializeStudents___(QSqlQuery& query);
+
 QStringList initializeSpecialties(QSqlQuery& query);
 QVector <QVector<QString>> initializeFaculties(QSqlQuery& query);
 QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query);
@@ -80,6 +84,35 @@ QStringList initializeGrades(QSqlQuery& query);
 
 void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId);
 
+struct student {
+private:
+    QString name;
+    QString group;
+    QString facl;
+    QString spec;
+    //масив пар де кожна пара це назва предмету і масив оцінок
+    QVector<std::pair<QString, QVector<QString>>> PredmetsAndTheirGrades;
+public:
+    student() {}
+    void setName(const QString& Name) { this->name = Name; }
+    void setGrup(const QString& Group) { this->group = Group; }
+    void setFacl(const QString& Faculty) { this->facl = Faculty; }
+    void setspec(const QString& specialty) { this->spec = specialty; }
+    void pushPredmetAndGraides(const QString& PredmetName, QVector<QString> Grades) {
+        PredmetsAndTheirGrades.push_back({ PredmetName, Grades });
+    }
+    std::pair<QString, QVector<QString>>operator[](int iterator) {
+        return this->PredmetsAndTheirGrades[iterator];
+    }
+    int sizePredmetsAndTheirGrades() { return this->PredmetsAndTheirGrades.size(); }
+
+    QString getName() { return this->name; }
+    QString getGrup() { return this->group; }
+    QString getFacl() { return this->facl; }
+    QString getspec() { return this->spec; }
+
+
+};
 
 class counterTimer {
     int counter = 0;
