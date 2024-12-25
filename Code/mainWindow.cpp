@@ -36,73 +36,8 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
                 throw ex(2);
             }
         }
-        QSqlDatabase db = QSqlDatabase::database();
-        QSqlQuery query(db);
 
-        QStringList specialties = initializeSpecialties(query);
-        QVector <QVector<QString>> faculties = initializeFaculties(query);
-        QVector <QVector<QString>> classGroups = initializeClassGroups(query);
-        QStringList students = initializeStudents(query);
-        QStringList predmets = initializePredmets(query);
-
-        cqdout << "Specialties:" << specialties << "\n\n";
-        cqdout << "Faculties:" << faculties << "\n\n";
-        cqdout << "Class Groups:" << classGroups << "\n\n";
-        cqdout << "Students:" << students << "\n\n";
-        cqdout << "Predmets:" << predmets << "\n\n";
-        //this->arrayStudentBlock TODO: додати до структури даних інфу
-         /*
-        [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
-        */
-
-        
         static StudentBlock arrayStudentBlock;
-
-        for (int i = 0; i < specialties.size(); i++) {
-            arrayStudentBlock.addSpecialty(specialties[i]);
-        }
-        for (int i = 0; i < faculties.size(); i++) {
-            arrayStudentBlock.addFaculty(faculties[i][0], faculties[i][1]);
-        }
-        for (int i = 0; i < classGroups.size(); i++) {
-            arrayStudentBlock.addGroup(classGroups[i][0], classGroups[i][1], classGroups[i][2]);
-        }
-        //for (int i = 0; i < /*кількість студентів у БД*/; i++) {
-        //    arrayStudentBlock.addStudent(
-        //        StudInfo(
-        //            "ПІБ", "Спеціальність", "Група", "Факультет",
-        //            QVector<SubjectInfo>{
-        //                SubjectInfo("Предмет_1", { "1", "2" , "2309483" }),
-        //                SubjectInfo("Предмет_2", { "0", "1", "20394023" })
-        //            }
-        //        )
-        //    );
-        //}
-        
-        //arrayStudentBlock.addSpecialty("Просто тестік");
-        //arrayStudentBlock.addSpecialty("Просто тестовий");
-
-        //arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
-        //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
-        //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
-
-        //arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
-        //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
-        //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
-        //arrayStudentBlock.addGroup("Просто тестік", "", "123 тестовий але невідомий"); //ось це не додасть групу і це відповідає логіці додавання
-
-
-
-       /* arrayStudentBlock.addStudent (
-            StudInfo(
-                "ГАЙЛУНЬ", "Просто тестік", "223 тестовий", "КНТ тестовий",
-                QVector<SubjectInfo>{
-                    SubjectInfo("OOP", { "1", "2" , "2309483" }), 
-                    SubjectInfo("АТАСД", {"0", "1", "2039402"})
-                }
-            )
-        );*/
-
         this->setWindowIcon(mainIcon); // Встановлюю іконку
         //віджети для інструментів та для головної частини
 
@@ -144,12 +79,12 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
 
         //викликаю методи для роботи з віджетом інструментів
         leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
-        rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
+        rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout, 
+            *mainWindowToolsWidget, *mainWindownMainAreaLayout, *mainWindowMainAreaWidget, arrayStudentBlock);
         ToolsMiddleWidget(mainWindowToolsWidget, mainWindowToolsLayout, arrayStudentBlock);
 
         //викликаю метод для роботи з головною частиною
         mainWidgetArea(mainWindowToolsWidget, mainWindownMainAreaLayout, *mainWindowMainAreaWidget, arrayStudentBlock);
-
         QString styleWidgets =
             "   border-radius: 10px;"
             "   background-color: rgb(90,90,90);";
@@ -373,7 +308,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
 
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
-void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout, QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock)  {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
     QGridLayout* mainWindowToolsRightLayout = new QGridLayout(mainWindowToolsRightWidget);
@@ -389,7 +324,7 @@ void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* pare
     font_tmp.setPointSize(10);
     setingsButton->setFont(font_tmp);
 
-    connect(setingsButton, &QPushButton::released, this, &MainWindow_C::setingsButtonPressed);
+    connect(setingsButton, &QPushButton::released, [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {setingsButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock); });
     mainWindowToolsRightWidget->setStyleSheet(
         "#mainWindowToolsRightWidget {"
         "   border-radius: 10px;"
@@ -432,6 +367,24 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         );
        
     };
+
+
+
+
+    QWidget* deletedW1 = parent_grid->findChild<QWidget*>("LeftSide");
+    QWidget* deletedW2 = parent_grid->findChild<QWidget*>("MiddleSide");
+    QWidget* deletedW3 = parent_grid->findChild<QWidget*>("RightSide");
+
+    if (deletedW1) {
+        delete deletedW1; // Видаляємо знайдений віджет
+    }
+    if (deletedW2) {
+        delete deletedW2; // Видаляємо знайдений віджет
+    }
+    if (deletedW3) {
+        delete deletedW3; // Видаляємо знайдений віджет
+    }
+
     QWidget* LeftSide = new QWidget(parent); LeftSide->setObjectName("LeftSide"); CSS(LeftSide, "LeftSide");
     QWidget* MiddleSide = new QWidget(parent); MiddleSide->setObjectName("MiddleSide"); CSS(MiddleSide, "MiddleSide");
     QWidget* RightSide = new QWidget(parent); RightSide->setObjectName("RightSide"); CSS(RightSide, "RightSide");
@@ -445,6 +398,70 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     //HERE: зчитування всіх: спеціальностей, факультетів, груп, студентів, предметів, з БД і запис у масиви класу sortBlock
    
     static counterTimer TimersCounter;
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    QStringList specialties = initializeSpecialties(query);
+    QVector <QVector<QString>> faculties = initializeFaculties(query);
+    QVector <QVector<QString>> classGroups = initializeClassGroups(query);
+    QStringList students = initializeStudents(query);
+    QStringList predmets = initializePredmets(query);
+
+    cqdout << "Specialties:" << specialties << "\n\n";
+    cqdout << "Faculties:" << faculties << "\n\n";
+    cqdout << "Class Groups:" << classGroups << "\n\n";
+    cqdout << "Students:" << students << "\n\n";
+    cqdout << "Predmets:" << predmets << "\n\n";
+    //this->arrayStudentBlock TODO: додати до структури даних інфу
+     /*
+    [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
+    */
+
+    arrayStudentBlock.clearAllData(); //треба щоб при повторному запуску програми у СД не було данних
+    for (int i = 0; i < specialties.size(); i++) {
+        arrayStudentBlock.addSpecialty(specialties[i]);
+    }
+    for (int i = 0; i < faculties.size(); i++) {
+        arrayStudentBlock.addFaculty(faculties[i][0], faculties[i][1]);
+    }
+    for (int i = 0; i < classGroups.size(); i++) {
+        arrayStudentBlock.addGroup(classGroups[i][0], classGroups[i][1], classGroups[i][2]);
+    }
+    //for (int i = 0; i < /*кількість студентів у БД*/; i++) {
+    //    arrayStudentBlock.addStudent(
+    //        StudInfo(
+    //            "ПІБ", "Спеціальність", "Група", "Факультет",
+    //            QVector<SubjectInfo>{
+    //                SubjectInfo("Предмет_1", { "1", "2" , "2309483" }),
+    //                SubjectInfo("Предмет_2", { "0", "1", "20394023" })
+    //            }
+    //        )
+    //    );
+    //}
+
+    //arrayStudentBlock.addSpecialty("Просто тестік");
+    //arrayStudentBlock.addSpecialty("Просто тестовий");
+
+    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
+    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
+    //arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
+
+    //arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
+    //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
+    //arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
+    //arrayStudentBlock.addGroup("Просто тестік", "", "123 тестовий але невідомий"); //ось це не додасть групу і це відповідає логіці додавання
+
+
+
+   /* arrayStudentBlock.addStudent (
+        StudInfo(
+            "ГАЙЛУНЬ", "Просто тестік", "223 тестовий", "КНТ тестовий",
+            QVector<SubjectInfo>{
+                SubjectInfo("OOP", { "1", "2" , "2309483" }),
+                SubjectInfo("АТАСД", {"0", "1", "2039402"})
+            }
+        )
+    );*/
     arrayStudentBlock.filterBySpec();
     //підключення натиску на спеціальність для факульетів
     configBlock * block = new configBlock(this);
@@ -1025,7 +1042,7 @@ void MainWindow_C::HelpButtonPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
-void MainWindow_C::setingsButtonPressed() {
+void MainWindow_C::setingsButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock) {
     //нове вікно з кнопками для додавання студентів,і для видалення 
     QDialog* settingsWidget = new QDialog();
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
@@ -1114,17 +1131,32 @@ void MainWindow_C::setingsButtonPressed() {
     DeleteGroup->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     DeleteStudent->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     //слоти для обробки сигналів натиску на кнопки "додати"
-    connect(AddStudent, &QPushButton::released, this, &MainWindow_C::AddStudentButtonPressed);
-    connect(AddGroup, &QPushButton::released, this, &MainWindow_C::AddGroupButtonPressed);
-
-    connect(AddFaculty, &QPushButton::released, this, &MainWindow_C::AddFacultyButtonPressed);
-    connect(AddSpecialty, &QPushButton::released, this, &MainWindow_C::AddSpecialtyButtonPressed); 
+    connect(AddStudent, &QPushButton::released, 
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {AddStudentButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(AddGroup, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {AddGroupButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(AddFaculty, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {AddFacultyButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(AddSpecialty, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {AddSpecialtyButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
     //слоти для обробки сигналів натиску на кнопки "видалити"
-    connect(DeleteStudent, &QPushButton::released, this, &MainWindow_C::DeleteStudentButtonPressed); 
-    connect(DeleteGroup, &QPushButton::released, this, &MainWindow_C::DeleteGroupButtonPressed); 
-    connect(DeleteFaculty, &QPushButton::released, this, &MainWindow_C::DeleteFacultyButtonPressed); 
-    connect(DeleteSpecialty, &QPushButton::released, this, &MainWindow_C::DeleteSpecialtyButtonPressed); 
-
+    connect(DeleteStudent, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {DeleteStudentButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(DeleteGroup, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {DeleteGroupButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(DeleteFaculty, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {DeleteFacultyButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    connect(DeleteSpecialty, &QPushButton::released,
+        [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
+        {DeleteSpecialtyButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
+    
     //додавання кнопок у головний компоновщик
     settingsLayout->addWidget(AddSpecialty, 0, 0, 1, 1);
     settingsLayout->addWidget(AddFaculty, 1, 0, 1, 1);
@@ -1140,7 +1172,9 @@ void MainWindow_C::setingsButtonPressed() {
     settingsWidget->setAttribute(Qt::WA_DeleteOnClose); //автоматичне очищення пам'яті
     settingsWidget->exec();
 }
-void MainWindow_C::AddStudentButtonPressed() {
+void MainWindow_C::AddStudentButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Add_icon.png");
@@ -1152,8 +1186,9 @@ void MainWindow_C::AddStudentButtonPressed() {
     зберети дані про групу, це тільки 3 методи, тому для кожного додавання
     треба окремий метод щоб правильно зберігати все в бд
     */
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->SaveButtonFor_AddStudent(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1165,13 +1200,17 @@ void MainWindow_C::AddStudentButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::AddGroupButtonPressed() {
+void MainWindow_C::AddGroupButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Add_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->SaveButtonFor_AddGroup(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1183,13 +1222,17 @@ void MainWindow_C::AddGroupButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::AddFacultyButtonPressed() {
+void MainWindow_C::AddFacultyButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Add_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->SaveButtonFor_AddFaculty(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1201,13 +1244,16 @@ void MainWindow_C::AddFacultyButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::AddSpecialtyButtonPressed() {
+void MainWindow_C::AddSpecialtyButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept();
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Add_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->SaveButtonFor_AddSpecialty(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1219,13 +1265,17 @@ void MainWindow_C::AddSpecialtyButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::DeleteStudentButtonPressed() {
+void MainWindow_C::DeleteStudentButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Delete_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->DeleteButtonFor_DeleteStudent(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1237,13 +1287,17 @@ void MainWindow_C::DeleteStudentButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::DeleteGroupButtonPressed() {
+void MainWindow_C::DeleteGroupButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Delete_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->DeleteButtonFor_DeleteGroup(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1255,13 +1309,17 @@ void MainWindow_C::DeleteGroupButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::DeleteFacultyButtonPressed() {
+void MainWindow_C::DeleteFacultyButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
+
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Delete_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->DeleteButtonFor_DeleteFaculty(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(
@@ -1273,14 +1331,17 @@ void MainWindow_C::DeleteFacultyButtonPressed() {
         saveAction
     );
 }
-void MainWindow_C::DeleteSpecialtyButtonPressed() {
+void MainWindow_C::DeleteSpecialtyButtonPressed(QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock, QDialog& settingsWidget) {
+    settingsWidget.accept(); // Закриваю вікно налаштувань
 
     QDialog* settingsWidgetAddStydentWidget = new QDialog();
     settingsWidgetAddStydentWidget->setAttribute(Qt::WA_DeleteOnClose);
     QIcon mainIcon("Images/Delete_icon.png");
     settingsWidgetAddStydentWidget->setWindowIcon(mainIcon); // Встановлюю іконку
-    auto saveAction = [this, settingsWidgetAddStydentWidget]() {
+    auto saveAction = [this, settingsWidgetAddStydentWidget, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock]() {
         this->DeleteButtonFor_DeleteІSpetialty(settingsWidgetAddStydentWidget);
+        mainWidgetArea(&mainWindowToolsWidget, &mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock);
+
         };
 
     WindowAdd_and_Delete_All_Type(

@@ -179,7 +179,7 @@ class MainWindow_C : public QWidget {
 private:
     QGridLayout* mainLayout = nullptr;
     void leftSideToolsWidget(QWidget*, QGridLayout*);
-    void rightSideToolsWidget(QWidget*, QGridLayout*);
+    void rightSideToolsWidget(QWidget*, QGridLayout*, QWidget&, QGridLayout&, QWidget&, StudentBlock&);
     void ToolsMiddleWidget(QWidget*, QGridLayout*, StudentBlock&);
     //логіка кнопки збережння та видалення для всіх типів (шаблон для лямбда функції)
     template<typename LaFunc>
@@ -204,16 +204,16 @@ private slots:
     void AboutUsButtonPressed(); //вікно "про нас"
     void HelpButtonPressed();// допомога
     //слоти для інструментального віджету (правий віджет)
-    void setingsButtonPressed(); //натиснуто кнопку налаштувань
+    void setingsButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&); //натиснуто кнопку налаштувань
     //слоти для налаштувань (првий віджет інструментів)
-    void AddStudentButtonPressed();
-    void AddGroupButtonPressed();
-    void AddFacultyButtonPressed();
-    void AddSpecialtyButtonPressed();
-    void DeleteStudentButtonPressed();
-    void DeleteGroupButtonPressed();
-    void DeleteFacultyButtonPressed();
-    void DeleteSpecialtyButtonPressed();
+    void AddStudentButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void AddGroupButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void AddFacultyButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void AddSpecialtyButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void DeleteStudentButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void DeleteGroupButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void DeleteFacultyButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
+    void DeleteSpecialtyButtonPressed(QWidget&, QGridLayout&, QWidget&, StudentBlock&, QDialog&);
 public:
     MainWindow_C(QWidget* = nullptr);
     ~MainWindow_C();

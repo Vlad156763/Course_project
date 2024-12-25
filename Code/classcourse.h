@@ -139,7 +139,14 @@ public:
     // Геттери
     const QVector<StudInfo>& getStudents() const { return Students; }
     QVector<StudInfo>& getStudentsWConst() { return Students; }
-
+    
+    void clearAllData() {
+        this->Specialties.clear();
+        this->Faculties.clear();
+        this->Groups.clear();
+        this->Names.clear();
+        this->Students.clear();
+    }
 
     const QVector<const StudInfo*>& getStudentsBuffer() const { return StudentsBuffer; }
     const QVector<const QString*>& getSpecBuffer() const { return SpecialtyBuffer; }
