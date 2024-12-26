@@ -872,11 +872,9 @@ QStringList initializeGrades(QSqlQuery& query, int predmet_id, int student_id) {
     }
 
     while (query.next()) {
-        QString gradeData = QString("ID: %1, Grade: %2, Predmet ID: %3, Student ID: %4")
-            .arg(query.value("id").toInt())
-            .arg(query.value("grade").toString())
-            .arg(query.value("predmet_id").toInt())
-            .arg(query.value("student_id").toInt());
+        QString gradeData = QString("%1")
+            .arg(query.value("grade").toString());
+
         grades << gradeData;
     }
     return grades;

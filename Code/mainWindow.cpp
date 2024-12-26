@@ -2358,6 +2358,19 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
     if (predmet_id != -1 && student_id != -1) {
         QStringList grades = initializeGrades(query, predmet_id, student_id);
 
+        for (int i = 0; i < arrayStudentBlock.getNonConstStudentBuffer().size(); i++) {
+            if (arrayStudentBlock.getNonConstStudentBuffer()[i]->getStudGroup() == GroupName &&
+                arrayStudentBlock.getNonConstStudentBuffer()[i]->getStudFullName() == StudentName
+                ) {
+                for (int j = 0; j < arrayStudentBlock.getNonConstStudentBuffer()[i]->getStudSubjectsWConst().size(); j++) {
+                    if (arrayStudentBlock.getNonConstStudentBuffer()[i]->getStudSubjectsWConst()[j].getSubject() == PredmetName) {
+                        arrayStudentBlock.getNonConstStudentBuffer()[i]->getStudSubjectsWConst()[j].setGrades(grades);
+                    }
+                }
+            }
+        }
+        arrayStudentBlock.addStudent(StudInfo(StudentName, SpecialtyName, GroupName, FacultyName, {SubjectInfo(PredmetName, grades)}));
+
         qDebug() << "Grades:" << grades;
     }
     else {
@@ -2409,9 +2422,8 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         }
         getGrades(query, numbers, predmet_id, StudentName);
         bool exit = false;
-        if (arrayStudentBlock.getStudentsBuffer()[0]->getStudSpecialty() == SpecialtyName ||
-            arrayStudentBlock.getStudentsBuffer()[0]->getStudFaculty() == FacultyName ||
-            arrayStudentBlock.getStudentsBuffer()[0]->getStudGroup() == GroupName ||
+        if (
+            arrayStudentBlock.getStudentsBuffer()[0]->getStudGroup() == GroupName &&
             arrayStudentBlock.getStudentsBuffer()[0]->getStudFullName() == StudentName
             ) {
             for (int j = 0; j < arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size() || !exit; j++) {
