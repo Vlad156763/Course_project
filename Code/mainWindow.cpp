@@ -2393,20 +2393,30 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
             cqdout << "Failed to add grade. No matching predmet found.";
         }
         getGrades(query, numbers, predmet_id);
-        for (int i = 0; i < arrayStudentBlock.getStudents().size(); i++) {
-            if (arrayStudentBlock.getStudents()[i].getStudSpecialty() == SpecialtyName ||
-                arrayStudentBlock.getStudents()[i].getStudFaculty() == FacultyName ||
-                arrayStudentBlock.getStudents()[i].getStudGroup() == GroupName ||
-                arrayStudentBlock.getStudents()[i].getStudFullName() == StudentName
-                ) {
-                for (int j = 0; j < arrayStudentBlock.getStudents()[i].getStudSubjects().size(); j++) {
-                    if (arrayStudentBlock.getStudents()[i].getStudSubjects()[j].getSubject() == PredmetName) {
-                        arrayStudentBlock.getStudentsWConst()[i].getStudSubjectsWConst()[j].setGrades(numbers);
+        bool exit = false;
+        if (arrayStudentBlock.getStudentsBuffer()[0]->getStudSpecialty() == SpecialtyName ||
+            arrayStudentBlock.getStudentsBuffer()[0]->getStudFaculty() == FacultyName ||
+            arrayStudentBlock.getStudentsBuffer()[0]->getStudGroup() == GroupName ||
+            arrayStudentBlock.getStudentsBuffer()[0]->getStudFullName() == StudentName
+            ) {
+            for (int j = 0; j < arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size() || !exit; j++) {
+                if (arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[j].getSubject() == PredmetName) {
+                    for (int i = 0; i < arrayStudentBlock.getStudentsWConst().size() || !exit; i++) {
+                        if (arrayStudentBlock.getStudentsWConst()[i].getStudGroup() == arrayStudentBlock.getStudentsBuffer()[0]->getStudGroup() &&
+                            arrayStudentBlock.getStudentsWConst()[i].getStudFullName() == arrayStudentBlock.getStudentsBuffer()[0]->getStudFullName()
+                            ) {
+                            for (int k = 0; k < arrayStudentBlock.getStudentsWConst()[i].getStudSubjects().size() || !exit; k++) {
+                                if (arrayStudentBlock.getStudentsWConst()[i].getStudSubjects()[k].getSubject() == PredmetName) {
+                                    arrayStudentBlock.getStudentsWConst()[i].getStudSubjectsWConst()[k].setGrades(numbers);
+                                    exit = true;
+                                }
+                            }
+                        }
                     }
                 }
             }
-
         }
+        
         cqdout << numbers; //оцінки певного студента
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         dialog->accept();

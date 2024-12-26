@@ -129,7 +129,7 @@ void StudentBlock::filterByCriteria(
 
     StudentsBuffer.clear(); // Очищуємо буфер
 
-    for (const auto& student : Students) {
+    for (auto& student : Students) {
         // Перевірка критеріїв
         if ((!specialty.isEmpty() && student.getStudSpecialty() != specialty) ||
             (!faculty.isEmpty() && student.getStudFaculty() != faculty) ||
@@ -157,18 +157,19 @@ void StudentBlock::filterByCriteria(
 }
 void StudentBlock::filterBySpec(const QString& specialty) {
     SpecialtyBuffer.clear();
-    for (const auto& entry : Specialties) {
+    for (auto& entry : Specialties) {
         if (!specialty.isEmpty() && entry != specialty) {
             continue;
         }
         SpecialtyBuffer.append(&entry);
     }
-
+    
+    // Викликати сортування ось тут :) (на місці коментаря)
 }
 
 void StudentBlock::filterByFac(const QString& specialty, const QString& faculty) {
     FacultyBuffer.clear();
-    for (const auto& entry : Faculties) {
+    for (auto& entry : Faculties) {
         if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
             (!faculty.isEmpty() && entry.getFacultyName() != faculty)) {
             continue;
@@ -176,12 +177,13 @@ void StudentBlock::filterByFac(const QString& specialty, const QString& faculty)
         FacultyBuffer.append(&entry);
         
     }
+    
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 
 void StudentBlock::filterByGroup(const QString& specialty, const QString& faculty, const QString& group) {
     GroupBuffer.clear();
-    for (const auto& entry : Groups) {
+    for (auto& entry : Groups) {
         if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
             (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
             (!group.isEmpty() && entry.getGroupName() != group)) {
@@ -194,7 +196,7 @@ void StudentBlock::filterByGroup(const QString& specialty, const QString& facult
 
 void StudentBlock::filterByName(const QString& specialty, const QString& faculty, const QString& group, const QString& name) {
     NameBuffer.clear();
-    for (const auto& entry : Names) {
+    for (auto& entry : Names) {
         if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
             (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
             (!group.isEmpty() && entry.getGroupName() != group) ||
@@ -376,7 +378,7 @@ bool StudentBlock::removeStudent(const QString& fullName) {
 
 
 
-QVector<const StudInfo*>& StudentBlock::getbuffer() {
+QVector<StudInfo*>& StudentBlock::getbuffer() {
     return this->StudentsBuffer;
 }
 

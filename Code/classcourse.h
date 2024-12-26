@@ -74,6 +74,11 @@ public:
     QString getFacultyName() const { return FacultyName; }
     QString getGroupName() const { return GroupName; }
     QString getFullName() const { return FullNameString; }
+
+    void setSpecialty(const QString& Specialty)  {  this->Specialty = Specialty; }
+    void setFacultyName(const QString& FacultyName)  {  this->FacultyName = FacultyName; }
+    void setGroupName(const QString& GroupName)  {  this->GroupName = GroupName; }
+    void setFullName(const QString& FullNameString)  {  this->FullNameString = FullNameString; }
 };
 
 class StudInfo {
@@ -125,11 +130,11 @@ private:
     QVector<FullName> Names;
     QVector<StudInfo> Students;
 
-    QVector<const QString*> SpecialtyBuffer;
-    QVector<const Faculty*> FacultyBuffer;
-    QVector<const Group*> GroupBuffer;
-    QVector<const FullName*> NameBuffer;
-    QVector<const StudInfo*> StudentsBuffer;
+    QVector<QString*> SpecialtyBuffer;
+    QVector<Faculty*> FacultyBuffer;
+    QVector<Group*> GroupBuffer;
+    QVector<FullName*> NameBuffer;
+    QVector<StudInfo*> StudentsBuffer;
 
 public:
     // Конструктори
@@ -149,11 +154,12 @@ public:
     }
 
 
-    const QVector<const StudInfo*>& getStudentsBuffer() const { return StudentsBuffer; }
-    const QVector<const QString*>& getSpecBuffer() const { return SpecialtyBuffer; }
-    const QVector<const Faculty*>& getFacultyBuffer() const { return FacultyBuffer; }
-    const QVector<const Group*>& getGroupBuffer() const { return GroupBuffer; }
-    const QVector<const FullName*>& getNameBuffer() const { return NameBuffer; }
+    const QVector< StudInfo*>& getStudentsBuffer() const { return StudentsBuffer; }
+    QVector< StudInfo*>& getNonConstStudentBuffer() { return StudentsBuffer; }
+    const QVector< QString*>& getSpecBuffer() const { return SpecialtyBuffer; }
+    const QVector< Faculty*>& getFacultyBuffer() const { return FacultyBuffer; }
+    const QVector< Group*>& getGroupBuffer() const { return GroupBuffer; }
+    const QVector< FullName*>& getNameBuffer() const { return NameBuffer; }
 
 
     // Додавання елементів
@@ -190,7 +196,7 @@ public:
 
     // Буферні операції
     StudInfo* findInBuffer(const QString& fullName);
-    QVector<const StudInfo*>& getbuffer();
+    QVector<StudInfo*>& getbuffer();
 
 };
 
