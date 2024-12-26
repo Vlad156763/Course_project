@@ -204,6 +204,7 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
             QString StudyName, GroupName, FacultyName, SpecialtyName;
             //todo: запит на отримання предметів студента за спеціальністю, факультетом, групою і піб
             // 1. виписати введені значення з lineEdit->text() у StudyName, GroupName, FacultyName, SpecialtyName
+
             arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName );
             cqdout << "\033[38;2;255;0;0mМетод filterByCriteria для коректної роботи повинен отримувати правдиві значення:"
                 << "\nSpecialtyName - " << SpecialtyName 
@@ -1639,7 +1640,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
 }
 
 SmallMessage_C::SmallMessage_C(QWidget* parent) : QWidget(parent) {}
-void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout, Qt::Alignment aligment, int row, int column, int rowSpan, int ColumnSpan) {
+void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout* layout, Qt::Alignment aligment, int row, int column, int rowSpan, int ColumnSpan, int millsecoond) {
     QLabel* label = new QLabel(text, this);
     label->setObjectName("label"); //унікальна назва для CSS
     label->setFixedSize(160, 40); //фіксований розмір
@@ -1666,7 +1667,7 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
     connect(timer, &QTimer::timeout, [label]() { label->deleteLater();  });
     //таймер для запуску один раз
     timer->setSingleShot(true);
-    timer->start(3000); //запуск на 3 секунди
+    timer->start(millsecoond); 
 }
 WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString& titleText, const QString& wayIconTitle, QLabel* IconMsg, const QString& textButton) : QDialog(parent) {
     QGridLayout* layout = new QGridLayout(this);

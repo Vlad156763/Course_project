@@ -129,7 +129,7 @@ public:
 class SmallMessage_C : public QWidget {
 public:
     SmallMessage_C(QWidget*);
-    void show(const QString&, const QString&, QGridLayout*, Qt::Alignment = Qt::AlignBottom | Qt::AlignRight, int = 1, int = 0, int = 1, int = 1 );
+    void show(const QString&, const QString&, QGridLayout*, Qt::Alignment = Qt::AlignBottom | Qt::AlignRight, int = 1, int = 0, int = 1, int = 1, int = 3000);
     
 };
 class WarningDialog : public QDialog {
