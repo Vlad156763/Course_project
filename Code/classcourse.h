@@ -148,6 +148,7 @@ public:
         this->Students.clear();
     }
 
+
     const QVector<const StudInfo*>& getStudentsBuffer() const { return StudentsBuffer; }
     const QVector<const QString*>& getSpecBuffer() const { return SpecialtyBuffer; }
     const QVector<const Faculty*>& getFacultyBuffer() const { return FacultyBuffer; }

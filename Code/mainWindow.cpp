@@ -203,9 +203,16 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
             if (!is_correct(lineEdit)) { throw ex(0); };
             QString StudyName, GroupName, FacultyName, SpecialtyName;
             //todo: запит на отримання предметів студента за спеціальністю, факультетом, групою і піб
+            // 1. виписати введені значення з lineEdit->text() у StudyName, GroupName, FacultyName, SpecialtyName
+            arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName );
+            cqdout << "\033[38;2;255;0;0mМетод filterByCriteria для коректної роботи повинен отримувати правдиві значення:"
+                << "\nSpecialtyName - " << SpecialtyName 
+                << "\nFacultyName - " << FacultyName 
+                << "\nGroupName -  "<< GroupName 
+                << "\nStudyName - "<< StudyName << "\033[0m";
             QWidget* PredmetBox;
             blockWidget* tmp = new blockWidget(mainWindowToolsMiddle);
-            QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
+            QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName,&PredmetBox, arrayStudentBlock);
             configBlock *block = new configBlock(this);
             block->setWidget(PredmetBox);
             block->setLayout(PredmetBox->layout());
@@ -215,8 +222,11 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                     ///////////////////////////////////////////////////////////////////////////////////////////////////
                     //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
                     static int counter = 0;
-                    QString PredmetName = "Предмети";
-                    if (counter++ >= 3) { counter = 0; return true; }
+                    if ((counter) >= arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size()) { counter = 0; return true; }
+                    QString PredmetName = arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[counter++].getSubject();
+                    if (SpecialtyName.isEmpty()) {
+                        return false;
+                    }
                     ///////////////////////////////////////////////////////////////////////////////////////////////////
                     blockWidget* block = new blockWidget(PredmetName, PredmetBox);
                     connect(block, &QPushButton::released, [this, block, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, &arrayStudentBlock]() {
@@ -1956,18 +1966,18 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
     );
 }
 
-void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, StudentBlock& arrayStudentBlock) {
+void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, StudentBlock& arrayStudentBlock, QWidget* PredmetBoxPrev, QDialog* PrevDialog, QGridLayout* PrevLayout) {
     cqdout << "StudyButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << '(' << StudyName << ')';
-
     QWidget*PredmetBox;
-    QDialog* dialog = this->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox);
+    QDialog* dialog = this->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox, arrayStudentBlock);
+
     configBlock *block = new configBlock(this);
     block->setAttribute(Qt::WA_DeleteOnClose);
     arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
     block->setWidget(PredmetBox);
     block->setLayout(PredmetBox->layout());
     block->setConfigPredmetBlock(
-        [SpecialtyName, FacultyName, GroupName, StudyName, this, PredmetBox, block, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
+        [SpecialtyName, FacultyName, GroupName, StudyName, this, &PredmetBox, block, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
             static int counter = 0;
@@ -1992,7 +2002,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
     );
     dialog->exec();    
 }
-QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, QWidget** PredmetBoxM) {
+QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, QWidget** PredmetBoxM, StudentBlock& arrayStudentBlock) {
     QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
     settingsWidget->setStyleSheet(
         "#settingsWidget {"
@@ -2029,7 +2039,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
     QPushButton* delPredmet = new QPushButton("Видалити предмет", WidgetButton); delPredmet->setObjectName("delPredmet");
     //вікно з додаванням та видаленням предметів
 
-    auto WindowAddAndDelPredmet = [settingsLayout, settingsWidget, this, SpecialtyName, FacultyName, GroupName, StudyName]
+    auto WindowAddAndDelPredmet = [&arrayStudentBlock, settingsWidget, PredmetBox, settingsLayout, this, SpecialtyName, FacultyName, GroupName, StudyName, &PredmetBoxM]
     (const QString& title, const QString& Label, const QString& textButton, QString& PredmetName, const QString& textW, const QString& color) {
         QDialog* dialog = new QDialog(); dialog->setObjectName("dialog");
         dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -2045,7 +2055,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
             QString text = lineEdit->text();
             return regex.match(text).hasMatch();
             };
-        QObject::connect(button, &QPushButton::released, [textButton, settingsLayout, settingsWidget, textW, color, &PredmetName, dialog, line, is_correct, this, SpecialtyName, FacultyName, GroupName, StudyName]() {
+        QObject::connect(button, &QPushButton::released, [PredmetBox, &arrayStudentBlock, settingsWidget, &PredmetBoxM, textButton, settingsLayout, textW, color, &PredmetName, dialog, line, is_correct, this, SpecialtyName, FacultyName, GroupName, StudyName]() {
             if (line->text().isEmpty()) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(dialog->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
@@ -2076,6 +2086,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
 
                     if (studentId != -1) {
                         addSubject(query, PredmetName, studentId);
+                        arrayStudentBlock.addSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, {});
                         cqdout << "Subject added successfully for student ID:" << studentId;
                     }
                     else {
@@ -2095,6 +2106,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
 
                     if (studentId != -1) {
                         DeleteSubject(query, PredmetName, studentId);
+                        arrayStudentBlock.removeSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
                         cqdout << "Subject deleted successfully for student ID:" << studentId;
                     }
                     else {
@@ -2115,6 +2127,36 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                 SmallMessage_C* smallWindow = new SmallMessage_C(settingsWidget);
                 smallWindow->show(textW, color, settingsLayout, Qt::AlignHCenter | Qt::AlignTop, 0, 0, 1, 2);
                 dialog->accept();
+
+                configBlock* block = new configBlock(this);
+                block->setAttribute(Qt::WA_DeleteOnClose);
+                arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
+                block->setWidget(PredmetBox);
+                block->setLayout(PredmetBox->layout());
+                block->setConfigPredmetBlock(
+                    [PredmetBox,SpecialtyName, FacultyName, GroupName, StudyName, this, &PredmetBoxM, block, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
+                        ///////////////////////////////////////////////////////////////////////////////////////////////////
+                        //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
+                        static int counter = 0;
+                        if ((counter) >= arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size()) { counter = 0;  return true; }
+                        QString PredmetName = arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[counter++].getSubject();
+                        if (PredmetName.isEmpty()) {
+                
+                            return false;
+                        }
+                        ///////////////////////////////////////////////////////////////////////////////////////////////////
+                        blockWidget* block = new blockWidget(PredmetName, PredmetBox);
+                        connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, &arrayStudentBlock]() {
+                            this->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, arrayStudentBlock);
+                            });
+                
+                        block->AddStructure();
+                        layout->addWidget(block, counter, 0);
+                        return false;
+                    },
+                    PredmetBox,
+                    "Предмети"
+                );
             }
             });
         text->setStyleSheet(

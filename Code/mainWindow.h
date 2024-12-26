@@ -177,7 +177,7 @@ public:
     blockWidget(const QString&, QWidget* = nullptr);
     blockWidget(QWidget* = nullptr);
     void AddStructure();
-    QDialog* setDialogForPredmet(const QString&, const QString&, const QString&, const QString&, QWidget**);
+    QDialog* setDialogForPredmet(const QString&, const QString&, const QString&, const QString&, QWidget**, StudentBlock&);
     
 private:
     void resizeEvent(QResizeEvent* ) override;
@@ -190,7 +190,7 @@ public slots:
     void specialtyButtonPressed(counterTimer&, QWidget&, QWidget*, QWidget*, const QString&, StudentBlock&);
     void GroupButtonPressed(counterTimer&, QWidget&, QWidget*, const QString&, const QString&, const QString&, StudentBlock&);
     void FacultyButtonPressed(counterTimer&,  QWidget&, QWidget*, const QString&, const QString&, StudentBlock&);
-    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, StudentBlock&);
+    void StudyButtonPressed(const QString&, const QString&, const QString&, const QString&, StudentBlock&, QWidget* = nullptr, QDialog* = nullptr, QGridLayout* = nullptr);
     void PredmetButtonPressed(const QString&, const QString&, const QString&, const QString&, const QString&, StudentBlock&);
 };
 class configBlock : public QWidget{

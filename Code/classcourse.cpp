@@ -96,9 +96,8 @@ bool StudentBlock::addName(const QString& specialty, const QString& faculty, con
 
 bool StudentBlock::addSubject(const QString& specialty, const QString& faculty, const QString& group,
     const QString& fullName, const QString& subjectName, const QVector<QString>& grades) {
-    //WТF? коли я хочу додати предмет (тобто заповнини з БД значеннями масив Students буде пустий, нащо цикл?)
     for (auto& student : Students) {
-        if (student.getStudSpecialty() == specialty && student.getStudFaculty() == faculty &&
+        if (
             student.getStudGroup() == group && student.getStudFullName() == fullName) {
             student.addSubject(subjectName, grades);
             return true;
@@ -164,6 +163,7 @@ void StudentBlock::filterBySpec(const QString& specialty) {
         }
         SpecialtyBuffer.append(&entry);
     }
+
 }
 
 void StudentBlock::filterByFac(const QString& specialty, const QString& faculty) {
@@ -174,6 +174,7 @@ void StudentBlock::filterByFac(const QString& specialty, const QString& faculty)
             continue;
         }
         FacultyBuffer.append(&entry);
+        
     }
     // Викликати сортування ось тут :) (на місці коментаря)
 }
@@ -355,7 +356,7 @@ bool StudentBlock::removeSubject(const QString& specialty, const QString& facult
     const QString& fullName, const QString& subject) {
     bool deleted = false;
     for (auto& student : Students) {
-        if (student.getStudSpecialty() == specialty && student.getStudFaculty() == faculty &&
+        if (
             student.getStudGroup() == group && student.getStudFullName() == fullName) {
             deleted = student.removeSubject(subject);
         }

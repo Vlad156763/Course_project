@@ -443,14 +443,12 @@ void getGroup(QSqlQuery& query) {
 }
 
 //:todo нужно исправить логику
-int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId, const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName){
+
+int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId, const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName) {
     query.prepare(
         "SELECT id FROM students "
-        "WHERE specialty = :specialty AND faculty = :faculty "
-        "AND class_group = :classGroup AND name = :StudyName"
+        "WHERE class_group = :classGroup AND name = :StudyName"
     );
-    query.bindValue(":specialty", SpecialtyName); // specialty
-    query.bindValue(":faculty", FacultyName); // faculty
     query.bindValue(":classGroup", GroupName); // class_group
     query.bindValue(":StudyName", StudyName); // name
 
@@ -463,7 +461,6 @@ int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int stude
         return studentId = -1;
     }
 }
-
 int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
     query.prepare(
         "SELECT id FROM predmet "
