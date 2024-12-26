@@ -2349,10 +2349,24 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
 
-    QStringList grades = initializeGrades(query);
+    int predmet_id = -1;
+    int student_id = -1;
+    predmet_id = getPredmetId(query, PredmetName, predmet_id);
+    student_id = getStudentId(query, predmet_id, StudentName);
+
+
+    if (predmet_id != -1 && student_id != -1) {
+        QStringList grades = initializeGrades(query, predmet_id, student_id);
+
+        qDebug() << "Grades:" << grades;
+    }
+    else {
+        cqdout << "Failed to initialize grade. No matching predmet found.";
+    }
+
+
     //для прикладу запишу уже в рядок для редагування трохи чисел
 
-    qDebug() << "Grades:" << grades;
     arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudentName, PredmetName);
     
     for (int i = 0;true; i++) {
@@ -2387,13 +2401,13 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         predmet_id = getPredmetId(query, PredmetName, predmet_id);
 
         if (predmet_id != -1) {
-            addGrades(query, numbers, predmet_id);
+            addGrades(query, numbers, predmet_id, StudentName);
             cqdout << "Grade added successfully for predment ID:" << predmet_id;
         }
         else {
             cqdout << "Failed to add grade. No matching predmet found.";
         }
-        getGrades(query, numbers, predmet_id);
+        getGrades(query, numbers, predmet_id, StudentName);
         bool exit = false;
         if (arrayStudentBlock.getStudentsBuffer()[0]->getStudSpecialty() == SpecialtyName ||
             arrayStudentBlock.getStudentsBuffer()[0]->getStudFaculty() == FacultyName ||
