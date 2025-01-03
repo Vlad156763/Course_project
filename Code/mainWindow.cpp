@@ -193,24 +193,29 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
         "   padding: 5px;"
         "}"
     );
-    auto is_correct = [&arrayStudentBlock](QLineEdit* lineEdit)->bool {
-        QRegularExpression regex(R"(^s:\s*+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*f:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*g:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*n:\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+\s*$)");
+    QRegularExpression regex(R"(^\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s*$)");
+
+    auto is_correct = [&arrayStudentBlock, regex](QLineEdit* lineEdit)->bool {
         QString text = lineEdit->text();
         return regex.match(text).hasMatch();
         };
-    QObject::connect(lineEdit, &QLineEdit::returnPressed, [is_correct, lineEdit, mainWindowToolsMiddle, mainWindowToolsMiddleLayout, this, &arrayStudentBlock]() {
+    QObject::connect(lineEdit, &QLineEdit::returnPressed, [is_correct, lineEdit, mainWindowToolsMiddle, mainWindowToolsMiddleLayout, this, &arrayStudentBlock, regex]() {
         try {
             if (!is_correct(lineEdit)) { throw ex(0); };
             QString StudyName, GroupName, FacultyName, SpecialtyName;
             //todo: запит на отримання предметів студента за спеціальністю, факультетом, групою і піб
             // 1. виписати введені значення з lineEdit->text() у StudyName, GroupName, FacultyName, SpecialtyName
+            QStringList t = lineEdit->text().split(QRegularExpression("\\s+"));
+            int indexVal = 0; 
+            SpecialtyName = t[(t[0] == ""? ++indexVal : indexVal)];
+            FacultyName = t[++indexVal];
+            GroupName = t[++indexVal];
+            StudyName = t[++indexVal];
 
-            arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName );
-            cqdout << "\033[38;2;255;0;0mМетод filterByCriteria для коректної роботи повинен отримувати правдиві значення:"
-                << "\nSpecialtyName - " << SpecialtyName 
-                << "\nFacultyName - " << FacultyName 
-                << "\nGroupName -  "<< GroupName 
-                << "\nStudyName - "<< StudyName << "\033[0m";
+            arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
+            if (arrayStudentBlock.getStudentsBuffer().isEmpty()) {
+                throw ex(1);
+            }
             QWidget* PredmetBox;
             blockWidget* tmp = new blockWidget(mainWindowToolsMiddle);
             QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName,&PredmetBox, arrayStudentBlock);
@@ -235,7 +240,7 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                         });
 
                     block->AddStructure();
-                    layout->addWidget(block, counter++ + 1, 0);
+                    layout->addWidget(block, counter, 0);
                     return false;
                 },
                 PredmetBox,
@@ -253,6 +258,9 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                 };
             if (error.getErrorCode() == 0) {
                 TextInLineEditIsWrong("Введено неправильний запит!");
+            }
+            else if (error.getErrorCode() == 1) {
+                TextInLineEditIsWrong(" Студента незнайдено!");
             }
         }  
     });
@@ -1538,7 +1546,7 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
     QVector<QString> Buffer;
     AllLineEdits.reserve(fieldNames.size());//резервні місця під текст
     auto is_correct = [](QLineEdit* lineEdit)->bool {
-        QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+$)");
+        QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+$)");
         QString text = lineEdit->text();
         return regex.match(text).hasMatch();
         };
