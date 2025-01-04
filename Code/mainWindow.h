@@ -52,18 +52,17 @@ void addFaculty(QSqlQuery& query, const QString& specialty, const QString& facul
 void addGroup(QSqlQuery& query, const QString& specialty, const QString& faculty, const QString& class_group);
 void addStudent(QSqlQuery& query, const QString& name, const QString& faculty, const QString& specialty, const QString& class_group);
 void addSubject(QSqlQuery& query, const QString& predmet, int studentId);
-void addGrades(QSqlQuery& query, const QStringList& grade, int predmetId, const QString StudentName);
+void addGrades(QSqlQuery& query, const QStringList& grade, int predmetId, int student_id);
 
 int getStudentIDforPredmet(QSqlQuery& query, const QString& StudyName, int studentId, const QString& SpecialtyName, const QString& FacultyName, const QString& GroupName);
 int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId);
 int getNextAvailableId(QSqlQuery& query, const QString& tableName, const QString& idColumn);
-int getStudentId(QSqlQuery& query, int predmetId, const QString& StudentName);
+int getStudentId(QSqlQuery& query, int predmetId, const QString& StudentName, const QString& GroupName);
 
 void getAllStudents(QSqlQuery& query);
 void getFaculty(QSqlQuery& query);
 void getSpecialty(QSqlQuery& query);
 void getGroup(QSqlQuery& query);
-void getSubject(QSqlQuery& query, const QString& Predmet, int studentId);
 void getGrades(QSqlQuery& query, const QStringList& grades, int predmetId, const QString StudentName);
 
 void DeleteSpecialty(QSqlQuery& query, const QString& specialty);
@@ -79,8 +78,6 @@ QVector<student> initializeStudents___(QSqlQuery& query);
 QStringList initializeSpecialties(QSqlQuery& query);
 QVector <QVector<QString>> initializeFaculties(QSqlQuery& query);
 QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query);
-QStringList initializeStudents(QSqlQuery& query);
-QStringList initializePredmets(QSqlQuery& query);
 QStringList initializeGrades(QSqlQuery& query, int predmet_id, int student_id);
 
 void clearGradesForStudentAndPredmet(QSqlQuery& query, int predmetId, int studentId);

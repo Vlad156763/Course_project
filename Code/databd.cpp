@@ -327,39 +327,21 @@ void addSubject(QSqlQuery& query, const QString& predmet, int studentId) {
 
 }
 
-void addGrades(QSqlQuery& query, const QStringList& grades, int predmetId, const QString StudentName) {
+void addGrades(QSqlQuery& query, const QStringList& grades, int predmetId, int student_id) {
 
-    int studentId = -1;
-
-    query.prepare("SELECT id FROM students WHERE name = :StudentName");
-    query.bindValue(":StudentName", StudentName);
-
-    if (!query.exec()) {
-        qDebug() << "Error fetching student_id:" << query.lastError().text();
-        return;
-    }
-
-    if (query.next()) {
-        studentId = query.value("id").toInt();
-    }
-    else {
-        qDebug() << "Error: No student found for student name: " << StudentName;
-        throw ex(-1, "Неможливо додати оцінки! Незнайдено студента!");
-    }
-
-    clearGradesForStudentAndPredmet(query, predmetId, studentId);
+    clearGradesForStudentAndPredmet(query, predmetId, student_id);
     for (const QString& grade : grades) {
         query.prepare("INSERT INTO grades (grade, predmet_id, student_id) VALUES (:grade, :predmetId, :studentId)");
         query.bindValue(":grade", grade); 
         query.bindValue(":predmetId", predmetId);
-        query.bindValue(":studentId", studentId);
+        query.bindValue(":studentId", student_id);
 
         if (!query.exec()) {
             qDebug() << "Error adding grade:" << query.lastError().text();
             break;
         }
         else {
-            qDebug() << "Grade added successfully! Grade:" << grade << ", Predmet ID:" << predmetId << ", Student ID" << studentId;
+            qDebug() << "Grade added successfully! Grade:" << grade << ", Predmet ID:" << predmetId << ", Student ID" << student_id;
         }
     }
 }
@@ -482,12 +464,13 @@ int getPredmetId(QSqlQuery& query, const QString& predmet, int predmetId) {
     }
 }
 
-int getStudentId(QSqlQuery& query, int predmetId, const QString& StudentName) {
+int getStudentId(QSqlQuery& query, int predmetId, const QString& StudentName, const QString& GroupName) {
 
     int studentId = -1;
 
-    query.prepare("SELECT id FROM students WHERE name = :StudentName");
+    query.prepare("SELECT id FROM students WHERE name = :StudentName AND class_group = :GroupName");
     query.bindValue(":StudentName", StudentName);
+    query.bindValue(":GroupName", GroupName);
 
     if (!query.exec()) {
         qDebug() << "Error fetching student_id:" << query.lastError().text();
@@ -820,44 +803,6 @@ QVector <QVector<QString>> initializeClassGroups(QSqlQuery& query) {
     }
 
     return classGroups;
-}
-
-QStringList initializeStudents(QSqlQuery& query) {
-    QStringList students;
-    if (!query.exec("SELECT * FROM students;")) {
-        qDebug() << "Error fetching students:" << query.lastError().text();
-        return students;
-    }
-
-    while (query.next()) {
-        QString studentData = QString("ID: %1, Name: %2, Faculty: %3, Specialty: %4, Class Group: %5")
-            .arg(query.value("id").toInt())
-            .arg(query.value("name").toString())
-            .arg(query.value("faculty").toString())
-            .arg(query.value("specialty").toString())
-            .arg(query.value("class_group").toInt());
-        cqdout << query.value("id").toInt() << "initializeStudents";
-        students << studentData;
-    }
-    return students;
-}
-
-QStringList initializePredmets(QSqlQuery& query) {
-    QStringList predmets;
-    if (!query.exec("SELECT * FROM predmet;")) {
-        qDebug() << "Error fetching predmets:" << query.lastError().text();
-        return predmets;
-    }
-
-    while (query.next()) {
-        QString predmetData = QString("ID: %1, Predmet: %2, Student ID: %3")
-            .arg(query.value("id").toInt())
-            .arg(query.value("predmet").toString())
-            .arg(query.value("student_id").toInt());
-        cqdout << query.value("student_id").toInt() << " - " << query.value("predmet").toString() << "initializePredmets";
-        predmets << predmetData;
-    }
-    return predmets;
 }
 
 QStringList initializeGrades(QSqlQuery& query, int predmet_id, int student_id) {

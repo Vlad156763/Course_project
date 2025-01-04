@@ -525,15 +525,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QStringList specialties = initializeSpecialties(query);
     QVector <QVector<QString>> faculties = initializeFaculties(query);
     QVector <QVector<QString>> classGroups = initializeClassGroups(query);
-    QStringList students = initializeStudents(query);
-    QStringList predmets = initializePredmets(query);
-    QVector<student> test =  initializeStudents___(query);
-    cqdout << "Specialties:" << specialties << "\n\n";
-    cqdout << "Faculties:" << faculties << "\n\n";
-    cqdout << "Class Groups:" << classGroups << "\n\n";
-    cqdout << "Students:" << students << "\n\n";
-    cqdout << "Predmets:" << predmets << "\n\n";
-    
+    QVector<student> students =  initializeStudents___(query);
      /*
     [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
     */
@@ -548,17 +540,17 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     for (int i = 0; i < classGroups.size(); i++) {
         arrayStudentBlock.addGroup(classGroups[i][0], classGroups[i][1], classGroups[i][2]);
     }
-    for (int i = 0; i < test.size(); i++) {
+    for (int i = 0; i < students.size(); i++) {
         QVector<SubjectInfo> PredmetsCurStudents;
-        for (int j = 0; j < test[i].sizePredmetsAndTheirGrades(); j++) {
+        for (int j = 0; j < students[i].sizePredmetsAndTheirGrades(); j++) {
             PredmetsCurStudents.push_back(
-                SubjectInfo(test[i].operator[](j).first, test[i].operator[](j).second)
+                SubjectInfo(students[i].operator[](j).first, students[i].operator[](j).second)
             );
         }
 
         arrayStudentBlock.addStudent(
             StudInfo(
-                test[i].getName(), test[i].getspec(), test[i].getGrup(), test[i].getFacl(), PredmetsCurStudents 
+                students[i].getName(), students[i].getspec(), students[i].getGrup(), students[i].getFacl(), PredmetsCurStudents
             )
         );
     }
@@ -2462,7 +2454,7 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
     int predmet_id = -1;
     int student_id = -1;
     predmet_id = getPredmetId(query, PredmetName, predmet_id);
-    student_id = getStudentId(query, predmet_id, StudentName);
+    student_id = getStudentId(query, predmet_id, StudentName, GroupName);
 
 
     if (predmet_id != -1 && student_id != -1) {
@@ -2518,11 +2510,13 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         QSqlDatabase db = QSqlDatabase::database();
         QSqlQuery query(db);
         int predmet_id = -1;
+        int student_id = -1;
 
         predmet_id = getPredmetId(query, PredmetName, predmet_id);
+        student_id = getStudentId(query, predmet_id, StudentName, GroupName);
 
         if (predmet_id != -1) {
-            addGrades(query, numbers, predmet_id, StudentName);
+            addGrades(query, numbers, predmet_id, student_id);
             cqdout << "Grade added successfully for predment ID:" << predmet_id;
         }
         else {
