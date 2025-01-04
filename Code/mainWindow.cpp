@@ -193,7 +193,7 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
         "   padding: 5px;"
         "}"
     );
-    QRegularExpression regex(R"(^\s*[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s+[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+\s*$)");
+    QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+$)");
 
     auto is_correct = [&arrayStudentBlock, regex](QLineEdit* lineEdit)->bool {
         QString text = lineEdit->text();
@@ -203,19 +203,121 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
         try {
             if (!is_correct(lineEdit)) { throw ex(0); };
             QString StudyName, GroupName, FacultyName, SpecialtyName;
-            //todo: запит на отримання предметів студента за спеціальністю, факультетом, групою і піб
-            // 1. виписати введені значення з lineEdit->text() у StudyName, GroupName, FacultyName, SpecialtyName
-            QStringList t = lineEdit->text().split(QRegularExpression("\\s+"));
-            int indexVal = 0; 
-            SpecialtyName = t[(t[0] == ""? ++indexVal : indexVal)];
-            FacultyName = t[++indexVal];
-            GroupName = t[++indexVal];
-            StudyName = t[++indexVal];
-
-            arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
+            StudyName = lineEdit->text();
+            arrayStudentBlock.filterByCriteria("", "", "", StudyName);
             if (arrayStudentBlock.getStudentsBuffer().isEmpty()) {
                 throw ex(1);
             }
+
+            QDialog* windowForChoicePredmet = new QDialog(mainWindowToolsMiddle);
+            windowForChoicePredmet->setWindowTitle("Обрати студента");
+            windowForChoicePredmet->setStyleSheet(
+                "QDialog { "
+                "   background-color: rgb(30,30,30);"
+                "}"
+            );
+            QGridLayout* windowForChoicePredmetLaout = new QGridLayout(windowForChoicePredmet);
+            QWidget* area = new QWidget(windowForChoicePredmet); QGridLayout* areaLayout = new QGridLayout(area);
+            QScrollArea* wScroll = new QScrollArea(windowForChoicePredmet);
+            QWidget* main = new QWidget(wScroll);
+            QGridLayout* mainLayout = new QGridLayout(main);
+            wScroll->setWidget(main);
+            wScroll->setWidgetResizable(true);
+            area->setStyleSheet(
+                "QWidget {"
+                "   border-radius: 10px;"
+                "   background-color: rgb(90,90,90);"
+                "}"
+            );
+            windowForChoicePredmet->setFixedSize(500, 500);
+            wScroll->setStyleSheet(
+                "QScrollArea {"
+                "   border: none;"
+                "   background-color: transparent;"
+                "}"
+                "QScrollBar:vertical {"
+                "    width: 10px;"
+                "    margin: 0px;"
+                "    padding: 0px;"
+                "    border-radius: 10px;"
+                "    background-color: rgb(90,90,90);"
+                "}"
+                "QScrollBar::handle:vertical {"
+                "    background: rgb(64,64,64);"
+                "    min-height: 20px;"
+                "    border-radius: 5px;"
+                "}"
+                "QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {"
+                "    height: 0px;"
+                "}"
+                "QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {"
+                "    background: none;" //ось це прибирає прозорість блоку, де знаходиться повзунок 
+                "}"
+            );
+            main->setStyleSheet(
+                "QWidget {"
+                "   background-color: transparent;"
+                "}"
+            );
+            main->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+            bool preesedInButton = false;
+            for (int i = 0; i < arrayStudentBlock.getStudentsBuffer().size(); i++) {
+                QPushButton* button = new QPushButton(main); QGridLayout* buttonLayout = new QGridLayout(button);
+                QLabel* Name = new QLabel(arrayStudentBlock.getStudentsBuffer()[i]->getStudFullName(), button); Name->setObjectName("Name");
+                QLabel* Group = new QLabel(arrayStudentBlock.getStudentsBuffer()[i]->getStudGroup(), button); Group->setObjectName("Group");
+                Name->setStyleSheet(
+                    "#Name {"
+                    "   font-size: 18px;"
+                    "   font-weight: bold;"
+                    "}"
+                );
+                Group->setStyleSheet(
+                    "#Group {"
+                    "   font-size: 14px;"
+                    "   font-weight: bold;"
+                    "}"
+                );
+
+                button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+                button->setStyleSheet(
+                    "QPushButton {"
+                    "background: rgb(80, 80,80);"
+                    "	border-radius: 5px;"
+                    "	color: #ffffff;"
+                    "	font-weight: bold;"
+                    "	border: none;"
+                    "	padding: 10px;"
+                    "   border: 2px solid rgb(120,120,120);"
+                    "}"
+                    "QPushButton:focus {"
+                    "   outline: 0px;"
+                    "}"
+                    "QPushButton:hover {"
+                    "	background-color: rgb(120, 120,120);"
+                    "}"
+                );
+                buttonLayout->setRowStretch(0, 1);
+                buttonLayout->setRowStretch(1, 1);
+                button->setFixedHeight(70);
+
+                buttonLayout->addWidget(Name, 0, 0, Qt::AlignLeft);
+                buttonLayout->addWidget(Group, 1, 0, Qt::AlignLeft);
+                mainLayout->setAlignment(Qt::AlignTop);
+                mainLayout->addWidget(button, i, 0, Qt::AlignTop);
+                connect(button, &QPushButton::released, [&StudyName, &GroupName, &arrayStudentBlock, i, &preesedInButton,&windowForChoicePredmet]() {
+                    StudyName = arrayStudentBlock.getStudentsBuffer()[i]->getStudFullName();
+                    GroupName = arrayStudentBlock.getStudentsBuffer()[i]->getStudGroup();
+                    preesedInButton = true;
+                    windowForChoicePredmet->accept();
+                });
+            }
+
+            areaLayout->addWidget(wScroll);
+            windowForChoicePredmetLaout->addWidget(area);
+            windowForChoicePredmet->exec();
+            if (!preesedInButton) return;
+
+            arrayStudentBlock.filterByCriteria("", "", GroupName, StudyName);
             QWidget* PredmetBox;
             blockWidget* tmp = new blockWidget(mainWindowToolsMiddle);
             QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName,&PredmetBox, arrayStudentBlock);
@@ -230,7 +332,7 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                     static int counter = 0;
                     if ((counter) >= arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size()) { counter = 0; return true; }
                     QString PredmetName = arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[counter++].getSubject();
-                    if (SpecialtyName.isEmpty()) {
+                    if (PredmetName.isEmpty()) {
                         return false;
                     }
                     ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +362,7 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                 TextInLineEditIsWrong("Введено неправильний запит!");
             }
             else if (error.getErrorCode() == 1) {
-                TextInLineEditIsWrong(" Студента незнайдено!");
+                TextInLineEditIsWrong(" Студента не знайдено!");
             }
         }  
     });
@@ -944,7 +1046,7 @@ void MainWindow_C::HelpButtonPressed() {
         "               <div style = 'font-size: 14px; color: #ffffff;'>"
         "                   Поточне вікно зустрічає вас 2-ма частинами <i>верхньою </i> та <i>нижньою</i> які візуально поділені на 3 підчастини кожна."
         "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою, знайти студента та перейти до налаштувань." 
-        "                   Пошук студента відбувається за специфічним стандартом вказуючи спеціальність, факультет, групу та піб студента. Наприклад: (s: спеціальність f: факультет g: група n: піб) "
+        "                   Пошук студента відбувається за ПІБ. Вказавши ПІБ відкриється вікно з вибором студента в групі"
         "                   де, все що в () це записується в поле пошуку. Також не можна вводити інші символи окрім: англійських, українських літер (будь-якого регістру), цифри, символи ( ` ' \" - _) та пробіл. Всі інші символи викликатимуть помилку. "
         "                   <br><u>Нижня частина</u>- відповідає за навігацію та пошук студента вручну натискаючи на <i>блоки</i>. "/*сортування тут*/
         "                   <br><u>Блоки</u> - це кнопки, які допомагають знайти оцінки студента. "
@@ -972,7 +1074,7 @@ void MainWindow_C::HelpButtonPressed() {
         "                   В цьому вікні ви можете почитати що означає кожен віджет, для чого ця програма була створена, як нею користуватись. Цей віджет вам гарантовано допоможе!<br>"
         "               </div>"
         "           </li>"
-        //here:  якщо буде додано пошук, то напиши про нього тут
+
         "           <li>"
         "               <div style = 'font-size: 14px; color: #ffffff; font-weight: bold;'>"
         "                   Вікно (Налаштування)"
@@ -1546,7 +1648,7 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
     QVector<QString> Buffer;
     AllLineEdits.reserve(fieldNames.size());//резервні місця під текст
     auto is_correct = [](QLineEdit* lineEdit)->bool {
-        QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ\`\'\"\-\_]+$)");
+        QRegularExpression regex(R"(^[0-9A-Za-zа-яА-ЯєЄіІїЇґҐ \`\'\"\-\_]+$)");
         QString text = lineEdit->text();
         return regex.match(text).hasMatch();
         };
@@ -2377,8 +2479,6 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
                 }
             }
         }
-        arrayStudentBlock.addStudent(StudInfo(StudentName, SpecialtyName, GroupName, FacultyName, {SubjectInfo(PredmetName, grades)}));
-
         qDebug() << "Grades:" << grades;
     }
     else {
