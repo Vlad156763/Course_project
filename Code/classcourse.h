@@ -2,6 +2,7 @@
 #define STUDINFO_H
 #include <qstring.h>
 #include <qvector.h>
+#include <algorithm>
 
 class SubjectInfo {
 private:
@@ -186,6 +187,12 @@ public:
                         ОГОЛОСИТИ МОЖНА ОСЬ ТУТ :) :(
 
     */
+
+    void sortBuffer(QVector<StudInfo*>& buffer); // Уже существует
+    void sortBuffer(QVector<QString*>& buffer); // Уже существует
+    void sortBuffer(QVector<Faculty*>& buffer); // Новая перегрузка
+    void sortBuffer(QVector<Group*>& buffer);   // Новая перегрузка
+    void sortBuffer(QVector<FullName*>& buffer); // Новая перегрузка
 
     // Методи ФІЛЬТРАЦІЇ
     void filterBySpec(const QString& specialty = "");

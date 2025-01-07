@@ -1,5 +1,6 @@
 #include "classcourse.h"
 
+
 //=== SubjectInfo ===
 //
 // перевантажені оператори
@@ -117,9 +118,140 @@ void StudentBlock::addStudent(const StudInfo& student) {
 
 */
 
+// Функція сортування для буферів
+
+void StudentBlock::sortBuffer(QVector<StudInfo*>& buffer) {
+    std::sort(buffer.begin(), buffer.end(), [](const StudInfo* a, const StudInfo* b) {
+        return a->getStudFullName() < b->getStudFullName(); // Сортування у порядку ASCII
+        });
+}
+
+void StudentBlock::sortBuffer(QVector<QString*>& buffer) {
+    std::sort(buffer.begin(), buffer.end(), [](const QString* a, const QString* b) {
+        return *a < *b; // Сортування за значенням у порядку ASCII (Сравнение значений строк)
+        });
+}
+
+// Сортировка факультетов
+void StudentBlock::sortBuffer(QVector<Faculty*>& buffer) {
+    std::sort(buffer.begin(), buffer.end(), [](const Faculty* a, const Faculty* b) {
+        return a->getFacultyName() < b->getFacultyName(); // Сравнение имен факультетов
+        });
+}
+
+// Сортировка групп
+void StudentBlock::sortBuffer(QVector<Group*>& buffer) {
+    std::sort(buffer.begin(), buffer.end(), [](const Group* a, const Group* b) {
+        return a->getGroupName() < b->getGroupName(); // Сравнение групп
+        });
+}
+
+// Сортировка по именам
+void StudentBlock::sortBuffer(QVector<FullName*>& buffer) {
+    std::sort(buffer.begin(), buffer.end(), [](const FullName* a, const FullName* b) {
+        return a->getFullName() < b->getFullName(); // Полное имя
+        });
+}
 
 // фільтрація студентів за критеріями на власний вибір
 
+void StudentBlock::filterByCriteria(
+    const QString& specialty,
+    const QString& faculty,
+    const QString& group,
+    const QString& name,
+    const QString& subject) {
+
+    StudentsBuffer.clear(); // Очищуємо буфер 
+
+    for (auto& student : Students) {
+        // Перевірка критеріїв
+        if ((!specialty.isEmpty() && student.getStudSpecialty() != specialty) ||
+            (!faculty.isEmpty() && student.getStudFaculty() != faculty) ||
+            (!group.isEmpty() && student.getStudGroup() != group) ||
+            (!name.isEmpty() && student.getStudFullName() != name)) {
+            continue; // Пропускаємо, якщо критерій не виконується
+        }
+
+        // Додаткова перевірка на предмет
+        if (!subject.isEmpty()) {
+            bool subjectFound = false;
+            for (const auto& studSubject : student.getStudSubjects()) {
+                if (studSubject.getSubject() == subject) {
+                    subjectFound = true;
+                    break; // вихід (достатньо знайти 1 збіг)
+                }
+            }
+            if (!subjectFound) continue; // Якщо предмет не знайдено, пропускаємо
+        }
+
+        // Додаємо студента до буферу
+        StudentsBuffer.append(&student);
+    }
+
+    sortBuffer(StudentsBuffer); // сортування за ASCII після фільтрації
+}
+
+void StudentBlock::filterBySpec(const QString& specialty) {
+    SpecialtyBuffer.clear(); // Очищуємо буфер 
+    for (auto& entry : Specialties) {
+        if (!specialty.isEmpty() && entry != specialty) {
+            continue;
+        }
+        SpecialtyBuffer.append(&entry);
+    }
+
+    sortBuffer(SpecialtyBuffer); // сортування за ASCII після фільтрації
+}
+
+void StudentBlock::filterByFac(const QString& specialty, const QString& faculty) {
+    FacultyBuffer.clear(); // Очищуємо буфер (залишено без змін)
+    for (auto& entry : Faculties) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty)) {
+            continue;
+        }
+        FacultyBuffer.append(&entry);
+    }
+
+    sortBuffer(FacultyBuffer); // сортування за ASCII після фільтрації
+}
+
+void StudentBlock::filterByGroup(const QString& specialty, const QString& faculty, const QString& group) {
+    GroupBuffer.clear(); // Очищуємо буфер 
+    for (auto& entry : Groups) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
+            (!group.isEmpty() && entry.getGroupName() != group)) {
+            continue;
+        }
+        GroupBuffer.append(&entry);
+    }
+
+    sortBuffer(GroupBuffer); // сортування за ASCII після фільтрації
+}
+
+void StudentBlock::filterByName(const QString& specialty, const QString& faculty, const QString& group, const QString& name) {
+    NameBuffer.clear(); // Очищуємо буфер 
+    for (auto& entry : Names) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
+            (!group.isEmpty() && entry.getGroupName() != group) ||
+            (!name.isEmpty() && entry.getFullName() != name)) {
+            continue;
+        }
+        NameBuffer.append(&entry);
+    }
+
+    sortBuffer(NameBuffer); // сортування за ASCII після фільтрації
+}
+
+
+
+
+
+
+/*
 void StudentBlock::filterByCriteria(
     const QString& specialty,
     const QString& faculty,
@@ -211,6 +343,8 @@ void StudentBlock::filterByName(const QString& specialty, const QString& faculty
     
     // Викликати сортування ось тут :) (на місці коментаря)
 }
+
+*/
 
 /*
 bool StudentBlock::addSpecialty(const QString& specialty){
