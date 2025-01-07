@@ -269,12 +269,14 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                     "#Name {"
                     "   font-size: 18px;"
                     "   font-weight: bold;"
+                    "   color: rgb(255,255,255);"
                     "}"
                 );
                 Group->setStyleSheet(
                     "#Group {"
                     "   font-size: 14px;"
                     "   font-weight: bold;"
+                    "   color: rgb(255,255,255);"
                     "}"
                 );
 
