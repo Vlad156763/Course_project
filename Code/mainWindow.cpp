@@ -550,6 +550,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             );
         }
 
+        arrayStudentBlock.sortAllStudentsSubjects();
+
         arrayStudentBlock.addStudent(
             StudInfo(
                 students[i].getName(), students[i].getspec(), students[i].getGrup(), students[i].getFacl(), PredmetsCurStudents

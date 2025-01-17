@@ -121,6 +121,8 @@ public:
     // Методи додавання і вилучення предметів
     void addSubject(const QString& subjectName, const QVector<QString>& grades);
     bool removeSubject(const QString& subjectName);
+
+    void sortSubjectsByAscii();
 };
 
 class StudentBlock {
@@ -188,11 +190,13 @@ public:
 
     */
 
-    void sortBuffer(QVector<StudInfo*>& buffer); // Уже существует
-    void sortBuffer(QVector<QString*>& buffer); // Уже существует
-    void sortBuffer(QVector<Faculty*>& buffer); // Новая перегрузка
-    void sortBuffer(QVector<Group*>& buffer);   // Новая перегрузка
-    void sortBuffer(QVector<FullName*>& buffer); // Новая перегрузка
+    void sortBuffer(QVector<StudInfo*>& buffer);
+    void sortBuffer(QVector<QString*>& buffer);
+    void sortBuffer(QVector<Faculty*>& buffer);
+    void sortBuffer(QVector<Group*>& buffer);
+    void sortBuffer(QVector<FullName*>& buffer);
+
+    void sortAllStudentsSubjects();
 
     // Методи ФІЛЬТРАЦІЇ
     void filterBySpec(const QString& specialty = "");

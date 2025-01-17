@@ -119,7 +119,7 @@ void StudentBlock::addStudent(const StudInfo& student) {
 */
 
 // Функція сортування для буферів
-
+/*
 void StudentBlock::sortBuffer(QVector<StudInfo*>& buffer) {
     std::sort(buffer.begin(), buffer.end(), [](const StudInfo* a, const StudInfo* b) {
         return a->getStudFullName() < b->getStudFullName(); // Сортування у порядку ASCII
@@ -162,7 +162,7 @@ void StudentBlock::filterByCriteria(
     const QString& name,
     const QString& subject) {
 
-    StudentsBuffer.clear(); // Очищуємо буфер 
+    StudentsBuffer.clear(); // Очищуємо буфер
 
     for (auto& student : Students) {
         // Перевірка критеріїв
@@ -193,7 +193,7 @@ void StudentBlock::filterByCriteria(
 }
 
 void StudentBlock::filterBySpec(const QString& specialty) {
-    SpecialtyBuffer.clear(); // Очищуємо буфер 
+    SpecialtyBuffer.clear(); // Очищуємо буфер
     for (auto& entry : Specialties) {
         if (!specialty.isEmpty() && entry != specialty) {
             continue;
@@ -218,7 +218,7 @@ void StudentBlock::filterByFac(const QString& specialty, const QString& faculty)
 }
 
 void StudentBlock::filterByGroup(const QString& specialty, const QString& faculty, const QString& group) {
-    GroupBuffer.clear(); // Очищуємо буфер 
+    GroupBuffer.clear(); // Очищуємо буфер
     for (auto& entry : Groups) {
         if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
             (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
@@ -232,7 +232,7 @@ void StudentBlock::filterByGroup(const QString& specialty, const QString& facult
 }
 
 void StudentBlock::filterByName(const QString& specialty, const QString& faculty, const QString& group, const QString& name) {
-    NameBuffer.clear(); // Очищуємо буфер 
+    NameBuffer.clear(); // Очищуємо буфер
     for (auto& entry : Names) {
         if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
             (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
@@ -245,7 +245,188 @@ void StudentBlock::filterByName(const QString& specialty, const QString& faculty
 
     sortBuffer(NameBuffer); // сортування за ASCII після фільтрації
 }
+*/
 
+template <typename T, typename Compare>
+void mergeSort(QVector<T*>& buffer, Compare comp) {
+    if (buffer.size() <= 1) return; // База рекурсии
+
+    int mid = buffer.size() / 2;
+    QVector<T*> left(buffer.begin(), buffer.begin() + mid);
+    QVector<T*> right(buffer.begin() + mid, buffer.end());
+
+    // Рекурсивная сортировка левой и правой частей
+    mergeSort(left, comp);
+    mergeSort(right, comp);
+
+    // Слияние отсортированных частей
+    int i = 0, j = 0, k = 0;
+    while (i < left.size() && j < right.size()) {
+        if (comp(left[i], right[j])) {
+            buffer[k++] = left[i++];
+        }
+        else {
+            buffer[k++] = right[j++];
+        }
+    }
+    while (i < left.size()) buffer[k++] = left[i++];
+    while (j < right.size()) buffer[k++] = right[j++];
+}
+
+void StudInfo::sortSubjectsByAscii() {
+    QVector<SubjectInfo*> subjectPtrs;
+
+    // Создаем вектор указателей на предметы
+    for (auto& subject : StudSubjects) {
+        subjectPtrs.push_back(&subject);
+    }
+
+    // Выполняем сортировку
+    mergeSort(subjectPtrs, [](const SubjectInfo* a, const SubjectInfo* b) {
+        return a->getSubject() < b->getSubject();  // Сравнение по имени предмета
+        });
+
+    // Перестраиваем оригинальный вектор
+    QVector<SubjectInfo> sortedSubjects;
+    for (auto* ptr : subjectPtrs) {
+        sortedSubjects.push_back(*ptr);
+    }
+
+    StudSubjects = std::move(sortedSubjects);
+}
+
+
+// Сортировка студентов (StudentsBuffer)
+void StudentBlock::sortBuffer(QVector<StudInfo*>& buffer) {
+    mergeSort(buffer, [](const StudInfo* a, const StudInfo* b) {
+        return a->getStudFullName() < b->getStudFullName(); // Сравнение по имени студента
+        });
+}
+
+// Сортировка специальностей (SpecialtyBuffer)
+void StudentBlock::sortBuffer(QVector<QString*>& buffer) {
+    mergeSort(buffer, [](const QString* a, const QString* b) {
+        return *a < *b; // Сравнение строк по алфавиту
+        });
+}
+
+// Сортировка факультетов (FacultyBuffer)
+void StudentBlock::sortBuffer(QVector<Faculty*>& buffer) {
+    mergeSort(buffer, [](const Faculty* a, const Faculty* b) {
+        return a->getFacultyName() < b->getFacultyName(); // Сравнение по имени факультета
+        });
+}
+
+// Сортировка групп (GroupBuffer)
+void StudentBlock::sortBuffer(QVector<Group*>& buffer) {
+    mergeSort(buffer, [](const Group* a, const Group* b) {
+        return a->getGroupName() < b->getGroupName(); // Сравнение по названию группы
+        });
+}
+
+// Сортировка имен (NameBuffer)
+void StudentBlock::sortBuffer(QVector<FullName*>& buffer) {
+    mergeSort(buffer, [](const FullName* a, const FullName* b) {
+        return a->getFullName() < b->getFullName(); // Сравнение по полному имени
+        });
+}
+
+void StudentBlock::sortAllStudentsSubjects() {
+    for (auto& student : Students) {
+        student.sortSubjectsByAscii();  // метод сортировки для каждого студента
+    }
+}
+
+// Методы фильтрации с вызовом сортировки
+
+void StudentBlock::filterByCriteria(
+    const QString& specialty,
+    const QString& faculty,
+    const QString& group,
+    const QString& name,
+    const QString& subject) {
+
+    StudentsBuffer.clear(); // Очистка буфера
+
+    for (auto& student : Students) {
+        if ((!specialty.isEmpty() && student.getStudSpecialty() != specialty) ||
+            (!faculty.isEmpty() && student.getStudFaculty() != faculty) ||
+            (!group.isEmpty() && student.getStudGroup() != group) ||
+            (!name.isEmpty() && student.getStudFullName() != name)) {
+            continue; // Пропускаем, если критерий не выполняется
+        }
+
+        // Дополнительная проверка на предмет
+        if (!subject.isEmpty()) {
+            bool subjectFound = false;
+            for (const auto& studSubject : student.getStudSubjects()) {
+                if (studSubject.getSubject() == subject) {
+                    subjectFound = true;
+                    break;
+                }
+            }
+            if (!subjectFound) continue;
+        }
+
+        StudentsBuffer.append(&student); // Добавляем студента в буфер
+    }
+
+    sortBuffer(StudentsBuffer); // Сортировка слиянием
+}
+
+void StudentBlock::filterBySpec(const QString& specialty) {
+    SpecialtyBuffer.clear();
+    for (auto& entry : Specialties) {
+        if (!specialty.isEmpty() && entry != specialty) {
+            continue;
+        }
+        SpecialtyBuffer.append(&entry);
+    }
+
+    sortBuffer(SpecialtyBuffer); // Сортировка слиянием
+}
+
+void StudentBlock::filterByFac(const QString& specialty, const QString& faculty) {
+    FacultyBuffer.clear();
+    for (auto& entry : Faculties) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty)) {
+            continue;
+        }
+        FacultyBuffer.append(&entry);
+    }
+
+    sortBuffer(FacultyBuffer); // Сортировка слиянием
+}
+
+void StudentBlock::filterByGroup(const QString& specialty, const QString& faculty, const QString& group) {
+    GroupBuffer.clear();
+    for (auto& entry : Groups) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
+            (!group.isEmpty() && entry.getGroupName() != group)) {
+            continue;
+        }
+        GroupBuffer.append(&entry);
+    }
+
+    sortBuffer(GroupBuffer); // Сортировка слиянием
+}
+
+void StudentBlock::filterByName(const QString& specialty, const QString& faculty, const QString& group, const QString& name) {
+    NameBuffer.clear();
+    for (auto& entry : Names) {
+        if ((!specialty.isEmpty() && entry.getSpecialty() != specialty) ||
+            (!faculty.isEmpty() && entry.getFacultyName() != faculty) ||
+            (!group.isEmpty() && entry.getGroupName() != group) ||
+            (!name.isEmpty() && entry.getFullName() != name)) {
+            continue;
+        }
+        NameBuffer.append(&entry);
+    }
+
+    sortBuffer(NameBuffer); // Сортировка слиянием
+}
 
 
 
