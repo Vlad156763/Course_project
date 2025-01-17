@@ -32,7 +32,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
             "algoritms.png"
         };
         for (int i = 0; i < 19; i++) {
-            if (QIcon("Images/"+ photoNames[i]).isNull()) {
+            if (QIcon("Images/" + photoNames[i]).isNull()) {
                 throw ex(2);
             }
         }
@@ -79,7 +79,7 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
 
         //викликаю методи для роботи з віджетом інструментів
         leftSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout);
-        rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout, 
+        rightSideToolsWidget(mainWindowToolsWidget, mainWindowToolsLayout,
             *mainWindowToolsWidget, *mainWindownMainAreaLayout, *mainWindowMainAreaWidget, arrayStudentBlock);
         ToolsMiddleWidget(mainWindowToolsWidget, mainWindowToolsLayout, arrayStudentBlock);
 
@@ -158,17 +158,17 @@ MainWindow_C::MainWindow_C(QWidget* parent) : QWidget(parent) {
             layout->addWidget(button, 1, 1, 1, 2, Qt::AlignRight);
             this->setFixedHeight(100);
             this->show();
-        };
+            };
         if (error.getErrorCode() == 1) {
             showErrorDialog("Перевстановіть програму!\nКаталог з фото незнайдено!");
         }
         else if (error.getErrorCode() == 2) {
             showErrorDialog("Перевстановіть програму!\nДеякі фото пошкоджені або видалені!");
-        }  
-    }  
+        }
+    }
 }
 MainWindow_C::~MainWindow_C() {
-this->close();
+    this->close();
 }
 
 void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentLayout, StudentBlock& arrayStudentBlock) {
@@ -306,12 +306,12 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
                 buttonLayout->addWidget(Group, 1, 0, Qt::AlignLeft);
                 mainLayout->setAlignment(Qt::AlignTop);
                 mainLayout->addWidget(button, i, 0, Qt::AlignTop);
-                connect(button, &QPushButton::released, [&StudyName, &GroupName, &arrayStudentBlock, i, &preesedInButton,&windowForChoicePredmet]() {
+                connect(button, &QPushButton::released, [&StudyName, &GroupName, &arrayStudentBlock, i, &preesedInButton, &windowForChoicePredmet]() {
                     StudyName = arrayStudentBlock.getStudentsBuffer()[i]->getStudFullName();
                     GroupName = arrayStudentBlock.getStudentsBuffer()[i]->getStudGroup();
                     preesedInButton = true;
                     windowForChoicePredmet->accept();
-                });
+                    });
             }
 
             areaLayout->addWidget(wScroll);
@@ -322,8 +322,8 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
             arrayStudentBlock.filterByCriteria("", "", GroupName, StudyName);
             QWidget* PredmetBox;
             blockWidget* tmp = new blockWidget(mainWindowToolsMiddle);
-            QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName,&PredmetBox, arrayStudentBlock);
-            configBlock *block = new configBlock(this);
+            QDialog* dialog = tmp->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox, arrayStudentBlock);
+            configBlock* block = new configBlock(this);
             block->setWidget(PredmetBox);
             block->setLayout(PredmetBox->layout());
             block->setConfigPredmetBlock(
@@ -366,14 +366,14 @@ void MainWindow_C::ToolsMiddleWidget(QWidget* parentWidget, QGridLayout* parentL
             else if (error.getErrorCode() == 1) {
                 TextInLineEditIsWrong(" Студента не знайдено!");
             }
-        }  
-    });
+        }
+        });
     iconSearch->setPixmap(QPixmap("Images/searchIcon.png").scaled(40, 40, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
     mainWindowToolsMiddleLayout->addWidget(iconSearch, 0, 0);
     mainWindowToolsMiddleLayout->addWidget(lineEdit, 0, 1);
 }
-void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout)  {
+void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout) {
     //віджет і компоновщик
     QWidget* mainWindowToolsLeftWidget = new QWidget(parentWidget); mainWindowToolsLeftWidget->setObjectName("mainWindowToolsLeftWidget");
     QGridLayout* mainWindowToolsLeftLayout = new QGridLayout(mainWindowToolsLeftWidget);
@@ -431,7 +431,7 @@ void MainWindow_C::leftSideToolsWidget(QWidget* parentWidget, QGridLayout* paren
 
     parentLayout->addWidget(mainWindowToolsLeftWidget, 0, 0); //додаю до компоновщика інструментів віджет з кнопками
 }
-void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout, QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock)  {
+void MainWindow_C::rightSideToolsWidget(QWidget* parentWidget, QGridLayout* parentLayout, QWidget& mainWindowToolsWidget, QGridLayout& mainWindownMainAreaLayout, QWidget& mainWindowMainAreaWidget, StudentBlock& arrayStudentBlock) {
     //віджет і компоновщик
     QWidget* mainWindowToolsRightWidget = new QWidget(parentWidget); mainWindowToolsRightWidget->setObjectName("mainWindowToolsRightWidget");
     QGridLayout* mainWindowToolsRightLayout = new QGridLayout(mainWindowToolsRightWidget);
@@ -488,8 +488,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
                 "}"
             ).arg(string)
         );
-       
-    };
+
+        };
 
 
 
@@ -519,7 +519,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QGridLayout* MiddleSideLayout = new QGridLayout(MiddleSide);
     QGridLayout* RightSideLayout = new QGridLayout(RightSide);
     //HERE: зчитування всіх: спеціальностей, факультетів, груп, студентів, предметів, з БД і запис у масиви класу sortBlock
-   
+
     static counterTimer TimersCounter;
     QSqlDatabase db = QSqlDatabase::database();
     QSqlQuery query(db);
@@ -527,10 +527,10 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     QStringList specialties = initializeSpecialties(query);
     QVector <QVector<QString>> faculties = initializeFaculties(query);
     QVector <QVector<QString>> classGroups = initializeClassGroups(query);
-    QVector<student> students =  initializeStudents___(query);
-     /*
-    [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
-    */
+    QVector<student> students = initializeStudents___(query);
+    /*
+   [EDIT]Додано масив студентів для перевірки роботи інтерфейсу
+   */
 
     arrayStudentBlock.clearAllData(); //треба щоб при повторному запуску програми у СД не було данних
     for (int i = 0; i < specialties.size(); i++) {
@@ -556,28 +556,28 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             )
         );
     }
-    
-   /* arrayStudentBlock.addSpecialty("Просто тестік");
-    arrayStudentBlock.addSpecialty("Просто тестовий");
-    arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
-    arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
-    arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
-    arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
-    arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
-    arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
-   arrayStudentBlock.addStudent (
-        StudInfo(
-            "ГАЙЛУНЬ", "Просто тестік", "223 тестовий", "КНТ тестовий",
-            QVector<SubjectInfo>{
-                SubjectInfo("OOP", { "1", "2" , "2309483" }),
-                SubjectInfo("АТАСД", {"0", "1", "2039402"})
-            }
-        )
-    );*/
+
+    /* arrayStudentBlock.addSpecialty("Просто тестік");
+     arrayStudentBlock.addSpecialty("Просто тестовий");
+     arrayStudentBlock.addFaculty("Просто тестік", "КНТ");
+     arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий2132");
+     arrayStudentBlock.addFaculty("Просто тестік", "КНТ тестовий");
+     arrayStudentBlock.addGroup("Просто тестік", "КНТ", "223");
+     arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий");
+     arrayStudentBlock.addGroup("Просто тестік", "КНТ тестовий", "223 тестовий але інший");
+    arrayStudentBlock.addStudent (
+         StudInfo(
+             "ГАЙЛУНЬ", "Просто тестік", "223 тестовий", "КНТ тестовий",
+             QVector<SubjectInfo>{
+                 SubjectInfo("OOP", { "1", "2" , "2309483" }),
+                 SubjectInfo("АТАСД", {"0", "1", "2039402"})
+             }
+         )
+     );*/
 
     arrayStudentBlock.filterBySpec();
     //підключення натиску на спеціальність для факульетів
-    configBlock * block = new configBlock(this);
+    configBlock* block = new configBlock(this);
     block->setAttribute(Qt::WA_DeleteOnClose);
     block->setWidget(LeftSide);
     block->setLayout(LeftSideLayout);
@@ -588,7 +588,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         /*
         [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
         */
-        
+
         if ((counter) >= arrayStudentBlock.getSpecBuffer().size()) { counter = 0; return true; }
         QString SpecialtyName = *arrayStudentBlock.getSpecBuffer()[counter++];
         if (SpecialtyName.isEmpty()) {
@@ -607,8 +607,8 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         };
     block->setConfigBlock(
         Lafunctext,
-        mainWedgetTools, 
-        TimersCounter, 
+        mainWedgetTools,
+        TimersCounter,
         "Cпеціальності",
         &arrayStudentBlock
     );
@@ -620,24 +620,24 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
     blockk->setLayout(MiddleSideLayout);
     blockk->setConfigBlock(
         [this, &mainWedgetTools, MiddleSide, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        //HERE: відбувається поступове отримання всіх груп із об'єкта SandSBlocks за допомогою counter            
-        static int counter = 0;
-        /*
-        [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
-        */
-        if ((counter) >= arrayStudentBlock.getGroupBuffer().size()) { counter = 0; return true; }
-        QString GroupName = arrayStudentBlock.getGroupBuffer()[counter++]->getGroupName();
-        if (GroupName.isEmpty()) {
-            return false;
-        }
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            //HERE: відбувається поступове отримання всіх груп із об'єкта SandSBlocks за допомогою counter            
+            static int counter = 0;
+            /*
+            [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
+            */
+            if ((counter) >= arrayStudentBlock.getGroupBuffer().size()) { counter = 0; return true; }
+            QString GroupName = arrayStudentBlock.getGroupBuffer()[counter++]->getGroupName();
+            if (GroupName.isEmpty()) {
+                return false;
+            }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////////
-        blockWidget* block = new blockWidget(GroupName, widget);
-        connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, GroupName, &arrayStudentBlock]() { block->GroupButtonPressed(TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", "", arrayStudentBlock); });
-        block->AddStructure();
-        layout->addWidget(block, counter, 0);
-        return false;
+            ///////////////////////////////////////////////////////////////////////////////////////////////////
+            blockWidget* block = new blockWidget(GroupName, widget);
+            connect(block, &QPushButton::released, [this, &mainWedgetTools, block, MiddleSide, GroupName, &arrayStudentBlock]() { block->GroupButtonPressed(TimersCounter, mainWedgetTools, MiddleSide, GroupName, "", "", arrayStudentBlock); });
+            block->AddStructure();
+            layout->addWidget(block, counter, 0);
+            return false;
         },
         mainWedgetTools,
         TimersCounter,
@@ -654,7 +654,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
         [this, &mainWedgetTools, MiddleSide, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
             ///////////////////////////////////////////////////////////////////////////////////////////////////
             //HERE: відбувається поступове отримання всіх факультетів із об'єкта SandSBlocks за допомогою counter            
-           
+
             static int counter = 0;
             /*
             [EDIT]Додано зчититування із структури данних спеціальність для відображення у блоках
@@ -671,7 +671,7 @@ void MainWindow_C::mainWidgetArea(QWidget* parent, QGridLayout* parent_grid, QWi
             block->AddStructure();
             layout->addWidget(block, counter, 0);
             return false;
-        }, 
+        },
         mainWedgetTools,
         TimersCounter,
         "Факультети"
@@ -747,20 +747,20 @@ void MainWindow_C::AboutUsButtonPressed() {
             "}"
         );
 
-        ButtonNavigateLeft->setFixedSize(40,40);
-        ButtonNavigateLright->setFixedSize(40,40);
-        ButtonNavigateLeft->setIconSize(QSize(25,25));
-        ButtonNavigateLright->setIconSize(QSize(25,25));
+        ButtonNavigateLeft->setFixedSize(40, 40);
+        ButtonNavigateLright->setFixedSize(40, 40);
+        ButtonNavigateLeft->setIconSize(QSize(25, 25));
+        ButtonNavigateLright->setIconSize(QSize(25, 25));
 
         if (
             QIcon("Images/arrowL.png").isNull() ||
             QIcon("Images/arrowR.png").isNull() ||
             QIcon("Images/photo_Gaulun.jpg").isNull() ||
-            QIcon("Images/vladMamont.jpg").isNull() || 
+            QIcon("Images/vladMamont.jpg").isNull() ||
             QIcon("Images/IvanBondarenko.jpg").isNull() ||
-            QIcon("Images/sashaTretiak.jpg").isNull() || 
+            QIcon("Images/sashaTretiak.jpg").isNull() ||
             QIcon("Images/RodionShevchenko.jpg").isNull() ||
-            QIcon("Images/arrowL.png").isNull()  ||
+            QIcon("Images/arrowL.png").isNull() ||
             QIcon("Images/arrowR.png").isNull() ||
             QIcon("Images/photo_Gaulun.jpg").isNull() ||
             QIcon("Images/vladMamont.jpg").isNull() ||
@@ -769,7 +769,7 @@ void MainWindow_C::AboutUsButtonPressed() {
             throw ex(2);
         }
 
-       
+
         ButtonNavigateLeft->setIcon(QIcon("Images/arrowL.png"));
         ButtonNavigateLright->setIcon(QIcon("Images/arrowR.png"));
 
@@ -805,9 +805,9 @@ void MainWindow_C::AboutUsButtonPressed() {
         PaginationLayout->addWidget(classR, 0, 1);
 
 
-        
+
         PaginationLayout->addWidget(ButtonNavigateLeft, 0, 0, Qt::AlignRight);
-        
+
         PaginationLayout->addWidget(ButtonNavigateLright, 0, 2, Qt::AlignLeft);
 
         auto showDev = [this, Body, bodyLayout, &PaginationLayout, &ui, &algoritms, &DataBase, &excep, &classR](int& currentDevelopVar) {
@@ -918,10 +918,10 @@ void MainWindow_C::AboutUsButtonPressed() {
             dialogEW("Перевстановіть програму!\nДеякі фото пошкоджені або видалені!", "Помилка", QStyle::SP_MessageBoxCritical);
         }
     }
-   
+
 }
 //загальне вікно для виведення інформації про нас
-void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, const QString& responsible, const QString& linkToGit, QWidget* Body, QGridLayout* bodyLayout)  {
+void MainWindow_C::showWindowAboutUs(const QString& path, const QString& name, const QString& responsible, const QString& linkToGit, QWidget* Body, QGridLayout* bodyLayout) {
     QString styleForWidget =
         "#Body {"
         "   background-color: rgb(90,90,90);"
@@ -961,11 +961,11 @@ void MainWindow_C::showWindowAboutUs( const QString& path, const QString& name, 
     );
     textLink->setOpenExternalLinks(true); //відкриття зовнішніх посилань
     //налаштовую фото
-    
+
     QLabel* photoLabel = new QLabel(Body);  photoLabel->setObjectName("photoLabel");
     photoLabel->setPixmap(QPixmap(path).scaled(320, 320, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     photoLabel->setAlignment(Qt::AlignCenter);
-   
+
     photoLabel->setObjectName("photoLabel");
     photoLabel->setStyleSheet(
         "#photoLabel {"
@@ -1013,7 +1013,7 @@ void MainWindow_C::HelpButtonPressed() {
     MainText->setText(
         "<html>"
         "   <body>"
-        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"  
+        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"
         "           Зараз ми вам допоможемо!"
         "       </div>"
         "       <hr>"
@@ -1030,7 +1030,7 @@ void MainWindow_C::HelpButtonPressed() {
         "           Цей додаток був розроблений в цілях структурувати оцінки студентів у одне місце, а також полегшити взаємодію з ними."
         "       </div>"
         "       <div style = 'font-size: 18px; color: #ffffff; font-weight: bold;'>"
-        "       Як користуватись?"  
+        "       Як користуватись?"
         "       </div>"
         "       <ol>"
         "           <li>"
@@ -1039,7 +1039,7 @@ void MainWindow_C::HelpButtonPressed() {
         "               </div>"
         "               <div style = 'font-size: 14px; color: #ffffff;'>"
         "                   Поточне вікно зустрічає вас 2-ма частинами <i>верхньою </i> та <i>нижньою</i> які візуально поділені на 3 підчастини кожна."
-        "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою, знайти студента та перейти до налаштувань." 
+        "                   <br><u>Верхня частина</u> - відповідає за керування, тут можна: переглянути розробликів, відкрити вікно з допомогою, знайти студента та перейти до налаштувань."
         "                   <br>Пошук Студента відбувається за ПІБ. Вказавши ПІБ відкриється вікно з вибором студента в групі де можна обрати відповідного студента."
         "                   <br><u>Нижня частина</u>- відповідає за навігацію та пошук студента вручну натискаючи на <i>блоки</i>. "
         "                   <br><u>Блоки</u> - це кнопки, які допомагають знайти оцінки студента. "
@@ -1047,7 +1047,7 @@ void MainWindow_C::HelpButtonPressed() {
         "                   <br><u>Центральний віджет блоків</u> - відповідає одразу за групи, та за студентів. Одразу Вам буде видно тільки групи, так щоб отримати блоки із студентами треба зробити *клік* "
         "                   по блоку з групою. Після цього у Вас з'явиться доступ до студентів які є у групі. Натиснувши на будь-який блок із студентом ви відкриєте вікно з <i>предметами студента </i>."
         "                   <br><u>Правий віджет блоків</u> - у цьому віджеті ви можете обрати певний факультет щоб зменшити пошуки груп та студентів.<br>"
-      
+
         "               </div>"
         "           </li>"
         "           <li>"
@@ -1063,7 +1063,7 @@ void MainWindow_C::HelpButtonPressed() {
         "                   Вікно (Про нас)"
         "               </div>"
         "               <div  style = 'font-size: 14px; color: #ffffff;'>"
-        "                   Це вікно призначене для перегляду розробників, їх акаунтів на Github, фото яке розробники бажали вставити, а також хто за що був відповідальний.<br>"  
+        "                   Це вікно призначене для перегляду розробників, їх акаунтів на Github, фото яке розробники бажали вставити, а також хто за що був відповідальний.<br>"
         "                   Для навігації використовуйте пагінацію яка розташована знизу (стрілочки вліво-вправо) щоб переглядати всіх розробників.<br>"
         "               </div>"
         "           </li>"
@@ -1084,7 +1084,7 @@ void MainWindow_C::HelpButtonPressed() {
         "                   Вікно зустріне вас 8-ма кнопками, які додають студетів/групи/факультети і тд. (Після натиску на будь-яку кнопку з цього меню Вам буде надано поле для введеня "
         "                   і підказака що саме треба ввести у поле. Якщо ви спробуєте одразу зберегти (нічого не написавши у поле/поля буде попередження. Якщо поле міститиме символи, які не були перелічені \"пошуку\" буде попередження. Якщо ви додасте спеціальність/факультет/групу і тд. "
         "                   яка вам більше не потрібна, ви можете її в будь-який час видалити за допомогою відповідних кнопок. "
-        "                   Якщо ви заповнили поля для додавання/видалення і натиснули збереги (або видалити) то у правому нижньому куту екрану з'явиться повідомлення про це."  
+        "                   Якщо ви заповнили поля для додавання/видалення і натиснули збереги (або видалити) то у правому нижньому куту екрану з'явиться повідомлення про це."
         "               </div>"
         "           </li>"
         "           <li>"
@@ -1107,7 +1107,7 @@ void MainWindow_C::HelpButtonPressed() {
         "           </li>"
         "       </ol>"
         "       <hr>"
-        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"  
+        "       <div style='text-align: center; font-size: 20px; color: #ffffff; font-weight: bold;'>"
         "           Бажаємо приємного користування!"
         "       </div>"
         "   </body>"
@@ -1117,7 +1117,7 @@ void MainWindow_C::HelpButtonPressed() {
 
 
     MainText->setStyleSheet(
-        "#MainText {" 
+        "#MainText {"
         "   background-color: transparent;"
         "   padding: 10px;"
         "}"
@@ -1251,7 +1251,7 @@ void MainWindow_C::setingsButtonPressed(QWidget& mainWindowToolsWidget, QGridLay
     DeleteGroup->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     DeleteStudent->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     //слоти для обробки сигналів натиску на кнопки "додати"
-    connect(AddStudent, &QPushButton::released, 
+    connect(AddStudent, &QPushButton::released,
         [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
         {AddStudentButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
     connect(AddGroup, &QPushButton::released,
@@ -1276,7 +1276,7 @@ void MainWindow_C::setingsButtonPressed(QWidget& mainWindowToolsWidget, QGridLay
     connect(DeleteSpecialty, &QPushButton::released,
         [this, &mainWindowToolsWidget, &mainWindownMainAreaLayout, &mainWindowMainAreaWidget, &arrayStudentBlock, &settingsWidget]()
         {DeleteSpecialtyButtonPressed(mainWindowToolsWidget, mainWindownMainAreaLayout, mainWindowMainAreaWidget, arrayStudentBlock, *settingsWidget); });
-    
+
     //додавання кнопок у головний компоновщик
     settingsLayout->addWidget(AddSpecialty, 0, 0, 1, 1);
     settingsLayout->addWidget(AddFaculty, 1, 0, 1, 1);
@@ -1659,12 +1659,12 @@ void MainWindow_C::SaveButtonFor_AllType(QDialog* dialog, const QString& text, c
         iconLabel->setAttribute(Qt::WA_DeleteOnClose);
         WarningDialog warning(dialog, error.getErrorMsg(), "Попередження", "Images/warning.png", iconLabel, "Ок");
         warning.show();
-    };
+        };
     // Перевірка полів за допомогою ітератора
     // Перевіряємо, чи є діти
     for (const QString& fieldName : fieldNames) { //проходжусь по кожній комірці списку 
         QLineEdit* lineEdit = dialog->findChild<QLineEdit*>(fieldName);
-        
+
         if (lineEdit == nullptr || lineEdit->text().isEmpty()) { //якщо дитина з такою унікальною назовю знайдена і пуста - попередження
             QLabel* iconLabel = new QLabel();
             iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
@@ -1719,7 +1719,7 @@ void MainWindow_C::WindowAdd_and_Delete_All_Type(QDialog* dialog, const QString&
         layout->addWidget(lineEdit, i, 1);
     }
     QPushButton* saveButton = new QPushButton(textButton, dialog); saveButton->setObjectName("saveButton");
-    
+
     dialog->setStyleSheet(
         "#dialog {"
         "   background-color: rgb(30,30,30);"
@@ -1778,7 +1778,7 @@ void SmallMessage_C::show(const QString& text, const QString& color, QGridLayout
     connect(timer, &QTimer::timeout, [label]() { label->deleteLater();  });
     //таймер для запуску один раз
     timer->setSingleShot(true);
-    timer->start(millsecoond); 
+    timer->start(millsecoond);
 }
 WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString& titleText, const QString& wayIconTitle, QLabel* IconMsg, const QString& textButton) : QDialog(parent) {
     QGridLayout* layout = new QGridLayout(this);
@@ -1808,7 +1808,7 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
     );
     //кнопка
     QPushButton* button = new QPushButton(textButton, this);
-     button->setObjectName("button");
+    button->setObjectName("button");
     button->setStyleSheet(
         "#button {"
         "   color: rgb(255,255,255);"
@@ -1820,7 +1820,7 @@ WarningDialog::WarningDialog(QWidget* parent, const QString& msg, const QString&
     );
     button->setFixedSize(75, 25);
     connect(button, &QPushButton::released, [this]() {
-            this->accept();
+        this->accept();
         }
     );
     //додаю віджети у сітку
@@ -1849,9 +1849,9 @@ void smartTextBase::resizeEvent(QResizeEvent* event) {
 
 blockWidget::circleQWidget::circleQWidget(QWidget* parent) : QWidget(parent) {}
 void blockWidget::circleQWidget::SetCoordinats(const int& x, const int& y) {
-        this->x = x;
-        this->y = y;
-    }
+    this->x = x;
+    this->y = y;
+}
 void blockWidget::circleQWidget::SetSizeCircle(const int& r1, const int& r2) {
     this->r1 = r1;
     this->r2 = r2;
@@ -1871,7 +1871,7 @@ void blockWidget::circleQWidget::SetChar(const QChar& symbol) {
         "   font-size: 20px;"
         "   font-weight: bold;"
         "}"
-    ); 
+    );
     layout->setAlignment(Qt::AlignCenter);
     layout->addWidget(text);
 }
@@ -1951,7 +1951,7 @@ QColor blockWidget::generateColorFromString(const QString& input) {
     }
     return QColor::fromHsl(hue, saturation, lightness);
 }
-void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName, StudentBlock& arrayStudentBlock)  {
+void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* RightSide, QWidget* MiddleSide, const QString& SpecialtyName, StudentBlock& arrayStudentBlock) {
     cqdout << "specialtyButtonPressed" << '(' << SpecialtyName << ')' << "(None)" << "(None)" << "(None)" << "(None)";
     static QPointer<blockWidget> prevPressedButton = nullptr;
     if (prevPressedButton && prevPressedButton != this) {
@@ -1988,7 +1988,7 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
     );
     prevPressedButton = this;
     arrayStudentBlock.filterByFac(SpecialtyName);
-    configBlock *block = new configBlock(this);
+    configBlock* block = new configBlock(this);
     block->setAttribute(Qt::WA_DeleteOnClose);
     block->setWidget(RightSide);
     block->setLayout(RightSide->layout());
@@ -2014,8 +2014,8 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             block->AddStructure();
             layout->addWidget(block, counter, 0);
             return false;
-        }, 
-        mainWedgetTools, 
+        },
+        mainWedgetTools,
         counterTimers,
         "Факультети"
     );
@@ -2040,13 +2040,13 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
             block->AddStructure();
             layout->addWidget(block, counter, 0);
             return false;
-        }, 
-        mainWedgetTools, 
+        },
+        mainWedgetTools,
         counterTimers,
         "Групи"
     );
 }
- void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, StudentBlock& arrayStudentBlock) {
+void blockWidget::GroupButtonPressed(counterTimer& counterTimers, QWidget& mainWedgetTools, QWidget* widget, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, StudentBlock& arrayStudentBlock) {
     cqdout << "GroupButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << "(None)" << "(None)";
     configBlock* block = new configBlock(widget);
     block->setAttribute(Qt::WA_DeleteOnClose);
@@ -2080,10 +2080,10 @@ void blockWidget::specialtyButtonPressed(counterTimer& counterTimers, QWidget& m
 
 void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, StudentBlock& arrayStudentBlock, QWidget* PredmetBoxPrev, QDialog* PrevDialog, QGridLayout* PrevLayout) {
     cqdout << "StudyButtonPressed" << '(' << SpecialtyName << ')' << '(' << FacultyName << ')' << '(' << GroupName << ')' << '(' << StudyName << ')';
-    QWidget*PredmetBox;
+    QWidget* PredmetBox;
     QDialog* dialog = this->setDialogForPredmet(StudyName, GroupName, FacultyName, SpecialtyName, &PredmetBox, arrayStudentBlock);
 
-    configBlock *block = new configBlock(this);
+    configBlock* block = new configBlock(this);
     block->setAttribute(Qt::WA_DeleteOnClose);
     arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
     block->setWidget(PredmetBox);
@@ -2103,7 +2103,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
             blockWidget* block = new blockWidget(PredmetName, PredmetBox);
             connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, &arrayStudentBlock]() {
                 this->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, arrayStudentBlock);
-            });
+                });
 
             block->AddStructure();
             layout->addWidget(block, counter, 0);
@@ -2112,7 +2112,7 @@ void blockWidget::StudyButtonPressed(const QString& StudyName, const QString& Gr
         PredmetBox,
         "Предмети"
     );
-    dialog->exec();    
+    dialog->exec();
 }
 QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QString& GroupName, const QString& FacultyName, const QString& SpecialtyName, QWidget** PredmetBoxM, StudentBlock& arrayStudentBlock) {
     QDialog* settingsWidget = new QDialog(); settingsWidget->setObjectName("settingsWidget");
@@ -2174,7 +2174,8 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                 WarningDialog warning(dialog, "Заповніть всі поля!", "Попередження", "Images/warning.png", iconLabel, "Ок");
                 warning.show();
 
-            } else if (!is_correct(line)) {
+            }
+            else if (!is_correct(line)) {
                 QLabel* iconLabel = new QLabel();
                 iconLabel->setPixmap(this->style()->standardIcon(QStyle::SP_MessageBoxWarning).pixmap(40, 40));
                 iconLabel->setAttribute(Qt::WA_DeleteOnClose);
@@ -2188,44 +2189,44 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
        // todo: додати предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
                 try {
 
-                if (textButton == "Додати") {
-                    QSqlDatabase db = QSqlDatabase::database();
-                    QSqlQuery query(db);
-                    int studentId = -1;
+                    if (textButton == "Додати") {
+                        QSqlDatabase db = QSqlDatabase::database();
+                        QSqlQuery query(db);
+                        int studentId = -1;
 
-                    // Запрос на отримання студента
-                    studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
+                        // Запрос на отримання студента
+                        studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
 
-                    if (studentId != -1) {
-                        addSubject(query, PredmetName, studentId);
-                        arrayStudentBlock.addSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, {});
-                        cqdout << "Subject added successfully for student ID:" << studentId;
+                        if (studentId != -1) {
+                            addSubject(query, PredmetName, studentId);
+                            arrayStudentBlock.addSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, {});
+                            cqdout << "Subject added successfully for student ID:" << studentId;
+                        }
+                        else {
+                            cqdout << "Failed to add subject. No matching student found.";
+                            throw ex(-1, "Студента не знайдено!");
+                        }
                     }
                     else {
-                        cqdout << "Failed to add subject. No matching student found.";
-                        throw ex(-1, "Студента не знайдено!");
-                    }
-                }
-                else {
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////
-       // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
-                    QSqlDatabase db = QSqlDatabase::database();
-                    QSqlQuery query(db);
-                    int studentId = -1;
+                        ///////////////////////////////////////////////////////////////////////////////////////////////////
+           // todo: видалити предмет до БД SpecialtyName, FacultyName, GroupName, StudyName, PredmetName 
+                        QSqlDatabase db = QSqlDatabase::database();
+                        QSqlQuery query(db);
+                        int studentId = -1;
 
-                    // Запрос на отримання студента
-                    studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
+                        // Запрос на отримання студента
+                        studentId = getStudentIDforPredmet(query, StudyName, studentId, SpecialtyName, FacultyName, GroupName);
 
-                    if (studentId != -1) {
-                        DeleteSubject(query, PredmetName, studentId);
-                        arrayStudentBlock.removeSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
-                        cqdout << "Subject deleted successfully for student ID:" << studentId;
+                        if (studentId != -1) {
+                            DeleteSubject(query, PredmetName, studentId);
+                            arrayStudentBlock.removeSubject(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName);
+                            cqdout << "Subject deleted successfully for student ID:" << studentId;
+                        }
+                        else {
+                            cqdout << "Failed to delete subject. No matching student found.";
+                            throw ex(-1, "Студента не знайдено!");
+                        }
                     }
-                    else {
-                        cqdout << "Failed to delete subject. No matching student found.";
-                        throw ex(-1, "Студента не знайдено!");
-                    }
-                }
                 }
                 catch (const ex& error) {
                     QLabel* iconLabel = new QLabel();
@@ -2246,14 +2247,14 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                 block->setWidget(PredmetBox);
                 block->setLayout(PredmetBox->layout());
                 block->setConfigPredmetBlock(
-                    [PredmetBox,SpecialtyName, FacultyName, GroupName, StudyName, this, &PredmetBoxM, block, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
+                    [PredmetBox, SpecialtyName, FacultyName, GroupName, StudyName, this, &PredmetBoxM, block, &arrayStudentBlock](QGridLayout* layout, QWidget* widget)->bool {
                         ///////////////////////////////////////////////////////////////////////////////////////////////////
                         //HERE: відбувається поступове отримання предметів за спеціальністю, факульетом, групою, Піб студента (значення спеціальність, факультет можуть бути пусті) із об'єкта SandSBlocks за допомогою counter            
                         static int counter = 0;
                         if ((counter) >= arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects().size()) { counter = 0;  return true; }
                         QString PredmetName = arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[counter++].getSubject();
                         if (PredmetName.isEmpty()) {
-                
+
                             return false;
                         }
                         ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2261,7 +2262,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                         connect(block, &QPushButton::released, [this, SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, &arrayStudentBlock]() {
                             this->PredmetButtonPressed(SpecialtyName, FacultyName, GroupName, StudyName, PredmetName, arrayStudentBlock);
                             });
-                
+
                         block->AddStructure();
                         layout->addWidget(block, counter, 0);
                         return false;
@@ -2316,9 +2317,9 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         };
     QObject::connect(addPredmet, &QPushButton::released, [WindowAddAndDelPredmet, SpecialtyName, FacultyName, GroupName, StudyName]() {
         QString PredmetName;
-        
+
         WindowAddAndDelPredmet("Додати предмет", "Додати предмет:", "Додати", PredmetName, "Успішно додано!", "8, 82, 79");
-       
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         cqdout << SpecialtyName << ", " << FacultyName << ", " << GroupName << ", " << StudyName << ", " << PredmetName;
         });
@@ -2326,7 +2327,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
         QString PredmetName;
 
         WindowAddAndDelPredmet("Видалити предмет", "Видалити предмет:", "Видалити", PredmetName, "Успішно видалено!", "169, 38, 38");
-       
+
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         });
 
@@ -2417,7 +2418,7 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
         "   background-color: rgb(60,60,60);"
         "}"
     );
-    Edit->setReadOnly(false); 
+    Edit->setReadOnly(false);
 
     EvalLayout->addWidget(Edit);
     QWidget* SaveButtonWidget = new QWidget(dialog); SaveButtonWidget->setObjectName("SaveButtonWidget");
@@ -2490,8 +2491,8 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
     //для прикладу запишу уже в рядок для редагування трохи чисел
 
     arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudentName, PredmetName);
-    
-    for (int i = 0;true; i++) {
+
+    for (int i = 0; true; i++) {
         if (arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[i].getSubject() == PredmetName) {
             for (int j = 0; j < arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[i].getGrades().size(); j++) {
                 Edit->insertPlainText(arrayStudentBlock.getStudentsBuffer()[0]->getStudSubjects()[i].getGrades()[j] + " ");
@@ -2554,7 +2555,7 @@ void blockWidget::PredmetButtonPressed(const QString& SpecialtyName, const QStri
                 }
             }
         }
-        
+
         cqdout << numbers; //оцінки певного студента
         ///////////////////////////////////////////////////////////////////////////////////////////////////
         dialog->accept();
@@ -2605,7 +2606,7 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mai
     );
     prevPressedButton = this;
     arrayStudentBlock.filterByGroup(SpecialtyName, FacultyName);
-    configBlock *block = new configBlock(this);
+    configBlock* block = new configBlock(this);
     block->setAttribute(Qt::WA_DeleteOnClose);
     block->setWidget(MiddleSide);
     block->setLayout(MiddleSide->layout());
@@ -2626,7 +2627,7 @@ void blockWidget::FacultyButtonPressed(counterTimer& counterTimers, QWidget& mai
             block->AddStructure();
             layout->addWidget(block, counter, 0);
             return false;
-        }, 
+        },
         mainWedgetTools,
         counterTimers,
         "Групи"
@@ -2636,7 +2637,7 @@ configBlock::configBlock(QWidget* parent) : QWidget(parent) {}
 void configBlock::setWidget(QWidget* widget) {
     this->widget = widget;
 }
-void configBlock::setLayout(QLayout* layout ) {
+void configBlock::setLayout(QLayout* layout) {
     this->layout = layout;
 }
 
@@ -2662,7 +2663,7 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
     //віджет зверху щоб додати текст і кнопку сортування
     QWidget* WidgetTop = new QWidget(WidgetCapasity); WidgetTop->setObjectName("WidgetTop");
     WidgetTop->setFixedHeight(50);
-    QHBoxLayout* LayoutTop = new QHBoxLayout(WidgetTop); 
+    QHBoxLayout* LayoutTop = new QHBoxLayout(WidgetTop);
     LayoutTop->setSpacing(10);
     LayoutTop->setContentsMargins(10, 5, 10, 5);
     QLabel* TextTop = new QLabel(textTitle, WidgetTop); TextTop->setObjectName("TextTop");
@@ -2679,11 +2680,11 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
         "   color: #ffffff;"
         "}"
     );
-    
+
     TextTop->setAlignment(Qt::AlignCenter);
 
     LayoutTop->addWidget(TextTop, 0);
-    
+
     this->layout->addWidget(WidgetTop);
     this->layout->addWidget(WidgetScroll);
 
@@ -2705,17 +2706,17 @@ void configBlock::setConfigBlock(LaFunc workDB, QWidget& mainWedgetTools, counte
     // Підключення таймера до функції
     QObject::connect(timer, &QTimer::timeout,
         [&counterTimers, &mainWedgetTools, timer, WidgetCapasity, gif, gifLoad, LayoutCapasity, workDB]() mutable {
-             if (workDB(LayoutCapasity, WidgetCapasity)) {
+            if (workDB(LayoutCapasity, WidgetCapasity)) {
                 QTimer::singleShot(500, [&mainWedgetTools, &counterTimers, &gif, &gifLoad]() {
                     gif->stop();
                     gif->deleteLater();
                     gifLoad->deleteLater();
-                    counterTimers--; 
+                    counterTimers--;
                     QApplication::restoreOverrideCursor(); // Відновлення стандартного курсора
                     if (counterTimers.get() == 0) {
                         mainWedgetTools.setEnabled(true);  // Розблокування вікна                        
                     }
-                });
+                    });
                 timer->stop();
             }
         }
@@ -2793,7 +2794,7 @@ void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools,
         "   color: #ffffff;"
         "}"
     );
-  
+
     TextTop->setAlignment(Qt::AlignCenter);
 
     LayoutTop->addWidget(TextTop, 0);
@@ -2817,7 +2818,7 @@ void configBlock::setConfigPredmetBlock(LaFunc workDB, QWidget* mainWedgetTools,
     QApplication::setOverrideCursor(Qt::BusyCursor);
     // Підключення таймера до функції
     QObject::connect(timer, &QTimer::timeout,
-        [ mainWedgetTools, timer, WidgetCapasity, gif, gifLoad, LayoutCapasity, workDB]() mutable {
+        [mainWedgetTools, timer, WidgetCapasity, gif, gifLoad, LayoutCapasity, workDB]() mutable {
             if (workDB(LayoutCapasity, WidgetCapasity)) {
                 QTimer::singleShot(500, [&mainWedgetTools, &gif, &gifLoad]() {
                     gif->stop();

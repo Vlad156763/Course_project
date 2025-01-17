@@ -281,11 +281,11 @@ void StudentBlock::filterByCriteria(
             }
             if (!subjectFound) continue; // Якщо предмет не знайдено, пропускаємо
         }
-       
+
         // Додаємо студента до буферу
         StudentsBuffer.append(&student);
     }
-    
+
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 
@@ -297,7 +297,7 @@ void StudentBlock::filterBySpec(const QString& specialty) {
         }
         SpecialtyBuffer.append(&entry);
     }
-    
+
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 
@@ -309,9 +309,9 @@ void StudentBlock::filterByFac(const QString& specialty, const QString& faculty)
             continue;
         }
         FacultyBuffer.append(&entry);
-        
+
     }
-    
+
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 
@@ -325,7 +325,7 @@ void StudentBlock::filterByGroup(const QString& specialty, const QString& facult
         }
         GroupBuffer.append(&entry);
     }
-    
+
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 
@@ -340,7 +340,7 @@ void StudentBlock::filterByName(const QString& specialty, const QString& faculty
         }
         NameBuffer.append(&entry);
     }
-    
+
     // Викликати сортування ось тут :) (на місці коментаря)
 }
 

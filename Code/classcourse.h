@@ -76,10 +76,10 @@ public:
     QString getGroupName() const { return GroupName; }
     QString getFullName() const { return FullNameString; }
 
-    void setSpecialty(const QString& Specialty)  {  this->Specialty = Specialty; }
-    void setFacultyName(const QString& FacultyName)  {  this->FacultyName = FacultyName; }
-    void setGroupName(const QString& GroupName)  {  this->GroupName = GroupName; }
-    void setFullName(const QString& FullNameString)  {  this->FullNameString = FullNameString; }
+    void setSpecialty(const QString& Specialty) { this->Specialty = Specialty; }
+    void setFacultyName(const QString& FacultyName) { this->FacultyName = FacultyName; }
+    void setGroupName(const QString& GroupName) { this->GroupName = GroupName; }
+    void setFullName(const QString& FullNameString) { this->FullNameString = FullNameString; }
 };
 
 class StudInfo {
@@ -145,7 +145,7 @@ public:
     // Геттери
     const QVector<StudInfo>& getStudents() const { return Students; }
     QVector<StudInfo>& getStudentsWConst() { return Students; }
-    
+
     void clearAllData() {
         this->Specialties.clear();
         this->Faculties.clear();
@@ -169,7 +169,7 @@ public:
     bool addGroup(const QString& specialty, const QString& faculty, const QString& group);
     bool addName(const QString& specialty, const QString& faculty, const QString& group, const QString& fullName);
     bool addSubject(const QString& specialty, const QString& faculty, const QString& group,
-                    const QString& fullName, const QString& subjectName, const QVector<QString>& grades);
+        const QString& fullName, const QString& subjectName, const QVector<QString>& grades);
     void addStudent(const StudInfo& student);
 
     // Видалення елементів
