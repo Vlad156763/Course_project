@@ -2246,6 +2246,7 @@ QDialog* blockWidget::setDialogForPredmet(const QString& StudyName, const QStrin
                 configBlock* block = new configBlock(this);
                 block->setAttribute(Qt::WA_DeleteOnClose);
                 arrayStudentBlock.filterByCriteria(SpecialtyName, FacultyName, GroupName, StudyName);
+                arrayStudentBlock.sortAllStudentsSubjects();
                 block->setWidget(PredmetBox);
                 block->setLayout(PredmetBox->layout());
                 block->setConfigPredmetBlock(
